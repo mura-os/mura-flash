@@ -11,6 +11,70 @@ import typescript from "@rollup/plugin-typescript";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const virtualCatalog = "virtual:mura-recipes";
 const resolvedVirtualCatalog = `\0${virtualCatalog}`;
+const virtualV1Targets = "virtual:mura-v1-targets";
+const virtualV1Procedures = "virtual:mura-v1-procedures";
+const virtualV1RawData = "virtual:mura-v1-raw-data";
+
+function jsonFiles(directory) {
+  if (!fs.existsSync(directory)) {
+    return [];
+  }
+  return fs
+    .readdirSync(directory, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+    .map((entry) => path.join(entry.parentPath, entry.name))
+    .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
+}
+
+function schemaDocuments(moduleId, directory, schema) {
+  const resolvedId = `\0${moduleId}`;
+  return {
+    name: moduleId.replaceAll(":", "-"),
+    resolveId(source) {
+      return source === moduleId ? resolvedId : null;
+    },
+    load(id) {
+      if (id !== resolvedId) {
+        return null;
+      }
+      const documents = jsonFiles(path.join(root, directory))
+        .map((name) => fs.readFileSync(name, "utf8"))
+        .filter((text) => {
+          try {
+            return JSON.parse(text).schema === schema;
+          } catch {
+            return false;
+          }
+        });
+      return `export default ${JSON.stringify(documents)};`;
+    },
+  };
+}
+
+function rawDocuments(moduleId, directories) {
+  const resolvedId = `\0${moduleId}`;
+  return {
+    name: moduleId.replaceAll(":", "-"),
+    resolveId(source) {
+      return source === moduleId ? resolvedId : null;
+    },
+    load(id) {
+      if (id !== resolvedId) {
+        return null;
+      }
+      const documents = directories
+        .flatMap((directory) => jsonFiles(path.join(root, directory)))
+        .map((name) => ({
+          path: path.relative(root, name).split(path.sep).join("/"),
+          text: fs.readFileSync(name, "utf8"),
+        }))
+        .sort((left, right) =>
+          left.path < right.path ? -1 : left.path > right.path ? 1 : 0
+        );
+      return `export default ${JSON.stringify(documents)};`;
+    },
+  };
+}
 
 function recipeCatalog() {
   return {
@@ -72,6 +136,17 @@ export default {
   ],
   plugins: [
     recipeCatalog(),
+    schemaDocuments(
+      virtualV1Targets,
+      "catalog/targets",
+      "org.mura.flash.target-record/v1",
+    ),
+    schemaDocuments(
+      virtualV1Procedures,
+      "recipes/procedures",
+      "org.mura.flash.install-procedure/v1",
+    ),
+    rawDocuments(virtualV1RawData, ["catalog", "records", "replay"]),
     json(),
     nodeResolve({ browser: true }),
     commonjs(),

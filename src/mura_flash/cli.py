@@ -21,7 +21,12 @@ from mura_flash.errors import (
     SafetyRefusalError,
 )
 from mura_flash.inspection import Inspector, Transport
+from mura_flash.jsonio import canonical_json
+from mura_flash.procedure import plan_procedure
+from mura_flash.replay import replay_scenario
 from mura_flash.runner import SubprocessRunner
+from mura_flash.v1_catalog import load_v1_catalogs
+from mura_flash.v1_validation import load_v1_document
 
 
 class UsageError(MuraFlashError):
@@ -64,6 +69,28 @@ def build_parser() -> Parser:
     validate.add_argument("path", nargs="?", type=Path)
     _add_json_flag(validate, default=argparse.SUPPRESS)
 
+    procedures = commands.add_parser("procedures", help="list v1 install procedures")
+    procedures.add_argument("target", nargs="?")
+    _add_json_flag(procedures, default=argparse.SUPPRESS)
+
+    show_procedure = commands.add_parser(
+        "show-procedure",
+        help="show one v1 install procedure",
+    )
+    show_procedure.add_argument("procedure")
+    _add_json_flag(show_procedure, default=argparse.SUPPRESS)
+
+    plan = commands.add_parser("plan", help="plan one v1 install procedure")
+    plan.add_argument("procedure")
+    plan.add_argument("--flow")
+    plan.add_argument("--capability", action="append", default=None)
+    _add_json_flag(plan, default=argparse.SUPPRESS)
+
+    replay = commands.add_parser("replay", help="replay one deterministic v1 scenario")
+    replay.add_argument("procedure")
+    replay.add_argument("--scenario", type=Path, required=True)
+    _add_json_flag(replay, default=argparse.SUPPRESS)
+
     inspect = commands.add_parser("inspect", help="collect allowlisted device facts")
     inspect.add_argument("target")
     inspect.add_argument("--transport", choices=("adb", "fastboot"), required=True)
@@ -75,6 +102,10 @@ def build_parser() -> Parser:
 def _print_json(value: object, *, stream: Any | None = None) -> None:
     destination = sys.stdout if stream is None else stream
     print(json.dumps(value, sort_keys=True, separators=(",", ":")), file=destination)
+
+
+def _print_canonical_json(value: object) -> None:
+    print(canonical_json(value))
 
 
 def _error_name(error: MuraFlashError) -> str:
@@ -133,6 +164,67 @@ def _run_command(arguments: argparse.Namespace) -> int:
             noun = "recipe" if len(target_ids) == 1 else "recipes"
             print(f"valid: {len(target_ids)} {noun}")
         return ExitCode.OK
+
+    if command == "procedures":
+        _targets, procedure_catalog = load_v1_catalogs()
+        target = cast("str | None", arguments.target)
+        selected = (
+            procedure_catalog.for_target(target)
+            if target is not None
+            else tuple(procedure for _, procedure in sorted(procedure_catalog.procedures.items()))
+        )
+        rows = [
+            {
+                "id": procedure["id"],
+                "targetId": procedure["targetId"],
+                "enabled": procedure["enabled"],
+            }
+            for procedure in selected
+        ]
+        if use_json:
+            _print_canonical_json({"procedures": rows})
+        else:
+            for row in rows:
+                print(f"{row['id']}\t{row['targetId']}")
+        return ExitCode.OK
+
+    if command == "show-procedure":
+        _targets, procedure_catalog = load_v1_catalogs()
+        procedure = procedure_catalog.get(cast("str", arguments.procedure))
+        if use_json:
+            _print_canonical_json(procedure)
+        else:
+            print(json.dumps(procedure, ensure_ascii=False, indent=2, sort_keys=True))
+        return ExitCode.OK
+
+    if command == "plan":
+        _targets, procedure_catalog = load_v1_catalogs()
+        procedure = procedure_catalog.get(cast("str", arguments.procedure))
+        capabilities = cast("list[str] | None", arguments.capability)
+        result = plan_procedure(
+            procedure,
+            flow_id=cast("str | None", arguments.flow),
+            adapter_capabilities=set(capabilities) if capabilities is not None else None,
+        ).to_document()
+        if use_json:
+            _print_canonical_json(result)
+        else:
+            print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return ExitCode.OK
+
+    if command == "replay":
+        _targets, procedure_catalog = load_v1_catalogs()
+        procedure = procedure_catalog.get(cast("str", arguments.procedure))
+        scenario = load_v1_document(
+            cast("Path", arguments.scenario),
+            "org.mura.flash.replay-scenario/v1",
+        )
+        result = replay_scenario(procedure, scenario).to_document()
+        if use_json:
+            _print_canonical_json(result)
+        else:
+            print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return ExitCode.OK if cast("bool", result["matchedExpected"]) else ExitCode.RECIPE_INVALID
 
     if command == "inspect":
         catalog = load_catalog()

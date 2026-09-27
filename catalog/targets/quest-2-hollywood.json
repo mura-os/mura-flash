@@ -1,0 +1,40 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-2-hollywood",
+  "displayName": "Meta Quest 2",
+  "vendor": "Meta",
+  "models": [
+    "Quest 2"
+  ],
+  "codenames": [
+    "hollywood"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "The exact v29 build has a direct source path and build 50670960048600150 has a deployed inactive-slot path; neither applies to arbitrary current firmware."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Both build-bounded procedures remain disabled pending Quest 2-specific hardware, partition, artifact, and recovery proof."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "quest-2-hollywood-v29-direct-unlock",
+      "quest-2-hollywood-50670960048600150-inactive-slot-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 612,
+      "lineEnd": 643
+    }
+  ]
+}

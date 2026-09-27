@@ -1,0 +1,73 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-3s-panther",
+  "displayName": "Meta Quest 3S",
+  "vendor": "Meta",
+  "models": [
+    "Quest 3S"
+  ],
+  "codenames": [
+    "panther"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "unsupported",
+    "installState": "unsupported",
+    "summary": "Public temporary-root research is RAM-only; unavailable secondary ABL analysis cannot establish persistent unlock or safe recovery."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Temporary-root targets do not establish persistent unlock, accepted boot-chain writes, or recovery."
+  },
+  "buildEvidence": [
+    {
+      "buildId": "3814840024700610",
+      "status": "temporary-root-target",
+      "summary": "The pinned repository contains a dedicated Quest 3S target for this build.",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/targets/q3s_3814840024700610.json",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "targets/q3s_3814840024700610.json",
+          "lineStart": 1,
+          "lineEnd": 7
+        }
+      ]
+    },
+    {
+      "buildId": "836890024401570",
+      "status": "source-derived-unverified",
+      "summary": "The pinned target was derived from OTA artifacts and explicitly says it was not verified on a Panther unit.",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/targets/q3s_xse_836890024401570.json",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "targets/q3s_xse_836890024401570.json",
+          "lineStart": 1,
+          "lineEnd": 8
+        }
+      ]
+    }
+  ],
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "temporary-root-only",
+      "persistent-unlock-missing",
+      "recovery-missing"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 645,
+      "lineEnd": 666
+    }
+  ]
+}

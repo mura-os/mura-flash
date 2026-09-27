@@ -1,0 +1,41 @@
+{
+  "schema": "org.mura.flash.evidence-record/v1",
+  "id": "samsung-galaxy-xr-launch-unlock-media",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "immutable": true,
+  "capturedAt": "2026-09-27",
+  "authority": "community-demonstration",
+  "source": {
+    "uri": "https://x.com/SadlyItsBradley/status/1981549173565542669",
+    "followupUri": "https://x.com/SadlyItsBradley/status/1981549431485784544",
+    "retrieved": "2026-09-27"
+  },
+  "media": [
+    {
+      "role": "oem-unlock-setting-screenshot",
+      "uri": "https://pbs.twimg.com/media/G3_gtKpWMAEx_b3.jpg?name=orig",
+      "sha256": "f7f86e1eba183fa68d137cf6750bcf30712bc8163537101cb0bf26d7f384c227",
+      "size": 239082
+    },
+    {
+      "role": "unlock-warning-screenshot",
+      "uri": "https://pbs.twimg.com/media/G3_gtKwWYAAu1O_.jpg?name=orig",
+      "sha256": "42b33f44d32c6f4704e45d4a6243caa542e5ed7b1e7b23a29f7473bfc4a6b5e4",
+      "size": 253867
+    },
+    {
+      "role": "unlock-demonstration-video",
+      "uri": "https://video.twimg.com/amplify_video/1981549069446066177/vid/avc1/2160x3840/WYBlAAoDN8NGMC4G.mp4?tag=21",
+      "sha256": "da71b58c44e61bae4f79a9a751f0930b4a380d7534c8f4a4bdcc166162c6738b",
+      "size": 14306238
+    }
+  ],
+  "claims": [
+    "Launch-era media shows an OEM unlocking control and a completed Galaxy XR unlock interaction.",
+    "The media supports a manual source-behavior description only."
+  ],
+  "limits": [
+    "The media does not expose the full build, CSC, RP SWREV, USB transcript, exact key sequence, or host command.",
+    "No live Mura operation may infer an Odin, Heimdall, fastboot, or key-chord recipe from this record."
+  ]
+}

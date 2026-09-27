@@ -1,0 +1,194 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "fixture-disabled-destructive",
+  "targetId": "quest-1-monterey",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Schema fixture proving that a destructive operation can be represented while disabled.",
+    "evidenceLevel": "source-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Fixture only; no live destructive operation is authorized.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "flow.initial",
+      "kind": "flow",
+      "initial": true
+    },
+    {
+      "id": "flow.stopped",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [],
+  "partitions": [
+    {
+      "id": "userdata",
+      "deviceName": "userdata",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    }
+  ],
+  "backups": [],
+  "confirmations": [
+    {
+      "id": "confirm-erase",
+      "safetyClasses": [
+        "device-erase"
+      ],
+      "prompt": "Fixture confirmation; this operation remains disabled."
+    }
+  ],
+  "operations": [
+    {
+      "id": "disabled-erase",
+      "variant": "fastboot.erase",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "fixture-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "userdata"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "disabled-erase",
+            "outputName": "erased"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stop"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 470,
+          "lineEnd": 500
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.initial"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "disabled-flow",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "flow.initial"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "disabled-erase"
+        }
+      ],
+      "guards": [],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-erase"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.initial"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "disabled-erase"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 1,
+      "lineEnd": 41
+    }
+  ],
+  "sourceGaps": [
+    "The source has no both-slots-lost recovery path.",
+    "Rollback reset and backup restoration lack authoritative readback."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/quest/disabled-destructive-procedure.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "fixture-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

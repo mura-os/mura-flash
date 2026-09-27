@@ -1,0 +1,5200 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "pico-4-pro-phoenix-unlock",
+  "targetId": "pico-4-pro-phoenix",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Test-only source parity for PICO 4 Pro; hardware is unqualified and writes are false. Pinned artifacts: tools/firehoses/prog_firehose_lite.elf 675208 bytes sha256 a033cab1d10a584a11643207d5ed9a6ad25932e8b4eb9738362ce0d4f84617a3; engineering ABL 151552 bytes sha256 446eb09a169eb8e8a25f3ecb9865c08b7ac8cd7636d366a8c450d59dfdbe118a; engineering devinfo 4096 bytes sha256 0fc9f5f864195a5ec61f18a005b4b2f0e1e59ace1bc707569612f3a97ff3e9fd. Current automation orders token, unlock_critical, unlock, setenforce; original embedded text contradicts it. Reset-before-restore and restore-before-reset both remain disabled and unselected. Exact acceptance, geometry, partition sizing, authenticated payload provenance, and persistence remain unknown.",
+    "evidenceLevel": "source-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "No live operation is permitted. Any future write requires exact target/build/programmer qualification; two independent bounded reads with matching SHA-256 for both abl and devinfo; unit binding; explicit destructive authorization; mandatory restore and readback of both partitions; token/serial redaction; and an owner-selected reset/restore order.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "device.android",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "device.edl",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "device.fastboot-engineering",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "device.recovery",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "security.locked",
+      "kind": "security",
+      "initial": true
+    },
+    {
+      "id": "security.unlocked-unverified",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "security.unlocked-verified",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "storage.stock",
+      "kind": "storage",
+      "initial": true
+    },
+    {
+      "id": "storage.engineering-staged",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "storage.stock-restored",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "storage.userdata-reset",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "flow.blocked-unqualified",
+      "kind": "flow",
+      "initial": true
+    },
+    {
+      "id": "flow.stopped",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pico.programmer.lite",
+      "role": "programmer",
+      "source": {
+        "kind": "remote",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/firehoses/prog_firehose_lite.elf"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "a033cab1d10a584a11643207d5ed9a6ad25932e8b4eb9738362ce0d4f84617a3"
+      }
+    },
+    {
+      "id": "pico.engineering-abl",
+      "role": "image",
+      "source": {
+        "kind": "remote",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/abl.elf"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "446eb09a169eb8e8a25f3ecb9865c08b7ac8cd7636d366a8c450d59dfdbe118a"
+      }
+    },
+    {
+      "id": "pico.engineering-devinfo",
+      "role": "image",
+      "source": {
+        "kind": "remote",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/devinfo"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "0fc9f5f864195a5ec61f18a005b4b2f0e1e59ace1bc707569612f3a97ff3e9fd"
+      }
+    },
+    {
+      "id": "pico.source-parity",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "tests/fixtures/source-parity/pico/manifest.json"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "c5cd27fe9ef32ded315e3a72b4eff80496c9415ad5c175bc6465c6c30abd0010"
+      }
+    }
+  ],
+  "partitions": [
+    {
+      "id": "abl",
+      "deviceName": "abl",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "devinfo",
+      "deviceName": "devinfo",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "userdata",
+      "deviceName": "userdata",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    }
+  ],
+  "backups": [
+    {
+      "id": "stock-abl",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "abl"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "stock-devinfo",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "devinfo"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    }
+  ],
+  "confirmations": [
+    {
+      "id": "confirm-unqualified-test-only",
+      "safetyClasses": [
+        "device-code-execution",
+        "device-write",
+        "device-erase",
+        "security-state-change"
+      ],
+      "prompt": "This procedure is unqualified test-only machine data. It cannot authorize loading a programmer, writing, erasing, or changing security state."
+    },
+    {
+      "id": "confirm-userdata-wipe",
+      "safetyClasses": [
+        "device-erase",
+        "security-state-change"
+      ],
+      "prompt": "Unlock and factory reset erase userdata. Confirm a separate user-data backup and explicit acceptance of loss."
+    },
+    {
+      "id": "confirm-unit-bound-restore",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Confirm both ABL and devinfo backups are from this exact unit, have two matching SHA-256 reads, and both will be restored and read back."
+    },
+    {
+      "id": "confirm-reset-restore-order",
+      "safetyClasses": [
+        "manual",
+        "device-erase",
+        "device-write"
+      ],
+      "prompt": "Choose reset-before-restore or restore-before-reset. Source order conflicts; this procedure selects neither."
+    }
+  ],
+  "operations": [
+    {
+      "id": "fetch-programmer",
+      "variant": "artifact.fetch",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "sourceUri",
+          "value": {
+            "kind": "constant",
+            "valueType": "uri",
+            "value": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/firehoses/prog_firehose_lite.elf"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "artifacts/prog_firehose_lite.elf"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "fetch-programmer",
+            "outputName": "artifact"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "fetch-programmer",
+            "outputName": "artifact"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-fetch-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "verify-programmer",
+      "variant": "artifact.verify",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "artifact",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fetch-programmer",
+            "outputName": "artifact"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "a033cab1d10a584a11643207d5ed9a6ad25932e8b4eb9738362ce0d4f84617a3"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "verify-programmer",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "a033cab1d10a584a11643207d5ed9a6ad25932e8b4eb9738362ce0d4f84617a3"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "fetch-engineering-abl",
+      "variant": "artifact.fetch",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "sourceUri",
+          "value": {
+            "kind": "constant",
+            "valueType": "uri",
+            "value": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/abl.elf"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "artifacts/abl.elf"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-abl",
+            "outputName": "artifact"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-abl",
+            "outputName": "artifact"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-fetch-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "verify-engineering-abl",
+      "variant": "artifact.verify",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "artifact",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-abl",
+            "outputName": "artifact"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "446eb09a169eb8e8a25f3ecb9865c08b7ac8cd7636d366a8c450d59dfdbe118a"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "verify-engineering-abl",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "446eb09a169eb8e8a25f3ecb9865c08b7ac8cd7636d366a8c450d59dfdbe118a"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "fetch-engineering-devinfo",
+      "variant": "artifact.fetch",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "sourceUri",
+          "value": {
+            "kind": "constant",
+            "valueType": "uri",
+            "value": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/devinfo"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "artifacts/devinfo"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-devinfo",
+            "outputName": "artifact"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-devinfo",
+            "outputName": "artifact"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-fetch-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "verify-engineering-devinfo",
+      "variant": "artifact.verify",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "artifact",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fetch-engineering-devinfo",
+            "outputName": "artifact"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "0fc9f5f864195a5ec61f18a005b4b2f0e1e59ace1bc707569612f3a97ff3e9fd"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "verify-engineering-devinfo",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "0fc9f5f864195a5ec61f18a005b4b2f0e1e59ace1bc707569612f3a97ff3e9fd"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "capture-soc-serial",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Capture only /sys/devices/soc0/serial_number as an unsigned decimal secret; do not log or persist it."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "A private runtime socSerial value exists and transcript output is redacted."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "capture-soc-serial",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 212,
+          "lineEnd": 234
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "derive-unlock-token",
+      "variant": "pico.derive-token",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "socSerial",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "secret-runtime:socSerial"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "not-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "derive-unlock-token",
+            "outputName": "unlockToken"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": ""
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/more-picohaxx.py",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "more-picohaxx.py",
+          "lineStart": 1,
+          "lineEnd": 20
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 374,
+          "lineEnd": 409
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "enter-edl-for-stage",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Enter EDL using the documented target-specific button/reboot path; do not probe an unbound programmer."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The same target is observed in Qualcomm 9008 EDL mode."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "enter-edl-for-stage",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+          "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+          "path": "recovery/README.md",
+          "lineStart": 17,
+          "lineEnd": 62
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.edl"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "load-programmer-stage",
+      "variant": "edl.load-programmer",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "verifiedProgrammer",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "verify-programmer",
+            "outputName": "verifiedArtifact"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+          "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+          "path": "recovery/README.md",
+          "lineStart": 17,
+          "lineEnd": 62
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ]
+    },
+    {
+      "id": "read-abl-first",
+      "variant": "edl.read",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "backups/unit-bound/abl.first.img"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-abl-first",
+            "outputName": "backup"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "read-abl-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "hash-abl-first",
+      "variant": "partition.hash",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-abl-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "read-abl-second",
+      "variant": "edl.read",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "backups/unit-bound/abl.second.img"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-abl-second",
+            "outputName": "backup"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "read-abl-second",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "hash-abl-second",
+      "variant": "partition.hash",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-abl-second",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-second",
+            "outputName": "digest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "read-devinfo-first",
+      "variant": "edl.read",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devinfo"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "backups/unit-bound/devinfo.first.img"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-first",
+            "outputName": "backup"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "hash-devinfo-first",
+      "variant": "partition.hash",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "read-devinfo-second",
+      "variant": "edl.read",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devinfo"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "backups/unit-bound/devinfo.second.img"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-second",
+            "outputName": "backup"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-second",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "hash-devinfo-second",
+      "variant": "partition.hash",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-second",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-second",
+            "outputName": "digest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "write-engineering-abl",
+      "variant": "edl.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "verify-engineering-abl",
+            "outputName": "verifiedArtifact"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "not-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "write-engineering-abl",
+            "outputName": "bytesWritten"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "integer",
+            "value": 0
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "write-engineering-devinfo",
+      "variant": "edl.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-stage",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devinfo"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "verify-engineering-devinfo",
+            "outputName": "verifiedArtifact"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "not-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "write-engineering-devinfo",
+            "outputName": "bytesWritten"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "integer",
+            "value": 0
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "storage.engineering-staged"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "enter-fastboot-with-engineering-abl",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Enter fastboot with Volume Down + Power; engineering ABL may otherwise remain in EDL."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The same target is present in bootloader fastboot mode."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "enter-fastboot-with-engineering-abl",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 241,
+          "lineEnd": 339
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+          "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+          "path": "recovery/README.md",
+          "lineStart": 17,
+          "lineEnd": 62
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.fastboot-engineering"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "vendor-pico-token-unlock",
+      "variant": "fastboot.vendor-pico-unlock",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "unlockToken",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "derive-unlock-token",
+            "outputName": "unlockToken"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "vendor-pico-token-unlock",
+            "outputName": "accepted"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 437,
+          "lineEnd": 519
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ]
+    },
+    {
+      "id": "flashing-unlock-critical",
+      "variant": "fastboot.unlock-critical",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "flashing-unlock-critical",
+            "outputName": "accepted"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "confirmation-declined",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 437,
+          "lineEnd": 519
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ]
+    },
+    {
+      "id": "flashing-unlock",
+      "variant": "fastboot.unlock",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "flashing-unlock",
+            "outputName": "accepted"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "confirmation-declined",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 437,
+          "lineEnd": 519
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "security.unlocked-unverified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "retry-unlock-after-observation"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "retry-unlock-after-observation"
+        }
+      ]
+    },
+    {
+      "id": "oem-setenforce-zero",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Source parity records fastboot oem setenforce 0 here; no bounded registry operation exists, so execution remains disabled."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Source command position recorded without free-form command execution."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "oem-setenforce-zero",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 437,
+          "lineEnd": 519
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "reboot-bootloader-for-verification",
+      "variant": "fastboot.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "reboot-bootloader-for-verification",
+            "outputName": "expectedMode"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 660,
+          "lineEnd": 771
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "verify-unlocked-after-reboot",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "unlocked"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "verify-unlocked-after-reboot",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "yes"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 660,
+          "lineEnd": 771
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "security.unlocked-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "reboot-recovery-before-restore",
+      "variant": "fastboot.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "recovery"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "reboot-recovery-before-restore",
+            "outputName": "expectedMode"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "recovery"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 602,
+          "lineEnd": 632
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.recovery"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "factory-reset",
+      "variant": "recovery.reset",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "factory-reset",
+            "outputName": "resetAccepted"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 602,
+          "lineEnd": 632
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "storage.userdata-reset"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "enter-edl-for-restore",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Re-enter EDL using the documented target path to perform mandatory unit-bound restoration."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The same target is observed in Qualcomm 9008 EDL mode."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "enter-edl-for-restore",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+          "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+          "path": "recovery/README.md",
+          "lineStart": 17,
+          "lineEnd": 62
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.edl"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "load-programmer-restore",
+      "variant": "edl.load-programmer",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "verifiedProgrammer",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "verify-programmer",
+            "outputName": "verifiedArtifact"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-restore",
+            "outputName": "edlSession"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-restore",
+            "outputName": "edlSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "modules/utils.ps1",
+          "lineStart": 343,
+          "lineEnd": 364
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ]
+    },
+    {
+      "id": "restore-stock-abl",
+      "variant": "partition.restore",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-abl-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "restore-stock-abl",
+            "outputName": "restoredDigest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "readback-stock-abl",
+      "variant": "partition.readback",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "readback-stock-abl",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-abl-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "restore-stock-devinfo",
+      "variant": "partition.restore",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devinfo"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "read-devinfo-first",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "restore-stock-devinfo",
+            "outputName": "restoredDigest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "readback-stock-devinfo",
+      "variant": "partition.readback",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devinfo"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "readback-stock-devinfo",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "hash-devinfo-first",
+            "outputName": "digest"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-stock-required"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "storage.stock-restored"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-stock-required"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-stock-required"
+        }
+      ]
+    },
+    {
+      "id": "edl-reset-system-after-restore",
+      "variant": "edl.reset",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-restore",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "system"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "edl-reset-system-after-restore",
+            "outputName": "expectedMode"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "system"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.android"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "edl-reset-recovery-after-restore",
+      "variant": "edl.reset",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-programmer-restore",
+            "outputName": "edlSession"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "recovery"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "edl-reset-recovery-after-restore",
+            "outputName": "expectedMode"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "recovery"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 602,
+          "lineEnd": 632
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.recovery"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "reconnect-system",
+      "variant": "transport.reconnect",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "runtime-device"
+          }
+        },
+        {
+          "inputName": "expectedMode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "system"
+          }
+        },
+        {
+          "inputName": "timeout",
+          "value": {
+            "kind": "constant",
+            "valueType": "duration-ms",
+            "value": 360000
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "reconnect-system",
+            "outputName": "reconnectedDevice"
+          },
+          "right": {
+            "kind": "operation-output",
+            "operationId": "reconnect-system",
+            "outputName": "reconnectedDevice"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 343,
+          "lineEnd": 431
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "manual-boot-system-after-reset",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Boot system after reset; do not infer success from reset acceptance alone."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The same target boots stock ABL/devinfo and reports unlocked state only if independently observed."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "manual-boot-system-after-reset",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "picounlock.ps1",
+          "lineStart": 602,
+          "lineEnd": 632
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "flow.blocked-unqualified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "device.android"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "recover-observe",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop all writes, preserve transcript and observed mode, and require operator diagnosis."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No further operation was attempted."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "recover-observe",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-and-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.android"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-and-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-and-stop"
+        }
+      ]
+    },
+    {
+      "id": "recover-loader-rejected",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop after programmer rejection or timeout; do not try another programmer."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Device remains unmodified by any fallback programmer attempt."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "recover-loader-rejected",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+          "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+          "path": "recovery/README.md",
+          "lineStart": 17,
+          "lineEnd": 62
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 379
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "loader-rejected-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "loader-rejected-stop"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "reset-before-restore",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "flow.blocked-unqualified"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "fetch-programmer"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-programmer"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fetch-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fetch-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "capture-soc-serial"
+        },
+        {
+          "kind": "operation",
+          "operationId": "derive-unlock-token"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-for-stage"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-programmer-stage"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-abl-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-abl-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-abl-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-abl-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-devinfo-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-devinfo-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-devinfo-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-devinfo-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-fastboot-with-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "vendor-pico-token-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock-critical"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "oem-setenforce-zero"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-bootloader-for-verification"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-unlocked-after-reboot"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-recovery-before-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "factory-reset"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-for-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-programmer-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "edl-reset-system-after-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reconnect-system"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-unqualified-test-only"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-userdata-wipe"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-unit-bound-restore"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-reset-restore-order"
+        }
+      ]
+    },
+    {
+      "id": "restore-before-reset",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "flow.blocked-unqualified"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "fetch-programmer"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-programmer"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fetch-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fetch-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "capture-soc-serial"
+        },
+        {
+          "kind": "operation",
+          "operationId": "derive-unlock-token"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-for-stage"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-programmer-stage"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-abl-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-abl-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-abl-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-abl-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-devinfo-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-devinfo-first"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-devinfo-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "hash-devinfo-second"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-engineering-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-fastboot-with-engineering-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "vendor-pico-token-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock-critical"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "oem-setenforce-zero"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-bootloader-for-verification"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-unlocked-after-reboot"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-for-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-programmer-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "edl-reset-recovery-after-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "factory-reset"
+        },
+        {
+          "kind": "operation",
+          "operationId": "manual-boot-system-after-reset"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "flow.blocked-unqualified"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-unqualified-test-only"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-userdata-wipe"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-unit-bound-restore"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-reset-restore-order"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "observe-and-stop",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.android"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.recovery"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.unlocked-unverified"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.unlocked-verified"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.stock"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.engineering-staged"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.stock-restored"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "recover-observe"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      }
+    },
+    {
+      "id": "loader-rejected-stop",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.stock"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.engineering-staged"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "recover-loader-rejected"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "flow.stopped"
+      }
+    },
+    {
+      "id": "retry-unlock-after-observation",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.unlocked-unverified"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "vendor-pico-token-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock-critical"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "oem-setenforce-zero"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-bootloader-for-verification"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-unlocked-after-reboot"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "security.unlocked-verified"
+      }
+    },
+    {
+      "id": "restore-stock-required",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "device.edl"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.fastboot-engineering"
+        },
+        {
+          "kind": "state",
+          "stateId": "device.recovery"
+        },
+        {
+          "kind": "state",
+          "stateId": "storage.engineering-staged"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.unlocked-unverified"
+        },
+        {
+          "kind": "state",
+          "stateId": "security.unlocked-verified"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-for-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-programmer-restore"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-abl"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restore-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "readback-stock-devinfo"
+        },
+        {
+          "kind": "operation",
+          "operationId": "edl-reset-system-after-restore"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "storage.stock-restored"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/README.md",
+      "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+      "path": "README.md",
+      "lineStart": 65,
+      "lineEnd": 80
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+      "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+      "path": "modules/utils.ps1",
+      "lineStart": 343,
+      "lineEnd": 364
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/thoricelli/PICO-documentation/blob/99face1b92ccf8350e30268089e2da5b2682010e/recovery/README.md",
+      "commit": "99face1b92ccf8350e30268089e2da5b2682010e",
+      "path": "recovery/README.md",
+      "lineStart": 17,
+      "lineEnd": 62
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 280,
+      "lineEnd": 379
+    }
+  ],
+  "sourceGaps": [
+    "Exact retail SKU and build acceptance of the programmer and engineering images is unverified.",
+    "Factory-reset versus mandatory stock-restoration ordering is unresolved."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/pico/manifest.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "runtime-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

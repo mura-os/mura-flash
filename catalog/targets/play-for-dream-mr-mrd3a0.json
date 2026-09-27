@@ -1,0 +1,41 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "play-for-dream-mr-mrd3a0",
+  "displayName": "Play For Dream MR",
+  "vendor": "Play For Dream",
+  "models": [
+    "MRD3A0"
+  ],
+  "codenames": [
+    "anorak"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "reported",
+    "installState": "unsupported",
+    "summary": "One unit displayed an unlocked state, but retail fuse policy, complete firmware, partition inventory, and recovery remain unknown."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "A single-unit report does not qualify a retail write or recovery boundary."
+  },
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "single-unit-report",
+      "stock-artifact-missing",
+      "restore-unqualified"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 203,
+      "lineEnd": 246
+    }
+  ]
+}

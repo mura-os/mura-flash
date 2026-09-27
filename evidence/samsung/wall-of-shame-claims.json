@@ -1,0 +1,39 @@
+{
+  "schema": "org.mura.flash.evidence-record/v1",
+  "id": "samsung-galaxy-xr-wall-of-shame-claims",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "immutable": true,
+  "capturedAt": "2026-09-27",
+  "authority": "community-survey",
+  "source": {
+    "kind": "pinned-external",
+    "uri": "https://github.com/zenfyrdev/bootloader-unlock-wall-of-shame/blob/92d55840269532ec0576c30a60db297a703f2daa/brands/samsung/README.md",
+    "commit": "92d55840269532ec0576c30a60db297a703f2daa",
+    "path": "brands/samsung/README.md",
+    "lineStart": 8,
+    "lineEnd": 40
+  },
+  "claims": [
+    {
+      "status": "community-reported",
+      "claim": "The December 9, 2025 Galaxy XR update removed bootloader-unlock eligibility."
+    },
+    {
+      "status": "community-reported",
+      "claim": "The April 8, 2026 update seemingly prevents downgrade to older unlockable firmware."
+    },
+    {
+      "status": "generic-samsung-warning",
+      "claim": "Samsung One UI 8 flashing may relock an already-unlocked device."
+    },
+    {
+      "status": "generic-samsung-warning",
+      "claim": "A complete Samsung package uses BL, AP, CP, and CSC together rather than selective members."
+    }
+  ],
+  "limits": [
+    "No public SM-I610 AYKE-to-AYIA flash transcript is included.",
+    "No public SM-I610 SW REV CHECK FAIL capture is included.",
+    "Generic Samsung phone warnings are not treated as Galaxy XR policy authority or proof of SM-I610 behavior."
+  ]
+}

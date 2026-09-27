@@ -1,0 +1,317 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "source": {
+    "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+    "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+    "provenanceLimit": "Git content identity is known; upstream origin, signing chain, redistribution authority, and device acceptance of the engineering images are not established.",
+    "pinnedUrl": "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968"
+  },
+  "artifacts": {
+    "standardProgrammer": {
+      "path": "tools/firehoses/prog_firehose_ddr.elf",
+      "sizeBytes": 672696,
+      "sha256": "79c425760f2a6d4464e34911cd27ff098cf8c7e6973fde2e38c507fa2f465015",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/firehoses/prog_firehose_ddr.elf",
+      "provenance": {
+        "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "tools/firehoses/prog_firehose_ddr.elf",
+        "digestComputedFromPinnedGitBlob": true,
+        "publisherDigestAvailable": false,
+        "authenticatedVendorProvenance": false
+      }
+    },
+    "liteProgrammer": {
+      "path": "tools/firehoses/prog_firehose_lite.elf",
+      "sizeBytes": 675208,
+      "sha256": "a033cab1d10a584a11643207d5ed9a6ad25932e8b4eb9738362ce0d4f84617a3",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/firehoses/prog_firehose_lite.elf",
+      "provenance": {
+        "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "tools/firehoses/prog_firehose_lite.elf",
+        "digestComputedFromPinnedGitBlob": true,
+        "publisherDigestAvailable": false,
+        "authenticatedVendorProvenance": false
+      }
+    },
+    "engineeringAbl": {
+      "path": "tools/engineering/abl.elf",
+      "sizeBytes": 151552,
+      "sha256": "446eb09a169eb8e8a25f3ecb9865c08b7ac8cd7636d366a8c450d59dfdbe118a",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/abl.elf",
+      "provenance": {
+        "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "tools/engineering/abl.elf",
+        "digestComputedFromPinnedGitBlob": true,
+        "publisherDigestAvailable": false,
+        "authenticatedVendorProvenance": false
+      }
+    },
+    "engineeringDevinfo": {
+      "path": "tools/engineering/devinfo",
+      "sizeBytes": 4096,
+      "sha256": "0fc9f5f864195a5ec61f18a005b4b2f0e1e59ace1bc707569612f3a97ff3e9fd",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/engineering/devinfo",
+      "provenance": {
+        "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "tools/engineering/devinfo",
+        "digestComputedFromPinnedGitBlob": true,
+        "publisherDigestAvailable": false,
+        "authenticatedVendorProvenance": false
+      }
+    },
+    "neoRebootEdlFastboot": {
+      "path": "tools/neo/fastboot.exe",
+      "sizeBytes": 318464,
+      "sha256": "bc7fd0fb36876324a803395a7d5649582c7a507711d1cfe06ad505944d97191e",
+      "uri": "https://github.com/chaixshot/more-picohaxx-tool/raw/29591aec1b2babab3c3c26239e85576da556e968/tools/neo/fastboot.exe",
+      "provenance": {
+        "repository": "https://github.com/chaixshot/more-picohaxx-tool",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "tools/neo/fastboot.exe",
+        "digestComputedFromPinnedGitBlob": true,
+        "publisherDigestAvailable": false,
+        "authenticatedVendorProvenance": false
+      }
+    }
+  },
+  "modelMappings": [
+    {
+      "targetId": "pico-4-phoenix",
+      "sourceSelection": "1",
+      "programmer": "standardProgrammer",
+      "sourceLabel": "DDR 4 Firehose",
+      "neoRebootEdlVariant": false,
+      "qualification": "unqualified",
+      "authenticationStatus": "test-only",
+      "writesEnabled": false,
+      "operationsEnabled": false
+    },
+    {
+      "targetId": "pico-4-pro-phoenix",
+      "sourceSelection": "2",
+      "programmer": "liteProgrammer",
+      "sourceLabel": "DDR 5 Firehose",
+      "neoRebootEdlVariant": false,
+      "qualification": "unqualified",
+      "authenticationStatus": "test-only",
+      "writesEnabled": false,
+      "operationsEnabled": false
+    },
+    {
+      "targetId": "pico-neo-3",
+      "sourceSelection": "3",
+      "programmer": "standardProgrammer",
+      "sourceLabel": "DDR 4 Firehose",
+      "neoRebootEdlVariant": true,
+      "qualification": "unqualified",
+      "authenticationStatus": "test-only",
+      "writesEnabled": false,
+      "operationsEnabled": false
+    }
+  ],
+  "tokenAlgorithm": {
+    "id": "more-picohaxx-token-v1",
+    "input": {
+      "name": "socSerial",
+      "sourcePath": "/sys/devices/soc0/serial_number",
+      "syntax": "unsigned decimal integer",
+      "sensitive": true,
+      "persist": false,
+      "log": "redact",
+      "transcriptReplacement": "<redacted-soc-serial>"
+    },
+    "parameters": {
+      "bitMaskHex": "0xF7F3F37F",
+      "alphabet": "0XD9J6FB3ATQIHNM46XYZZZOPQRSTUVWXYZ",
+      "radix": 16,
+      "digitSelection": "least-significant-nibble",
+      "digitOrder": "reverse-after-encoding",
+      "zeroEncoding": "0",
+      "tokenPrefix": "pico",
+      "commandShape": "fastboot oem <token> unlock"
+    },
+    "output": {
+      "sensitive": true,
+      "persist": false,
+      "log": "redact",
+      "transcriptReplacement": "fastboot oem <redacted-pico-token> unlock"
+    },
+    "testVectors": [
+      {
+        "socSerial": "0",
+        "maskedHex": "0x0",
+        "token": "pico0"
+      },
+      {
+        "socSerial": "1",
+        "maskedHex": "0x1",
+        "token": "picoX"
+      },
+      {
+        "socSerial": "15",
+        "maskedHex": "0xf",
+        "token": "picoM"
+      },
+      {
+        "socSerial": "16",
+        "maskedHex": "0x10",
+        "token": "picoX0"
+      },
+      {
+        "socSerial": "1234567",
+        "maskedHex": "0x12d207",
+        "token": "picoXDHD0B"
+      },
+      {
+        "socSerial": "4294967295",
+        "maskedHex": "0xf7f3f37f",
+        "token": "picoMBM9M9BM"
+      }
+    ],
+    "citations": [
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/more-picohaxx.py",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "more-picohaxx.py",
+        "lineStart": 1,
+        "lineEnd": 20
+      },
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/modules/utils.ps1",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "modules/utils.ps1",
+        "lineStart": 374,
+        "lineEnd": 409
+      }
+    ]
+  },
+  "operationOrder": {
+    "currentAutomation": [
+      "derive-token",
+      "stage-engineering-abl",
+      "stage-engineering-devinfo",
+      "vendor-pico-token-unlock",
+      "flashing-unlock-critical",
+      "flashing-unlock",
+      "oem-setenforce-0",
+      "verify-after-bootloader-reboot",
+      "restore-stock-abl-and-devinfo"
+    ],
+    "originalDiscovererText": [
+      "vendor-pico-token-unlock",
+      "oem-setenforce-0",
+      "flashing-unlock",
+      "flashing-unlock-critical",
+      "verify-after-bootloader-reboot",
+      "factory-reset",
+      "restore-stock-abl-recommended"
+    ],
+    "contradiction": "The current PowerShell and README order token, unlock_critical, unlock, setenforce; the embedded original text orders token, setenforce, unlock, unlock_critical. The README lists stock restore before factory reset, while the current unlock finalizer presents the required reset before naming stock restore as the next step.",
+    "citations": [
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "picounlock.ps1",
+        "lineStart": 437,
+        "lineEnd": 519
+      },
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "picounlock.ps1",
+        "lineStart": 602,
+        "lineEnd": 632
+      },
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/README.md",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "README.md",
+        "lineStart": 65,
+        "lineEnd": 80
+      },
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/more-picohaxx.py",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "more-picohaxx.py",
+        "lineStart": 69,
+        "lineEnd": 91
+      }
+    ]
+  },
+  "mandatoryRestore": {
+    "partitions": [
+      "abl",
+      "devinfo"
+    ],
+    "unitBound": true,
+    "minimumIndependentReads": 2,
+    "digest": "sha256",
+    "matchingReadDigestsRequiredBeforeAnyWrite": true,
+    "restoreBothRequired": true,
+    "readbackBothRequired": true,
+    "anotherUnitBackupAllowed": false,
+    "sourceWeakness": "The source restores devinfo only when present; Mura makes it mandatory. Source backup checks are non-empty/size checks, not duplicate cryptographic reads."
+  },
+  "resetRestoreChoices": [
+    {
+      "id": "reset-before-restore",
+      "enabled": false,
+      "selected": false
+    },
+    {
+      "id": "restore-before-reset",
+      "enabled": false,
+      "selected": false
+    }
+  ],
+  "retryBehavior": {
+    "trigger": "bootloader remains locked after bootloader reboot and observation",
+    "repeat": [
+      "vendor-pico-token-unlock",
+      "flashing-unlock-critical",
+      "flashing-unlock",
+      "oem-setenforce-0",
+      "verify-after-bootloader-reboot"
+    ],
+    "repeatEngineeringWrites": false,
+    "bound": "source-unbounded",
+    "automaticSourceMode": true,
+    "muraPolicy": "disabled; retry only after explicit observation and operator decision; no retry count is chosen without hardware qualification",
+    "citations": [
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/picounlock.ps1",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "picounlock.ps1",
+        "lineStart": 660,
+        "lineEnd": 731
+      },
+      {
+        "kind": "pinned-external",
+        "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/README.md",
+        "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+        "path": "README.md",
+        "lineStart": 120,
+        "lineEnd": 133
+      }
+    ]
+  },
+  "preservedUnknowns": [
+    "Exact retail SKU/build acceptance of each programmer and engineering image.",
+    "UFS geometry, GPT identity, partition sizes, A/B behavior, AVB indexes, and protected calibration set.",
+    "Engineering devinfo origin and authenticated provenance.",
+    "Whether the source-described unlock persists on each target specimen after stock ABL and devinfo restoration.",
+    "A safe selected ordering between factory reset and mandatory stock restoration.",
+    "Neo 3 support is maintainer-reported; the original discoverer explicitly tested only PICO 4."
+  ]
+}

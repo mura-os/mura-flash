@@ -1,0 +1,39 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "oculus-go-pacific",
+  "displayName": "Oculus Go",
+  "vendor": "Meta",
+  "models": [
+    "Oculus Go"
+  ],
+  "codenames": [
+    "pacific"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "Meta published a Go-only software unlock flow, but durable artifact hashes, complete protected state, and tested stock restoration remain unresolved."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The official mechanism is not enabled without reproducible artifacts and a qualified recovery boundary."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "oculus-go-pacific-official-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 536,
+      "lineEnd": 570
+    }
+  ]
+}

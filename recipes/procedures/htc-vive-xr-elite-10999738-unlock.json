@@ -1,0 +1,1062 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "htc-vive-xr-elite-10999738-unlock",
+  "targetId": "htc-vive-xr-elite-kyoto",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "A single community guide reports success on displayed release 1.0.999.738: enable launcher USB debugging, run four exact ADB provisioning commands, enable OEM unlocking in Android settings, reboot to fastboot, run fastboot flashing unlock and approve it on-device, then perform the required recovery factory reset and optionally observe Device State: Unlocked.",
+    "evidenceLevel": "community-reported"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Live use is unavailable. Displayed release 1.0.999.738 is not an exact Android fingerprint/bootloader/SKU binding; no vendor unlock procedure, stock package hash, partition map, calibration backup, anti-rollback record, or local stock restore exists. The all-zero factory-package digest explicitly means unknown.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "release-10999738-launcher",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "android-provisioned-oem-enabled",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "bootloader-locked",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "unlock-command-accepted",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "recovery-reset-required",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "first-boot-complete",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "displayed-unlocked",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "safe-stop",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "vive-xr-elite-10999738-stock-package-unavailable",
+      "role": "stock",
+      "source": {
+        "kind": "local",
+        "path": "unavailable/vendor-factory-package-1.0.999.738"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    }
+  ],
+  "partitions": [],
+  "backups": [],
+  "confirmations": [
+    {
+      "id": "confirm-community-only-unlock",
+      "safetyClasses": [
+        "security-state-change"
+      ],
+      "prompt": "Run the reported fastboot unlock only on a specimen independently identified as the exact supported hardware/build. This record has only a displayed release and is disabled."
+    },
+    {
+      "id": "confirm-required-factory-reset",
+      "safetyClasses": [
+        "device-erase"
+      ],
+      "prompt": "The community guide says Android will not boot until recovery Wipe data/factory reset is completed; this destroys user data."
+    }
+  ],
+  "operations": [
+    {
+      "id": "observe-displayed-release-only",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "In the stock UI, read the displayed software release without assuming it binds the Android fingerprint, SKU, hardware revision, or bootloader revision."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "1.0.999.738"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "1.0.999.738"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "1.0.999.738"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-launcher"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        },
+        {
+          "kind": "external",
+          "uri": "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-10999738/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "release-10999738-launcher"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-launcher"
+        }
+      ]
+    },
+    {
+      "id": "record-provisioning-command-gap",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The source requires adb shell am start com.android.settings, then settings writes for development_settings_enabled=1, user_setup_complete=1, and device_provisioned=1. The registry has no allowlisted typed ADB settings-write operation, so do not substitute arbitrary shell execution."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Procedure remains disabled at the unmodeled provisioning boundary."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "1.0.999.738"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "1.0.999.738"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "record-provisioning-command-gap",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-launcher"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "release-10999738-launcher"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "android-provisioned-oem-enabled"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-launcher"
+        }
+      ]
+    },
+    {
+      "id": "enable-oem-unlocking-in-settings",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Navigate to Android Settings, System, Advanced, Developer Options; enable OEM unlocking and accept the device warning. Stop if unavailable."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "OEM unlocking is visibly enabled."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "enable-oem-unlocking-in-settings",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-launcher"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "release-10999738-launcher"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "android-provisioned-oem-enabled"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-launcher"
+        }
+      ]
+    },
+    {
+      "id": "reboot-to-bootloader",
+      "variant": "adb.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "vive-xr-elite-adb-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "android-provisioned-oem-enabled"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reboot-to-bootloader",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-launcher"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "android-provisioned-oem-enabled"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "bootloader-locked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-launcher"
+        }
+      ]
+    },
+    {
+      "id": "flashing-unlock",
+      "variant": "fastboot.unlock",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "vive-xr-elite-fastboot-device"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "bootloader-locked"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "flashing-unlock",
+            "outputName": "accepted"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "confirmation-declined",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "unlock-command-accepted"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ]
+    },
+    {
+      "id": "enter-recovery-menu",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "At the No Command screen hold Power and Volume Down about two seconds, release Volume Down, then release Power."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The Android recovery menu is visible."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "unlock-command-accepted"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "enter-recovery-menu",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "observe-recovery-or-bootloader"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "observe-recovery-or-bootloader"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "unlock-command-accepted"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "recovery-reset-required"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "observe-recovery-or-bootloader"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "observe-recovery-or-bootloader"
+        }
+      ]
+    },
+    {
+      "id": "required-recovery-factory-reset",
+      "variant": "recovery.reset",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "vive-xr-elite-recovery"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "recovery-reset-required"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "required-recovery-factory-reset",
+            "outputName": "resetAccepted"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stay-in-recovery"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-recovery"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stay-in-recovery"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "recovery-reset-required"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "first-boot-complete"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-recovery"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-recovery"
+        }
+      ]
+    },
+    {
+      "id": "observe-displayed-unlocked",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "After first setup, return to fastboot and read the displayed state; the guide calls this optional and provides no machine transcript."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Device State: Unlocked"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "first-boot-complete"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "observe-displayed-unlocked",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-after-first-boot"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-after-first-boot"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "first-boot-complete"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "displayed-unlocked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-after-first-boot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-after-first-boot"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop without updating to 2.0.999.960 or attempting Download Mode downgrade; the same author reports relock and both-slot boot corruption."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No update, downgrade, relock, or partition write is attempted."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-launcher"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "release-10999738-launcher"
+        },
+        {
+          "kind": "state",
+          "stateId": "android-provisioned-oem-enabled"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-command-accepted"
+        },
+        {
+          "kind": "state",
+          "stateId": "recovery-reset-required"
+        },
+        {
+          "kind": "state",
+          "stateId": "first-boot-complete"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-launcher"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-launcher"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "reported-10999738-unlock",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "release-10999738-launcher"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "observe-displayed-release-only"
+        },
+        {
+          "kind": "operation",
+          "operationId": "record-provisioning-command-gap"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enable-oem-unlocking-in-settings"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-to-bootloader"
+        },
+        {
+          "kind": "operation",
+          "operationId": "flashing-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-recovery-menu"
+        },
+        {
+          "kind": "operation",
+          "operationId": "required-recovery-factory-reset"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-displayed-unlocked"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "displayed-release:1.0.999.738"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "displayed-release:1.0.999.738"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-community-only-unlock"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-required-factory-reset"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-in-launcher",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "release-10999738-launcher"
+        },
+        {
+          "kind": "state",
+          "stateId": "android-provisioned-oem-enabled"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "reconnect-fastboot",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "android-provisioned-oem-enabled"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "bootloader-locked"
+      }
+    },
+    {
+      "id": "stop-in-bootloader",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "observe-recovery-or-bootloader",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "unlock-command-accepted"
+        },
+        {
+          "kind": "state",
+          "stateId": "recovery-reset-required"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "recovery-reset-required"
+      }
+    },
+    {
+      "id": "stay-in-recovery",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "recovery-reset-required"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "recovery-reset-required"
+      }
+    },
+    {
+      "id": "stop-after-first-boot",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "first-boot-complete"
+        },
+        {
+          "kind": "state",
+          "stateId": "displayed-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "external",
+      "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "external",
+      "uri": "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-10999738/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 669,
+      "lineEnd": 708
+    }
+  ],
+  "sourceGaps": [
+    "The cited source does not establish Mura hardware qualification or complete recovery.",
+    "One or more required artifact digests are unknown, so live verification is impossible."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/vendor/htc-vive-xr-elite-10999738-unlock.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "vive-xr-elite-adb-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "vive-xr-elite-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "vive-xr-elite-recovery",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "org.mura.flash.replay-scenario/v1",
+  "id": "fixture-replay-string-list",
+  "procedureId": "fixture-procedure",
+  "flowId": "fixture-flow",
+  "simulateDisabled": true,
+  "clock": {
+    "startTimestamp": "2026-09-27T12:00:00.000Z",
+    "tickMs": 10
+  },
+  "operationDurations": [
+    {
+      "operationId": "fixture-operation",
+      "durationMs": 25
+    }
+  ],
+  "adapterCapabilities": [],
+  "inputs": [
+    {
+      "name": "hyphenated-runtime-input",
+      "type": "string-list",
+      "value": [
+        "BL",
+        "AP",
+        "CP",
+        "CSC"
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "kind": "success",
+      "operationId": "fixture-operation",
+      "outputs": [
+        {
+          "name": "packageMembers",
+          "type": "string-list",
+          "value": [
+            "BL",
+            "AP",
+            "CP",
+            "CSC"
+          ]
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "terminalStateId": "fixture-terminal",
+    "eventKinds": [
+      "session-start",
+      "operation-would-execute",
+      "operation-success",
+      "session-end"
+    ],
+    "errorCode": null
+  }
+}

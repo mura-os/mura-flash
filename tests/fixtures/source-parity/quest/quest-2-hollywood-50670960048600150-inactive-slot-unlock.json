@@ -1,0 +1,133 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "quest-2-hollywood-50670960048600150-inactive-slot-unlock",
+  "sourceRevision": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+  "targetGate": {
+    "codenames": [
+      "hollywood"
+    ],
+    "startBuild": "50670960048600150",
+    "maxSupportedBuild": "50670960048600150",
+    "downgradeBootChainBuild": "16476800118700000"
+  },
+  "artifactSha256": {
+    "bootctl_shim": "a5a5a201c5d4318015b1f646729a5ec3ab8eee3bc2b856f46ed6ea887d225fcf",
+    "quest2a12/16476800118700000.zip": "af25f24a975eab802065da0f1bc753d209af10d66164db28ebacdbedfa05e6a2",
+    "quest2a12/ionstack-deployment-claim": "be86b85728160946f4886bba98f24132eb04094a1c53e3050b3e520e607d40ba",
+    "abl.img": "7fcc464d3528b6e570540e1068521e3a2fa0486c1be3a8f89c8321bafa85d008",
+    "linuxloader.pe": "67d424fd540d9f598285b54aa151bba25cf181b965b3ac4d65de3f6a92c39675"
+  },
+  "partitionOrder": [
+    "xbl",
+    "xbl_config",
+    "aop",
+    "tz",
+    "hyp",
+    "devcfg",
+    "cmnlib",
+    "cmnlib64",
+    "keymaster",
+    "uefisecapp",
+    "imagefv",
+    "featenabler",
+    "qupfw",
+    "abl",
+    "modem",
+    "dtbo",
+    "boot"
+  ],
+  "backupContract": {
+    "exactWriteSet": true,
+    "partitionCount": 17,
+    "storedHashComparedToRecordedHash": true,
+    "freshLivePartitionHashCompared": true,
+    "bootingSlotNeverWritten": true,
+    "restoreRequiresBootingAdbShell": true,
+    "bothSlotsLostRecoverable": false
+  },
+  "sourceConflict": {
+    "profileCommentSaysIonstackBinaryMissing": true,
+    "generatedManifestPinsIonstack": true,
+    "deployedAssetMatchedPinnedHash": true,
+    "verdict": "deployment-claim-not-independent-source-reproduction"
+  },
+  "sourceOperationOrder": [
+    "identify-hollywood-and-exact-start-build",
+    "refuse-if-ionstack-not-in-runtime-manifest",
+    "verify-and-unpack-assets",
+    "read-running-and-inactive-slots",
+    "acquire-quest2a12-ionstack-root",
+    "backup-and-reread-17-inactive-partitions",
+    "write-and-readback-17-v29-images",
+    "set-active-inactive-slot",
+    "reboot-bootloader",
+    "gate-v29-bootloader-build",
+    "send-payload-then-flash-unlock-token",
+    "reboot-and-read-authoritative-unlock-or-state",
+    "reset-rollback-indexes",
+    "set-active-original-slot-and-restart",
+    "fastboot-flash-17-backups",
+    "erase-userdata-misc-metadata",
+    "reboot-system-for-android-mark-success"
+  ],
+  "confirmationsPresent": [
+    "root-live-codename",
+    "overwrite-live-inactive-suffix",
+    "unlock-16476800118700000"
+  ],
+  "confirmationsAbsent": [
+    "set-active-inactive-slot",
+    "erase-userdata-misc-metadata"
+  ],
+  "sourceGaps": [
+    "quest2-ionstack-binary-is-missing-from-pinned-source-tree",
+    "active-slot-gpt-reading-falls-back-to-boot-control-flags-if-gpt-is-untrusted-or-unreadable",
+    "unlock-state-is-getvar-unlocked-or-oem-device-info",
+    "rollback-reset-has-no-readback-and-failure-is-nonfatal",
+    "fastboot-backup-restore-has-protocol-ack-but-no-partition-readback",
+    "original-slot-mark-success-is-user-observed-after-full-android-boot",
+    "newer-build-flow-is-not-independently-reproduced"
+  ],
+  "citations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/data/profiles.ts",
+      "lineStart": 200,
+      "lineEnd": 255
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/asset-hashes.json",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/data/asset-hashes.json",
+      "lineStart": 1,
+      "lineEnd": 9
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/binaries/EXPECTED.sha256",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "binaries/EXPECTED.sha256",
+      "lineStart": 1,
+      "lineEnd": 9
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/flow.ts",
+      "lineStart": 691,
+      "lineEnd": 1374
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 612,
+      "lineEnd": 642
+    }
+  ]
+}

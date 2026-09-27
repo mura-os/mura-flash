@@ -1,4 +1,5 @@
 import contractJson from "../../contracts/v0.json";
+import contractV1Json from "../../contracts/v1.json";
 
 import type { FlashContract } from "./types";
 
@@ -11,7 +12,32 @@ export type ErrorCode =
   | "device-ambiguous"
   | "probe-failed"
   | "probe-timeout"
-  | "safety-refusal";
+  | "safety-refusal"
+  | "invalid-document"
+  | "contract-mismatch"
+  | "closure-unresolved"
+  | "graph-invalid"
+  | "capability-missing"
+  | "live-destructive-policy-denied"
+  | "guard-failed"
+  | "confirmation-declined"
+  | "artifact-fetch-failed"
+  | "artifact-verification-failed"
+  | "artifact-extraction-failed"
+  | "transport-failed"
+  | "authentication-failed"
+  | "operation-timeout"
+  | "device-disconnected"
+  | "device-rejected"
+  | "backup-failed"
+  | "hash-mismatch"
+  | "write-failed"
+  | "readback-mismatch"
+  | "restore-failed"
+  | "postcondition-failed"
+  | "interrupted"
+  | "manual-action-declined"
+  | "replay-mismatch";
 
 export class MuraFlashError extends Error {
   readonly code: ErrorCode;
@@ -21,7 +47,8 @@ export class MuraFlashError extends Error {
     super(`${code}: ${detail}`, cause === undefined ? undefined : { cause });
     this.name = "MuraFlashError";
     this.code = code;
-    this.exitCode = contract.errorCodes[code] ?? 5;
+    const v1Codes = contractV1Json.errorCodes as Readonly<Record<string, number>>;
+    this.exitCode = contract.errorCodes[code] ?? v1Codes[code] ?? 5;
   }
 }
 

@@ -1,0 +1,40 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-1-monterey",
+  "displayName": "Meta Quest 1",
+  "vendor": "Meta",
+  "models": [
+    "Quest 1"
+  ],
+  "codenames": [
+    "monterey"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "Source documents both a direct vulnerable-v29 unlock and a final-build inactive-slot downgrade flow, but authenticated stock acquisition and both-slot recovery remain unresolved."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Both source-described procedures remain disabled pending hardware, artifact, protected-state, and recovery qualification."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "quest-1-monterey-v29-direct-unlock",
+      "quest-1-monterey-inactive-slot-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 572,
+      "lineEnd": 610
+    }
+  ]
+}

@@ -54,6 +54,28 @@ def test_validate_default_catalog(capsys) -> None:
     assert len(output["targets"]) == 15
 
 
+def test_v1_procedure_commands_use_hermetic_catalog(capsys) -> None:
+    assert main(["procedures", "--json"]) == 0
+    procedures = json.loads(capsys.readouterr().out)["procedures"]
+    assert len(procedures) == 12
+    procedure_id = procedures[0]["id"]
+
+    assert main(["show-procedure", procedure_id, "--json"]) == 0
+    shown = json.loads(capsys.readouterr().out)
+    assert shown["id"] == procedure_id
+
+    assert main(["plan", procedure_id, "--json"]) == 0
+    plan = json.loads(capsys.readouterr().out)
+    assert plan["procedureId"] == procedure_id
+    assert all(step["wouldExecute"] is False for step in plan["steps"])
+
+
+def test_cli_exposes_no_live_destructive_commands(capsys) -> None:
+    for command in ("run", "unlock", "flash"):
+        assert main([command]) == 2
+        assert "invalid choice" in capsys.readouterr().err
+
+
 def test_usage_error_uses_contract_exit_code(capsys) -> None:
     assert main(["show"]) == 2
     assert "required" in capsys.readouterr().err

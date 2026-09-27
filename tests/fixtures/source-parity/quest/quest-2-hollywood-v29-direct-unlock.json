@@ -1,0 +1,86 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "quest-2-hollywood-v29-direct-unlock",
+  "sourceRevision": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+  "targetGate": {
+    "kind": "bootloader-build-only",
+    "value": "16476800118700000",
+    "modelIdentityAbsent": true
+  },
+  "artifactSha256": {
+    "quest2a12/16476800118700000.zip": "af25f24a975eab802065da0f1bc753d209af10d66164db28ebacdbedfa05e6a2",
+    "abl.img": "7fcc464d3528b6e570540e1068521e3a2fa0486c1be3a8f89c8321bafa85d008",
+    "linuxloader.pe": "67d424fd540d9f598285b54aa151bba25cf181b965b3ac4d65de3f6a92c39675"
+  },
+  "profilePartitionOrder": [
+    "xbl",
+    "xbl_config",
+    "aop",
+    "tz",
+    "hyp",
+    "devcfg",
+    "cmnlib",
+    "cmnlib64",
+    "keymaster",
+    "uefisecapp",
+    "imagefv",
+    "featenabler",
+    "qupfw",
+    "abl",
+    "modem",
+    "dtbo",
+    "boot"
+  ],
+  "sourceOperationOrder": [
+    "read-oem-device-info-build-number",
+    "verify-firmware-archive",
+    "derive-patched-linuxloader-payload",
+    "send-overflow-payload",
+    "flash-unlock-token-without-intervening-reboot",
+    "read-tentative-unlock-state-by-or",
+    "reboot-bootloader",
+    "read-authoritative-unlock-state-by-or",
+    "oem-reset-rollback-indexes"
+  ],
+  "sourceGaps": [
+    "direct-profile-selection-is-build-only",
+    "unlock-state-is-getvar-unlocked-or-oem-device-info",
+    "tentative-patched-bootloader-reading-is-not-authoritative",
+    "rollback-reset-has-no-readback-and-failure-is-nonfatal",
+    "direct-optional-slot-reset-cleanup-has-no-inactive-flow-backup-context"
+  ],
+  "citations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/flow.ts",
+      "lineStart": 343,
+      "lineEnd": 400
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/flow.ts",
+      "lineStart": 1080,
+      "lineEnd": 1229
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/fastboot.ts",
+      "lineStart": 552,
+      "lineEnd": 684
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/data/profiles.ts",
+      "lineStart": 200,
+      "lineEnd": 255
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "source": {
+    "kind": "vendor-ledger-plus-community-reports",
+    "retrieved": "2026-09-27",
+    "provenanceLimit": "The sources establish build identities and reported launch unlock behavior, not an authenticated AYIA package or a qualified Galaxy XR rollback transport."
+  },
+  "procedureFixtures": [
+    {
+      "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+      "path": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock.json",
+      "authority": "vendor-build-ledger-plus-community-unlock-and-rollback-claims"
+    }
+  ],
+  "muraPolicy": {
+    "proceduresEnabled": false,
+    "operationsEnabled": false,
+    "liveDestructiveAllowed": false,
+    "testOnly": true,
+    "writesEnabled": false
+  }
+}

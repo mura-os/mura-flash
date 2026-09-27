@@ -1,0 +1,39 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "pico-4-phoenix",
+  "displayName": "PICO 4",
+  "vendor": "PICO",
+  "models": [
+    "PICO 4"
+  ],
+  "codenames": [
+    "phoenix"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "A source-described EDL engineering-ABL unlock path exists, but exact hardware qualification, backup, payload provenance, and recovery closure remain outstanding."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The procedure is descriptive only until exact hardware, artifacts, backups, and recovery are qualified."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "pico-4-phoenix-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 249,
+      "lineEnd": 381
+    }
+  ]
+}

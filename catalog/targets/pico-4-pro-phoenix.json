@@ -1,0 +1,39 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "pico-4-pro-phoenix",
+  "displayName": "PICO 4 Pro",
+  "vendor": "PICO",
+  "models": [
+    "PICO 4 Pro"
+  ],
+  "codenames": [
+    "phoenix"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "Pinned tooling describes the Phoenix EDL unlock and maps Pro to its Lite programmer, without independent hardware, payload, backup, or recovery qualification."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The procedure remains disabled pending exact loader acceptance, artifact provenance, backups, and recovery proof."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "pico-4-pro-phoenix-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 249,
+      "lineEnd": 380
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "org.mura.flash.evidence-manifest/v1",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "files": [
+    {
+      "path": "evidence/samsung/ayia-community-report.json",
+      "sha256": "9ca5afe1a2e6b28743380177ed1ba34fd28433963f5bf50af15fbd63dbff6526"
+    },
+    {
+      "path": "evidence/samsung/launch-unlock-media.json",
+      "sha256": "eea2398195287dfe1e29a17708d996f6f5de6dc0b165b3c5bd5d90722fac7af2"
+    },
+    {
+      "path": "evidence/samsung/official-build-ledger.json",
+      "sha256": "04c6726868940b0b1dd4a163c89b90d67c6ce3ab33069b8d37b941444528bd8b"
+    },
+    {
+      "path": "evidence/samsung/wall-of-shame-claims.json",
+      "sha256": "8e0a6c3730b44bfe9f7a4eb2768339497c4c17b39cd20804027d0e0618515019"
+    }
+  ]
+}

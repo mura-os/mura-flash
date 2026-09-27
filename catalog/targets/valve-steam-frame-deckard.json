@@ -1,0 +1,41 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "valve-steam-frame-deckard",
+  "displayName": "Valve Steam Frame",
+  "vendor": "Valve",
+  "models": [
+    "Steam Frame"
+  ],
+  "codenames": [
+    "deckard"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "unknown",
+    "installState": "incomplete",
+    "summary": "Stock administrator access and RAUC updates do not establish a first-install path or lower boot-chain trust policy."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Administrator access does not prove an alternate boot trust path or qualified rescue mechanism."
+  },
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "first-install-path-unknown",
+      "boot-chain-policy-unknown",
+      "rescue-path-unqualified"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 407,
+      "lineEnd": 463
+    }
+  ]
+}

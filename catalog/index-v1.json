@@ -1,0 +1,181 @@
+{
+  "procedures": [
+    {
+      "canonicalSize": 17895,
+      "id": "htc-vive-xr-elite-10999738-unlock",
+      "path": "recipes/procedures/htc-vive-xr-elite-10999738-unlock.json",
+      "sha256": "742d0cd32091f5a039a6acf585b99821eb31a3e7dc726225da875310291a6f4b",
+      "targetId": "htc-vive-xr-elite-kyoto"
+    },
+    {
+      "canonicalSize": 16772,
+      "id": "lynx-r1-qdl-stock-restore",
+      "path": "recipes/procedures/lynx-r1-qdl-stock-restore.json",
+      "sha256": "fae25d9d8b4479779915c1b611dd7b28e25c879fe67d542e68b16af718a8f47d",
+      "targetId": "lynx-r1"
+    },
+    {
+      "canonicalSize": 10738,
+      "id": "lynx-r1-versioned-sideload",
+      "path": "recipes/procedures/lynx-r1-versioned-sideload.json",
+      "sha256": "212d55e4e8a7de75bd207d66fc5c2b65c2448f51916b3fa0040a21b2ea98cef2",
+      "targetId": "lynx-r1"
+    },
+    {
+      "canonicalSize": 14439,
+      "id": "oculus-go-pacific-official-unlock",
+      "path": "recipes/procedures/oculus-go-pacific-official-unlock.json",
+      "sha256": "476043c5faf075361fe3b379cf2fca76dd9332023b3bce5b3212b513032ddecd",
+      "targetId": "oculus-go-pacific"
+    },
+    {
+      "canonicalSize": 84291,
+      "id": "pico-4-phoenix-unlock",
+      "path": "recipes/procedures/pico-4-phoenix-unlock.json",
+      "sha256": "10c1434690e221d8b3cbbe936e5f0e8bf705de1a61b62a6305d20d952f9e7262",
+      "targetId": "pico-4-phoenix"
+    },
+    {
+      "canonicalSize": 84303,
+      "id": "pico-4-pro-phoenix-unlock",
+      "path": "recipes/procedures/pico-4-pro-phoenix-unlock.json",
+      "sha256": "f9ab21b4f06c374fabcedd9d7af3ffa623042e2147fc065235e173a65cf9fbfc",
+      "targetId": "pico-4-pro-phoenix"
+    },
+    {
+      "canonicalSize": 88744,
+      "id": "pico-neo-3-unlock",
+      "path": "recipes/procedures/pico-neo-3-unlock.json",
+      "sha256": "00f855482aa1de381c5ca09090f8f275430df2c1f629f1dc20c66ba426f0f09a",
+      "targetId": "pico-neo-3"
+    },
+    {
+      "canonicalSize": 109551,
+      "id": "quest-1-monterey-inactive-slot-unlock",
+      "path": "recipes/procedures/quest-1-monterey-inactive-slot-unlock.json",
+      "sha256": "7f71ad5da9cc6570e3199b657729144a70324a756fa4a1c631ed015a6d2a7216",
+      "targetId": "quest-1-monterey"
+    },
+    {
+      "canonicalSize": 21563,
+      "id": "quest-1-monterey-v29-direct-unlock",
+      "path": "recipes/procedures/quest-1-monterey-v29-direct-unlock.json",
+      "sha256": "5c5c47116772dfc1d60ed6e1b006ae2067d0311128181ddc7d2aa7bd97380394",
+      "targetId": "quest-1-monterey"
+    },
+    {
+      "canonicalSize": 128660,
+      "id": "quest-2-hollywood-50670960048600150-inactive-slot-unlock",
+      "path": "recipes/procedures/quest-2-hollywood-50670960048600150-inactive-slot-unlock.json",
+      "sha256": "ba85f1ed450463eae1e594132b0f7ff58305d935a9d9aba438186b242817cf4c",
+      "targetId": "quest-2-hollywood"
+    },
+    {
+      "canonicalSize": 22051,
+      "id": "quest-2-hollywood-v29-direct-unlock",
+      "path": "recipes/procedures/quest-2-hollywood-v29-direct-unlock.json",
+      "sha256": "519c22b6daff12898fc8002e6e3584c31afaa8ece5c5bcd00eb53536b3ab180e",
+      "targetId": "quest-2-hollywood"
+    },
+    {
+      "canonicalSize": 65809,
+      "id": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+      "path": "recipes/procedures/samsung-galaxy-xr-ayke-to-ayia-rollback-unlock.json",
+      "sha256": "15217398c1beb0c446aea02f4307467c39fe300c792c81764ceae67c10657af7",
+      "targetId": "samsung-galaxy-xr-sm-i610"
+    }
+  ],
+  "schema": "org.mura.flash.target-catalog-index/v1",
+  "targets": [
+    {
+      "canonicalSize": 1040,
+      "id": "htc-vive-xr-elite-kyoto",
+      "path": "catalog/targets/htc-vive-xr-elite-kyoto.json",
+      "sha256": "b2b5097ef6d8f55bc7efe39d46537cde8c06210e4ddcd4d78678f9691f9b14e2"
+    },
+    {
+      "canonicalSize": 1052,
+      "id": "lynx-r1",
+      "path": "catalog/targets/lynx-r1.json",
+      "sha256": "2ada838d86b4cc530f198ecfbd4d589f39094ff50a87cf1a89d3f2b0cbba985b"
+    },
+    {
+      "canonicalSize": 1027,
+      "id": "oculus-go-pacific",
+      "path": "catalog/targets/oculus-go-pacific.json",
+      "sha256": "f5b275f4b2d9f7558e311c519a34ff5fa4abf2d8fde1855822034ecb8e58a9b6"
+    },
+    {
+      "canonicalSize": 1011,
+      "id": "pico-4-enterprise-phoenix",
+      "path": "catalog/targets/pico-4-enterprise-phoenix.json",
+      "sha256": "e5724ebd380f6e94900230d5ce5afc54e27e1428f9dd6471ba75e0c435cde46d"
+    },
+    {
+      "canonicalSize": 1018,
+      "id": "pico-4-phoenix",
+      "path": "catalog/targets/pico-4-phoenix.json",
+      "sha256": "94031db019d37d7db9a5f97c85a475a72a7b8d532be784e67932c1b7a3496432"
+    },
+    {
+      "canonicalSize": 1041,
+      "id": "pico-4-pro-phoenix",
+      "path": "catalog/targets/pico-4-pro-phoenix.json",
+      "sha256": "12e578fc9e49978ea5ee35d201e1669f90b4f99c94fa6bdde383a61ba988bed8"
+    },
+    {
+      "canonicalSize": 974,
+      "id": "pico-neo-3",
+      "path": "catalog/targets/pico-neo-3.json",
+      "sha256": "732410995353dc91d94926c1204fbee3bb6dcd4289b851a06aa8184e8cca0599"
+    },
+    {
+      "canonicalSize": 1023,
+      "id": "play-for-dream-mr-mrd3a0",
+      "path": "catalog/targets/play-for-dream-mr-mrd3a0.json",
+      "sha256": "311089e50648b210f62073241a8a3e2b35f573637f20e59bd86f38609d5a389f"
+    },
+    {
+      "canonicalSize": 1116,
+      "id": "quest-1-monterey",
+      "path": "catalog/targets/quest-1-monterey.json",
+      "sha256": "1f12b70b05a9ffdc2d4a2df1018fea8fce60421203a93541fa53db49dc8d6237"
+    },
+    {
+      "canonicalSize": 1114,
+      "id": "quest-2-hollywood",
+      "path": "catalog/targets/quest-2-hollywood.json",
+      "sha256": "8c4e0286982558835f5ae7e25256113fe7388efec3e168ec63451496af9d018c"
+    },
+    {
+      "canonicalSize": 2191,
+      "id": "quest-3-eureka",
+      "path": "catalog/targets/quest-3-eureka.json",
+      "sha256": "fb3a1d3aa50ff338fa8a5d59eabc4f489988711f973280f5eaccc328d5974aed"
+    },
+    {
+      "canonicalSize": 1986,
+      "id": "quest-3s-panther",
+      "path": "catalog/targets/quest-3s-panther.json",
+      "sha256": "192e4cbca20ffc5f46e3dd0918b198666513d63d2b5c68a35e0bdc6f39f01cdf"
+    },
+    {
+      "canonicalSize": 1765,
+      "id": "quest-pro-cambria",
+      "path": "catalog/targets/quest-pro-cambria.json",
+      "sha256": "a8dd3faf18344e0758e9d8e756deb670f532b2c46bbc744f0705b9ecc03c4e04"
+    },
+    {
+      "canonicalSize": 1624,
+      "id": "samsung-galaxy-xr-sm-i610",
+      "path": "catalog/targets/samsung-galaxy-xr-sm-i610.json",
+      "sha256": "1855974b0e1241773acf3f6aa155559b8633fa4bf3a7f0970d65a90ae08a63f9"
+    },
+    {
+      "canonicalSize": 1040,
+      "id": "valve-steam-frame-deckard",
+      "path": "catalog/targets/valve-steam-frame-deckard.json",
+      "sha256": "258b8322a1946b24e6a7eaae84f396bbb74ea4a478a1e5f05004c44422c371f2"
+    }
+  ]
+}

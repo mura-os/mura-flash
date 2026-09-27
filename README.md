@@ -2,16 +2,23 @@
 
 Host-side inspection and installation tooling for Mura target headsets.
 
-Version 0 is deliberately **inspection-only**. It can list and validate target
-recipes and collect allowlisted, read-only ADB or fastboot facts. It cannot
-download images, reboot a device, unlock a bootloader, change slots, execute a
-programmer, erase, format, flash, relock, or alter rollback state.
+Version 0 remains **inspection-only**. Version 1 adds typed target records and
+machine-executable procedure graphs shared by Python and JavaScript. Procedures
+can be planned and deterministically replayed, but all current state-changing
+operations remain test-only, unqualified, and disabled.
 
 ## Run
 
 ```sh
 nix run github:mura-os/mura-flash
 nix run github:mura-os/mura-flash -- targets
+nix run github:mura-os/mura-flash -- procedures
+nix run github:mura-os/mura-flash -- plan \
+  samsung-galaxy-xr-ayke-to-ayia-rollback-unlock \
+  --flow ayke-rollback-and-unlock
+nix run github:mura-os/mura-flash -- replay \
+  samsung-galaxy-xr-ayke-to-ayia-rollback-unlock \
+  --scenario replay/scenarios/samsung/samsung-ayke-u1-rollback-and-unlock-success.json
 ```
 
 The first public revision remains available by commit:
@@ -38,15 +45,26 @@ compiled by Rollup into committed ESM files under `dist/`.
 uv run pytest
 npm test
 npm run build
+python tools/check_replay_parity.py
 nix flake check
 ```
 
-Recipes under `recipes/targets/` are consumed by both implementations. The
-machine-readable contract under `contracts/` defines stable IDs, limits, error
-codes, CLI grammar, and the JavaScript export surface.
+Inspection recipes under `recipes/targets/` and executable procedure graphs
+under `recipes/procedures/` are consumed by both implementations. The
+machine-readable contracts under `contracts/` define stable IDs, limits, error
+codes, operation semantics, CLI grammar, and the JavaScript export surface.
+Target records, evidence manifests, shared record schemas, and replay scenarios
+live under `catalog/`, `evidence/`, `records/`, and `replay/`.
 
 ## Safety boundary
 
 Recipes are research evidence, not hardware qualification. Every shipped
-recipe is test-only, unqualified, and write-disabled. Device communication is
-restricted to compiled-in probes; recipes never contain executable commands.
+procedure is test-only, unqualified, and write-disabled. Destructive flows can
+only be simulated; live policy refusal occurs before an adapter is created.
+Device inspection is restricted to compiled-in read-only probes.
+
+The Galaxy XR procedure documents the community-reported `AYKE` (`U1`) to
+`AYIA` (`U1`) rollback and launch unlock, including package, CSC, SWREV,
+KG/FRP, interruption, and post-flash failure paths. It does not ship Samsung
+firmware, invent an Odin command, or claim a live rollback implementation.
+`U2` and later builds refuse the `U1` rollback without executing writes.

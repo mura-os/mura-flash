@@ -1,0 +1,61 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "samsung-galaxy-xr-sm-i610",
+  "displayName": "Samsung Galaxy XR",
+  "vendor": "Samsung",
+  "models": [
+    "SM-I610"
+  ],
+  "codenames": [],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "reported",
+    "installState": "procedure-available",
+    "summary": "A disabled simulation procedure preserves the reported launch unlock, the plausible but unproven AYKE U1 to AYIA U1 rollback shape, and the U2 refusal. No live Samsung write is qualified."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The AYIA package digest, exact CSC/package binding, Download entry and transport, complete protected-state backups, AYKE rollback transcript, and stock restore are unresolved. The procedure is test-only and all operations remain disabled."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "repository",
+      "path": "evidence/samsung/official-build-ledger.json",
+      "lineStart": 1,
+      "lineEnd": 10
+    },
+    {
+      "kind": "repository",
+      "path": "evidence/samsung/ayia-community-report.json",
+      "lineStart": 1,
+      "lineEnd": 10
+    },
+    {
+      "kind": "repository",
+      "path": "evidence/samsung/launch-unlock-media.json",
+      "lineStart": 1,
+      "lineEnd": 10
+    },
+    {
+      "kind": "repository",
+      "path": "evidence/samsung/wall-of-shame-claims.json",
+      "lineStart": 1,
+      "lineEnd": 10
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 117,
+      "lineEnd": 201
+    }
+  ]
+}

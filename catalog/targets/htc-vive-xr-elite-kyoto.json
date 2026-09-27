@@ -1,0 +1,39 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "htc-vive-xr-elite-kyoto",
+  "displayName": "HTC VIVE XR Elite",
+  "vendor": "HTC",
+  "models": [
+    "VIVE XR Elite"
+  ],
+  "codenames": [
+    "kyoto"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "reported",
+    "installState": "procedure-available",
+    "summary": "A community guide reports standard fastboot unlock on displayed release 1.0.999.738, without a captured fingerprint, SKU, bootloader revision, or recovery closure."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The single-author report and displayed release do not qualify hardware or stock recovery."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "htc-vive-xr-elite-10999738-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 669,
+      "lineEnd": 714
+    }
+  ]
+}

@@ -1,0 +1,661 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "lynx-r1-versioned-sideload",
+  "targetId": "lynx-r1",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Lynx documents selecting a specific R1 firmware version from its portal, enabling file transfer and debugging, then running adb reboot sideload-auto-reboot, adb wait-for-sideload, and adb sideload YourVersion.zip. The vendor explicitly says this can reverse an update.",
+    "evidenceLevel": "vendor-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Live use is unavailable because the selected official artifact has no acquired SHA-256 here, the current 1.4.1 link returned 404, and exact package compatibility, AVB/rollback effects, protected state, and hardware recovery are unqualified. The all-zero digest explicitly means unknown.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "lynx-stock-adb",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "sideload-auto-reboot",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "version-package-applied",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "stock-os-rebooted",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "safe-stop",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "lynx-r1-selected-version-zip",
+      "role": "stock",
+      "source": {
+        "kind": "remote",
+        "uri": "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    }
+  ],
+  "partitions": [],
+  "backups": [],
+  "confirmations": [
+    {
+      "id": "confirm-versioned-sideload",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Apply the exact user-selected Lynx R1 firmware ZIP, including a downgrade if selected. Unknown SHA-256 and rollback/protected-state effects block this disabled record from live use."
+    }
+  ],
+  "operations": [
+    {
+      "id": "gate-lynx-r1-model",
+      "variant": "adb.property",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-adb-device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.product.model"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-lynx-r1-model",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Lynx-R1"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ]
+    },
+    {
+      "id": "reboot-sideload-auto-reboot",
+      "variant": "adb.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "lynx-r1-adb-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "sideload"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-lynx-r1-model",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Lynx-R1"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reboot-sideload-auto-reboot",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "sideload-auto-reboot"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ]
+    },
+    {
+      "id": "sideload-selected-version",
+      "variant": "adb.sideload",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "lynx-r1-sideload-device"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "lynx-r1-selected-version-zip"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "sideload-auto-reboot"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "sideload-selected-version",
+            "outputName": "result"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-sideload"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-sideload"
+        },
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-in-sideload"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "sideload-auto-reboot"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "version-package-applied"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-sideload"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-sideload"
+        }
+      ]
+    },
+    {
+      "id": "observe-auto-reboot",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Allow the vendor sideload-auto-reboot flow to complete; do not infer success from ADB disconnect alone."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The selected firmware boots and reports its selected version."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "version-package-applied"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "observe-auto-reboot",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "vendor-qdl-handoff"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "vendor-qdl-handoff"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "version-package-applied"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "stock-os-rebooted"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "vendor-qdl-handoff"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "vendor-qdl-handoff"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop in the current vendor mode. If the OS no longer boots, use only the separately disabled vendor QDL stock-restore record with the exact official package."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No arbitrary package, downgrade, partition, or rawprogram is substituted."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "sideload-auto-reboot"
+        },
+        {
+          "kind": "state",
+          "stateId": "version-package-applied"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-stock-os"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-stock-os"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "version-selected-sideload",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "lynx-stock-adb"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "gate-lynx-r1-model"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-sideload-auto-reboot"
+        },
+        {
+          "kind": "operation",
+          "operationId": "sideload-selected-version"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-auto-reboot"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Lynx-R1"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Lynx-R1"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-versioned-sideload"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-in-stock-os",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "wait-for-sideload",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "sideload-auto-reboot"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "sideload-auto-reboot"
+      }
+    },
+    {
+      "id": "stay-in-sideload",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "sideload-auto-reboot"
+        },
+        {
+          "kind": "state",
+          "stateId": "version-package-applied"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "sideload-auto-reboot"
+      }
+    },
+    {
+      "id": "vendor-qdl-handoff",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "version-package-applied"
+        },
+        {
+          "kind": "state",
+          "stateId": "stock-os-rebooted"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "external",
+      "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "external",
+      "uri": "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 464,
+      "lineEnd": 534
+    }
+  ],
+  "sourceGaps": [
+    "The cited source does not establish Mura hardware qualification or complete recovery.",
+    "One or more required artifact digests are unknown, so live verification is impossible."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/vendor/lynx-r1-versioned-sideload.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "connected-adb-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "lynx-r1-adb-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "lynx-r1-sideload-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

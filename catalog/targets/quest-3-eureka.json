@@ -1,0 +1,81 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-3-eureka",
+  "displayName": "Meta Quest 3",
+  "vendor": "Meta",
+  "models": [
+    "Quest 3"
+  ],
+  "codenames": [
+    "eureka"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "unsupported",
+    "installState": "unsupported",
+    "summary": "Public temporary-root research is RAM-only and supplies neither persistent unlock nor a matching public recovery programmer."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Temporary root does not establish a persistent unlock or recoverable write boundary."
+  },
+  "buildEvidence": [
+    {
+      "buildId": "52433670036000520",
+      "status": "temporary-root-vulnerable",
+      "summary": "The pinned Quest 3 target and exploit documentation identify this as the last vulnerable build.",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/targets/q3_52433670036000520.json",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "targets/q3_52433670036000520.json",
+          "lineStart": 1,
+          "lineEnd": 6
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/README.md",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "README.md",
+          "lineStart": 10,
+          "lineEnd": 17
+        }
+      ]
+    },
+    {
+      "buildId": "52433670048800520",
+      "status": "temporary-root-patched",
+      "summary": "The pinned Quest 3 target records the patched kernel behavior and failed exploit primitive.",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/targets/q3_52433670048800520.json",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "targets/q3_52433670048800520.json",
+          "lineStart": 1,
+          "lineEnd": 7
+        }
+      ]
+    }
+  ],
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "temporary-root-only",
+      "persistent-unlock-missing",
+      "recovery-missing"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 645,
+      "lineEnd": 666
+    }
+  ]
+}

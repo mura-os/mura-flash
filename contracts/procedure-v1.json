@@ -1,0 +1,2332 @@
+{
+  "schema": "org.mura.flash.procedure-registry/v1",
+  "valueTypes": [
+    "artifact-ref",
+    "backup-ref",
+    "boolean",
+    "bytes",
+    "device-ref",
+    "digest",
+    "duration-ms",
+    "integer",
+    "mode",
+    "partition-ref",
+    "path",
+    "property-name",
+    "state-ref",
+    "string",
+    "string-list",
+    "uri",
+    "verified-artifact-ref"
+  ],
+  "safetyClasses": [
+    "host-read",
+    "host-transform",
+    "device-read",
+    "device-transition",
+    "device-code-execution",
+    "device-write",
+    "device-erase",
+    "security-state-change",
+    "manual"
+  ],
+  "operations": [
+    {
+      "id": "artifact.fetch",
+      "safetyClass": "host-read",
+      "inputs": [
+        {
+          "name": "sourceUri",
+          "type": "uri",
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "artifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "artifact-fetch-failed",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "artifact.fetch",
+      "algorithmParameters": [
+        {
+          "name": "redirect-policy",
+          "value": "same-scheme-or-https"
+        },
+        {
+          "name": "partial-file-policy",
+          "value": "discard"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 510,
+          "lineEnd": 518
+        }
+      ]
+    },
+    {
+      "id": "artifact.verify",
+      "safetyClass": "host-read",
+      "inputs": [
+        {
+          "name": "artifact",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "expectedDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "actualDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "artifact-verification-failed",
+        "hash-mismatch"
+      ],
+      "requiredAdapterCapability": "artifact.sha256",
+      "algorithmParameters": [
+        {
+          "name": "digest-algorithm",
+          "value": "sha256"
+        },
+        {
+          "name": "comparison",
+          "value": "constant-time-lowercase-hex"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 510,
+          "lineEnd": 518
+        }
+      ]
+    },
+    {
+      "id": "artifact.extract",
+      "safetyClass": "host-transform",
+      "inputs": [
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "members",
+          "type": "string-list",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "artifact-extraction-failed"
+      ],
+      "requiredAdapterCapability": "artifact.extract",
+      "algorithmParameters": [
+        {
+          "name": "path-traversal",
+          "value": "reject"
+        },
+        {
+          "name": "symlinks",
+          "value": "reject"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 544,
+          "lineEnd": 554
+        }
+      ]
+    },
+    {
+      "id": "adb.property",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "property",
+          "type": "property-name",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "adb.get-property",
+      "algorithmParameters": [
+        {
+          "name": "shell-template",
+          "value": "getprop-single-name"
+        },
+        {
+          "name": "arbitrary-command",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 59,
+          "lineEnd": 75
+        }
+      ]
+    },
+    {
+      "id": "adb.push",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "artifact",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "remotePath",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bytesWritten",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "write-failed"
+      ],
+      "requiredAdapterCapability": "adb.push",
+      "algorithmParameters": [
+        {
+          "name": "overwrite-policy",
+          "value": "procedure-declared-path-only"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 50,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "adb.pull",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "remotePath",
+          "type": "path",
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "artifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "backup-failed"
+      ],
+      "requiredAdapterCapability": "adb.pull",
+      "algorithmParameters": [
+        {
+          "name": "source-policy",
+          "value": "procedure-declared-path-only"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 157,
+          "lineEnd": 164
+        }
+      ]
+    },
+    {
+      "id": "adb.sideload",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "transport-failed",
+        "device-rejected",
+        "write-failed"
+      ],
+      "requiredAdapterCapability": "adb.sideload",
+      "algorithmParameters": [
+        {
+          "name": "accepted-mode",
+          "value": "recovery-sideload"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 470,
+          "lineEnd": 479
+        }
+      ]
+    },
+    {
+      "id": "adb.reboot",
+      "safetyClass": "device-transition",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "mode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "expectedMode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-mode",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "adb.reboot",
+      "algorithmParameters": [
+        {
+          "name": "allowed-modes",
+          "value": [
+            "system",
+            "bootloader",
+            "recovery",
+            "sideload",
+            "edl"
+          ]
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 232,
+          "lineEnd": 243
+        }
+      ]
+    },
+    {
+      "id": "root.acquire",
+      "safetyClass": "device-code-execution",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "payload",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rootSession",
+          "type": "state-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-runtime",
+      "failureClasses": [
+        "authentication-failed",
+        "device-rejected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "root.acquire",
+      "algorithmParameters": [
+        {
+          "name": "persistence",
+          "value": "operation-declared"
+        },
+        {
+          "name": "unlock-equivalence",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 647,
+          "lineEnd": 665
+        }
+      ]
+    },
+    {
+      "id": "boot-control.read",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "activeSlot",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "slotState",
+          "type": "state-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "transport-failed",
+        "device-rejected"
+      ],
+      "requiredAdapterCapability": "boot-control.read",
+      "algorithmParameters": [
+        {
+          "name": "slot-source",
+          "value": "adapter-authoritative"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 96,
+          "lineEnd": 102
+        }
+      ]
+    },
+    {
+      "id": "boot-control.set",
+      "safetyClass": "device-transition",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "slot",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "activeSlot",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-boot-control",
+      "failureClasses": [
+        "transport-failed",
+        "device-rejected",
+        "write-failed"
+      ],
+      "requiredAdapterCapability": "boot-control.set-active",
+      "algorithmParameters": [
+        {
+          "name": "verify-after-set",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 578,
+          "lineEnd": 594
+        }
+      ]
+    },
+    {
+      "id": "partition.backup",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "backup",
+          "type": "backup-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "backup-failed",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "partition.read",
+      "algorithmParameters": [
+        {
+          "name": "reads",
+          "value": 2
+        },
+        {
+          "name": "matching-sha256-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 319,
+          "lineEnd": 336
+        }
+      ]
+    },
+    {
+      "id": "partition.hash",
+      "safetyClass": "host-read",
+      "inputs": [
+        {
+          "name": "backup",
+          "type": "backup-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "digest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "backup-failed",
+        "hash-mismatch"
+      ],
+      "requiredAdapterCapability": "artifact.sha256",
+      "algorithmParameters": [
+        {
+          "name": "digest-algorithm",
+          "value": "sha256"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 103,
+          "lineEnd": 113
+        }
+      ]
+    },
+    {
+      "id": "partition.write",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bytesWritten",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "partition.write",
+      "algorithmParameters": [
+        {
+          "name": "qualified-partition-only",
+          "value": true
+        },
+        {
+          "name": "readback-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "partition.readback",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "expectedDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "actualDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "readback-mismatch",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "partition.read",
+      "algorithmParameters": [
+        {
+          "name": "digest-algorithm",
+          "value": "sha256"
+        },
+        {
+          "name": "byte-count",
+          "value": "exact-partition-declared-range"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "partition.restore",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "backup",
+          "type": "backup-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "restoredDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "restore-failed",
+        "readback-mismatch",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "partition.write",
+      "algorithmParameters": [
+        {
+          "name": "unit-binding-required",
+          "value": true
+        },
+        {
+          "name": "readback-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 329,
+          "lineEnd": 338
+        }
+      ]
+    },
+    {
+      "id": "pico.derive-token",
+      "safetyClass": "host-transform",
+      "inputs": [
+        {
+          "name": "socSerial",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "unlockToken",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "postcondition-failed"
+      ],
+      "requiredAdapterCapability": "pico.token-v1",
+      "algorithmParameters": [
+        {
+          "name": "input",
+          "value": "unsigned-soc-serial"
+        },
+        {
+          "name": "algorithm",
+          "value": "more-picohaxx-token-v1"
+        },
+        {
+          "name": "token-prefix",
+          "value": "pico"
+        },
+        {
+          "name": "sensitive-input",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/chaixshot/more-picohaxx-tool/blob/29591aec1b2babab3c3c26239e85576da556e968/more-picohaxx.py",
+          "commit": "29591aec1b2babab3c3c26239e85576da556e968",
+          "path": "more-picohaxx.py",
+          "lineStart": 1,
+          "lineEnd": 95
+        }
+      ]
+    },
+    {
+      "id": "edl.load-programmer",
+      "safetyClass": "device-code-execution",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedProgrammer",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "edlSession",
+          "type": "state-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-runtime",
+      "failureClasses": [
+        "authentication-failed",
+        "device-rejected",
+        "transport-failed"
+      ],
+      "requiredAdapterCapability": "edl.sahara-firehose",
+      "algorithmParameters": [
+        {
+          "name": "exact-programmer-hash-required",
+          "value": true
+        },
+        {
+          "name": "probe-load-is-code-execution",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 351,
+          "lineEnd": 377
+        }
+      ]
+    },
+    {
+      "id": "edl.read",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "edlSession",
+          "type": "state-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "destination",
+          "type": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "backup",
+          "type": "backup-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "backup-failed",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "edl.read",
+      "algorithmParameters": [
+        {
+          "name": "bounded-range-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 351,
+          "lineEnd": 377
+        }
+      ]
+    },
+    {
+      "id": "edl.write",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "edlSession",
+          "type": "state-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bytesWritten",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "edl.write",
+      "algorithmParameters": [
+        {
+          "name": "erase-all",
+          "value": false
+        },
+        {
+          "name": "partition-name-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 329,
+          "lineEnd": 355
+        }
+      ]
+    },
+    {
+      "id": "qdl.apply-package",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "edlSession",
+          "type": "state-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedPackage",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "transport-failed",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "qdl.apply-package",
+      "algorithmParameters": [
+        {
+          "name": "storage",
+          "value": "ufs"
+        },
+        {
+          "name": "rawprogram-source",
+          "value": "exact-package-only"
+        },
+        {
+          "name": "patch-source",
+          "value": "exact-package-only"
+        },
+        {
+          "name": "erase-all",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ]
+    },
+    {
+      "id": "edl.reset",
+      "safetyClass": "device-transition",
+      "inputs": [
+        {
+          "name": "edlSession",
+          "type": "state-ref",
+          "required": true
+        },
+        {
+          "name": "mode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "expectedMode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-mode",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "edl.reset",
+      "algorithmParameters": [
+        {
+          "name": "reconnect-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 214,
+          "lineEnd": 222
+        }
+      ]
+    },
+    {
+      "id": "fastboot.probe",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "variable",
+          "type": "property-name",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "transport-failed",
+        "device-rejected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "fastboot.getvar",
+      "algorithmParameters": [
+        {
+          "name": "getvar-all",
+          "value": false
+        },
+        {
+          "name": "allowlisted-variable-only",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 76,
+          "lineEnd": 101
+        }
+      ]
+    },
+    {
+      "id": "fastboot.vendor-pico-unlock",
+      "safetyClass": "security-state-change",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "unlockToken",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accepted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-security",
+      "failureClasses": [
+        "device-rejected",
+        "transport-failed",
+        "authentication-failed"
+      ],
+      "requiredAdapterCapability": "fastboot.vendor-pico-unlock",
+      "algorithmParameters": [
+        {
+          "name": "command-shape",
+          "value": "oem-pico-token-unlock"
+        },
+        {
+          "name": "arbitrary-oem-command",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 300
+        }
+      ]
+    },
+    {
+      "id": "fastboot.unlock-critical",
+      "safetyClass": "security-state-change",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accepted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-security",
+      "failureClasses": [
+        "device-rejected",
+        "transport-failed",
+        "confirmation-declined"
+      ],
+      "requiredAdapterCapability": "fastboot.flashing-unlock-critical",
+      "algorithmParameters": [
+        {
+          "name": "device-confirmation-may-be-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 300
+        }
+      ]
+    },
+    {
+      "id": "fastboot.unlock",
+      "safetyClass": "security-state-change",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accepted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-security",
+      "failureClasses": [
+        "device-rejected",
+        "transport-failed",
+        "confirmation-declined"
+      ],
+      "requiredAdapterCapability": "fastboot.flashing-unlock",
+      "algorithmParameters": [
+        {
+          "name": "device-confirmation-may-be-required",
+          "value": true
+        },
+        {
+          "name": "userdata-wipe-may-occur",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 680,
+          "lineEnd": 688
+        }
+      ]
+    },
+    {
+      "id": "fastboot.set-active",
+      "safetyClass": "device-transition",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "slot",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "activeSlot",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-boot-control",
+      "failureClasses": [
+        "device-rejected",
+        "transport-failed",
+        "write-failed"
+      ],
+      "requiredAdapterCapability": "fastboot.set-active",
+      "algorithmParameters": [
+        {
+          "name": "verify-current-slot",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 578,
+          "lineEnd": 594
+        }
+      ]
+    },
+    {
+      "id": "fastboot.flash",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedArtifact",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bytesWritten",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "device-rejected",
+        "transport-failed"
+      ],
+      "requiredAdapterCapability": "fastboot.flash",
+      "algorithmParameters": [
+        {
+          "name": "partition-ref-only",
+          "value": true
+        },
+        {
+          "name": "readback-or-equivalent-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "fastboot.erase",
+      "safetyClass": "device-erase",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "erased",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "device-rejected",
+        "transport-failed"
+      ],
+      "requiredAdapterCapability": "fastboot.erase",
+      "algorithmParameters": [
+        {
+          "name": "partition-ref-only",
+          "value": true
+        },
+        {
+          "name": "global-erase",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 470,
+          "lineEnd": 500
+        }
+      ]
+    },
+    {
+      "id": "fastboot.reboot",
+      "safetyClass": "device-transition",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "mode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "expectedMode",
+          "type": "mode",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-mode",
+      "failureClasses": [
+        "transport-failed",
+        "device-disconnected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "fastboot.reboot",
+      "algorithmParameters": [
+        {
+          "name": "allowed-modes",
+          "value": [
+            "system",
+            "bootloader",
+            "fastbootd",
+            "recovery"
+          ]
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 300
+        }
+      ]
+    },
+    {
+      "id": "fastboot.reset-rollback",
+      "safetyClass": "security-state-change",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "slot",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "resetAccepted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-security",
+      "failureClasses": [
+        "device-rejected",
+        "transport-failed",
+        "authentication-failed"
+      ],
+      "requiredAdapterCapability": "fastboot.reset-rollback",
+      "algorithmParameters": [
+        {
+          "name": "fuse-floor-unchanged",
+          "value": true
+        },
+        {
+          "name": "post-unlock-only",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 578,
+          "lineEnd": 594
+        }
+      ]
+    },
+    {
+      "id": "recovery.reset",
+      "safetyClass": "device-erase",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "resetAccepted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "manual-action-declined",
+        "device-rejected",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "recovery.factory-reset",
+      "algorithmParameters": [
+        {
+          "name": "userdata-erased",
+          "value": true
+        },
+        {
+          "name": "device-confirmation-may-be-required",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 280,
+          "lineEnd": 300
+        }
+      ]
+    },
+    {
+      "id": "manual.action",
+      "safetyClass": "manual",
+      "inputs": [
+        {
+          "name": "instruction",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedObservation",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "manual-action-declined",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "manual.prompt",
+      "algorithmParameters": [
+        {
+          "name": "frontend-neutral",
+          "value": true
+        },
+        {
+          "name": "freeform-command-prohibited",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 170,
+          "lineEnd": 185
+        }
+      ]
+    },
+    {
+      "id": "transport.reconnect",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "expectedMode",
+          "type": "mode",
+          "required": true
+        },
+        {
+          "name": "timeout",
+          "type": "duration-ms",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "reconnectedDevice",
+          "type": "device-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "device-disconnected",
+        "operation-timeout",
+        "transport-failed"
+      ],
+      "requiredAdapterCapability": "transport.reconnect",
+      "algorithmParameters": [
+        {
+          "name": "identity-match",
+          "value": "procedure-declared-nonsecret-identifiers"
+        },
+        {
+          "name": "poll-backoff",
+          "value": "bounded-exponential"
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "quest.payload-build",
+      "safetyClass": "host-transform",
+      "inputs": [
+        {
+          "name": "profile",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "archive",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "abl",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "linuxLoader",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "payload",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "payloadDigest",
+          "type": "digest",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "artifact-verification-failed",
+        "artifact-extraction-failed"
+      ],
+      "requiredAdapterCapability": "quest.payload-build",
+      "algorithmParameters": [
+        {
+          "name": "profile-bounded",
+          "value": true
+        },
+        {
+          "name": "deterministic-output",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 573,
+          "lineEnd": 609
+        }
+      ]
+    },
+    {
+      "id": "quest.payload-send",
+      "safetyClass": "device-code-execution",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "payload",
+          "type": "artifact-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "payloadSession",
+          "type": "state-ref",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-runtime",
+      "failureClasses": [
+        "transport-failed",
+        "authentication-failed",
+        "device-rejected"
+      ],
+      "requiredAdapterCapability": "quest.payload-send",
+      "algorithmParameters": [
+        {
+          "name": "exact-build-profile-required",
+          "value": true
+        },
+        {
+          "name": "persistent-unlock-assumption",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 573,
+          "lineEnd": 609
+        }
+      ]
+    },
+    {
+      "id": "wait",
+      "safetyClass": "host-read",
+      "inputs": [
+        {
+          "name": "duration",
+          "type": "duration-ms",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "elapsed",
+          "type": "duration-ms",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "interrupted"
+      ],
+      "requiredAdapterCapability": "clock.wait",
+      "algorithmParameters": [
+        {
+          "name": "clock",
+          "value": "monotonic"
+        },
+        {
+          "name": "interruptible",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "postcondition.evaluate",
+      "safetyClass": "device-read",
+      "inputs": [
+        {
+          "name": "predicate",
+          "type": "state-ref",
+          "required": true
+        },
+        {
+          "name": "observed",
+          "type": "state-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "satisfied",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "postcondition-failed",
+        "operation-timeout"
+      ],
+      "requiredAdapterCapability": "postcondition.evaluate",
+      "algorithmParameters": [
+        {
+          "name": "comparison",
+          "value": "typed-exact"
+        },
+        {
+          "name": "string-interpolation",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "fastboot.restore-backup",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "partition",
+          "type": "partition-ref",
+          "required": true
+        },
+        {
+          "name": "backup",
+          "type": "backup-ref",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "bytesWritten",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "restore-failed",
+        "readback-mismatch",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "fastboot.restore-backup",
+      "algorithmParameters": [
+        {
+          "name": "unit-binding-required",
+          "value": true
+        },
+        {
+          "name": "exact-partition",
+          "value": true
+        },
+        {
+          "name": "source-order-preserved",
+          "value": true
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 45,
+          "lineEnd": 57
+        }
+      ]
+    },
+    {
+      "id": "samsung.package-inspect",
+      "safetyClass": "host-read",
+      "inputs": [
+        {
+          "name": "package",
+          "type": "artifact-ref",
+          "required": true
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "csc",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedTargetBuild",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedTargetSwrev",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "exactPackageMembers",
+          "type": "string-list",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "verifiedPackage",
+          "type": "verified-artifact-ref",
+          "required": true
+        },
+        {
+          "name": "actualDigest",
+          "type": "digest",
+          "required": true
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "csc",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "targetBuild",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "targetSwrev",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "host-artifacts",
+      "failureClasses": [
+        "artifact-verification-failed",
+        "artifact-extraction-failed",
+        "hash-mismatch"
+      ],
+      "requiredAdapterCapability": "samsung.package-inspect",
+      "algorithmParameters": [
+        {
+          "name": "archive-policy",
+          "value": "exact-declared-members-only"
+        },
+        {
+          "name": "member-order",
+          "value": "bl-ap-cp-csc"
+        },
+        {
+          "name": "home-csc-accepted",
+          "value": false
+        },
+        {
+          "name": "path-traversal",
+          "value": "reject"
+        },
+        {
+          "name": "arbitrary-argv",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 180,
+          "lineEnd": 197
+        }
+      ]
+    },
+    {
+      "id": "samsung.download-observe",
+      "safetyClass": "manual",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "csc",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedSourceSwrev",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "productName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "csc",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "currentBinary",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "systemStatus",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "oemLock",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "frpLock",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "kgStatus",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "rpSwrev",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "secureDownload",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "stateEffect": "none",
+      "failureClasses": [
+        "manual-action-declined",
+        "operation-timeout",
+        "device-disconnected"
+      ],
+      "requiredAdapterCapability": "samsung.download-observe",
+      "algorithmParameters": [
+        {
+          "name": "capture",
+          "value": [
+            "PRODUCT NAME",
+            "CURRENT BINARY",
+            "SYSTEM STATUS",
+            "OEM LOCK",
+            "FRP LOCK",
+            "KG STATUS",
+            "RP SWREV",
+            "SECURE DOWNLOAD"
+          ]
+        },
+        {
+          "name": "transcription",
+          "value": "exact-no-normalization"
+        },
+        {
+          "name": "arbitrary-argv",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 170,
+          "lineEnd": 197
+        }
+      ]
+    },
+    {
+      "id": "samsung.download-flash-package",
+      "safetyClass": "device-write",
+      "inputs": [
+        {
+          "name": "device",
+          "type": "device-ref",
+          "required": true
+        },
+        {
+          "name": "verifiedPackage",
+          "type": "verified-artifact-ref",
+          "required": true
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "csc",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedSourceSwrev",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "expectedTargetSwrev",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "exactPackageMembers",
+          "type": "string-list",
+          "required": true
+        },
+        {
+          "name": "repartition",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "pitSubstitution",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "writeStarted",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "stateEffect": "device-storage",
+      "failureClasses": [
+        "write-failed",
+        "transport-failed",
+        "device-disconnected",
+        "device-rejected"
+      ],
+      "requiredAdapterCapability": "samsung.download-flash-package",
+      "algorithmParameters": [
+        {
+          "name": "package-policy",
+          "value": "full-signed-package-one-shot"
+        },
+        {
+          "name": "member-order",
+          "value": "bl-ap-cp-csc"
+        },
+        {
+          "name": "repartition",
+          "value": false
+        },
+        {
+          "name": "pit-substitution",
+          "value": false
+        },
+        {
+          "name": "automatic-retry",
+          "value": false
+        },
+        {
+          "name": "arbitrary-argv",
+          "value": false
+        }
+      ],
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 134,
+          "lineEnd": 197
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/zenfyrdev/bootloader-unlock-wall-of-shame/blob/92d55840269532ec0576c30a60db297a703f2daa/brands/samsung/README.md",
+          "commit": "92d55840269532ec0576c30a60db297a703f2daa",
+          "path": "brands/samsung/README.md",
+          "lineStart": 10,
+          "lineEnd": 39
+        }
+      ]
+    }
+  ]
+}

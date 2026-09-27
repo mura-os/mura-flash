@@ -1,0 +1,136 @@
+{
+  "schema": "org.mura.flash.contract/v1",
+  "procedureRegistry": {
+    "schema": "org.mura.flash.procedure-registry/v1",
+    "path": "contracts/procedure-v1.json"
+  },
+  "documentSchemas": [
+    {
+      "schema": "org.mura.flash.target-record/v1",
+      "path": "catalog/target-record-v1.schema.json"
+    },
+    {
+      "schema": "org.mura.flash.target-catalog-index/v1",
+      "path": "catalog/index-v1.schema.json"
+    },
+    {
+      "schema": "org.mura.flash.install-procedure/v1",
+      "path": "recipes/install-procedure-v1.schema.json"
+    },
+    {
+      "schema": "org.mura.flash.replay-scenario/v1",
+      "path": "replay/scenario-v1.schema.json"
+    },
+    {
+      "schema": "org.mura.flash.backup-result/v1",
+      "path": "records/backup-result-v1.schema.json"
+    },
+    {
+      "schema": "org.mura.flash.transcript-event/v1",
+      "path": "records/transcript-event-v1.schema.json"
+    }
+  ],
+  "canonicalJson": {
+    "encoding": "UTF-8",
+    "unicodeNormalization": "none",
+    "keyOrder": "lexicographic-code-point",
+    "whitespace": "none",
+    "trailingNewline": false,
+    "duplicateKeys": "reject",
+    "nonFiniteNumbers": "reject"
+  },
+  "eventRules": {
+    "schema": "org.mura.flash.transcript-event/v1",
+    "sequenceStartsAt": 0,
+    "sequenceStep": 1,
+    "timestampFormat": "RFC3339-UTC",
+    "hashAlgorithm": "sha256",
+    "previousHashForFirstEvent": null,
+    "hashInput": "canonical-json-event-without-eventHash"
+  },
+  "transitionAlgorithm": {
+    "flowSelection": "exactly-one-enabled-flow",
+    "operationOrdering": "ascending-step-index",
+    "guardEvaluation": "all-before-capability-preflight",
+    "confirmationTiming": "after-preflight-before-first-covered-operation",
+    "eventTiming": "append-before-and-after-operation",
+    "successTransition": "apply-declared-state-effect-then-postconditions",
+    "failureTransition": "take-exact-failure-edge-without-assuming-state-effect",
+    "interruptionTransition": "engine-failure-interrupted",
+    "postconditionFailure": "engine-failure-postcondition-failed"
+  },
+  "capabilityPreflight": {
+    "scope": "all-reachable-enabled-operations",
+    "match": "operation-requiredAdapterCapability-subset-of-adapter-capabilities",
+    "missingCapabilityError": "capability-missing",
+    "beforeConfirmation": true
+  },
+  "liveDestructivePolicyGate": {
+    "coveredSafetyClasses": [
+      "device-write",
+      "device-erase",
+      "security-state-change"
+    ],
+    "requirements": [
+      "target-hardware-qualified",
+      "procedure-enabled",
+      "flow-enabled",
+      "operation-enabled",
+      "all-guards-pass",
+      "capability-preflight-pass",
+      "required-backups-verified",
+      "required-confirmations-accepted",
+      "live-destructive-explicitly-authorized"
+    ],
+    "denialError": "live-destructive-policy-denied"
+  },
+  "errorCodes": {
+    "invalid-document": 10,
+    "contract-mismatch": 11,
+    "closure-unresolved": 12,
+    "graph-invalid": 13,
+    "capability-missing": 20,
+    "live-destructive-policy-denied": 21,
+    "guard-failed": 22,
+    "confirmation-declined": 23,
+    "artifact-fetch-failed": 30,
+    "artifact-verification-failed": 31,
+    "artifact-extraction-failed": 32,
+    "transport-failed": 40,
+    "authentication-failed": 41,
+    "operation-timeout": 42,
+    "device-disconnected": 43,
+    "device-rejected": 44,
+    "backup-failed": 50,
+    "hash-mismatch": 51,
+    "write-failed": 52,
+    "readback-mismatch": 53,
+    "restore-failed": 54,
+    "postcondition-failed": 60,
+    "interrupted": 61,
+    "manual-action-declined": 62,
+    "replay-mismatch": 70
+  },
+  "disabledOperationSemantics": {
+    "normalPlan": {
+      "simulateDisabled": false,
+      "wouldExecute": false,
+      "event": null
+    },
+    "explicitReplaySimulation": {
+      "simulateDisabled": true,
+      "wouldExecute": true,
+      "event": "operation-would-execute",
+      "adapterInvocation": false
+    }
+  },
+  "engineFailures": {
+    "classes": [
+      "postcondition-failed",
+      "interrupted"
+    ],
+    "validation": "every-operation-declares-exact-disposition",
+    "recovery": "take-declared-recovery-or-end-explicit-terminal-failure",
+    "stateRule": "do-not-infer-success-state-transition"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-pro-cambria",
+  "displayName": "Meta Quest Pro",
+  "vendor": "Meta",
+  "models": [
+    "Quest Pro"
+  ],
+  "codenames": [
+    "cambria"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "unsupported",
+    "installState": "unsupported",
+    "summary": "Public temporary-root research does not provide persistent retail bootloader unlock or recoverable custom-image installation."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The build-specific temporary-root target is RAM-only and provides no persistent unlock."
+  },
+  "buildEvidence": [
+    {
+      "buildId": "51483620027600340",
+      "status": "temporary-root-target",
+      "summary": "This is the Quest Pro build named by the pinned target; the Quest 3 524336700-series boundary does not apply to Quest Pro.",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/targets/QPro_51483620027600340.json",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "targets/QPro_51483620027600340.json",
+          "lineStart": 1,
+          "lineEnd": 7
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/Henry1887/fuguquest/blob/53cbd602d7a3978e4a5eac089096015ae756c24c/README.md",
+          "commit": "53cbd602d7a3978e4a5eac089096015ae756c24c",
+          "path": "README.md",
+          "lineStart": 79,
+          "lineEnd": 91
+        }
+      ]
+    }
+  ],
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "temporary-root-only",
+      "persistent-unlock-missing",
+      "recovery-missing"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 645,
+      "lineEnd": 666
+    }
+  ]
+}

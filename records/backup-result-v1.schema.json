@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/backup-result-v1.schema.json",
+  "title": "Mura Flash partition backup result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "backupId",
+    "procedureId",
+    "targetId",
+    "partitionId",
+    "unitBinding",
+    "reads",
+    "result",
+    "createdAt"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.backup-result/v1"
+    },
+    "backupId": {
+      "$ref": "#/$defs/id"
+    },
+    "procedureId": {
+      "$ref": "#/$defs/id"
+    },
+    "targetId": {
+      "$ref": "#/$defs/id"
+    },
+    "partitionId": {
+      "$ref": "#/$defs/id"
+    },
+    "unitBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "deviceIdentityHash"],
+      "properties": {
+        "kind": {
+          "const": "sha256-redacted-device-identity"
+        },
+        "deviceIdentityHash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "reads": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sequence", "byteCount", "sha256", "artifactPath"],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "byteCount": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "artifactPath": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "verifiedSha256", "byteCount"],
+          "properties": {
+            "kind": {
+              "const": "verified"
+            },
+            "verifiedSha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "byteCount": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "failureClass"],
+          "properties": {
+            "kind": {
+              "const": "failed"
+            },
+            "failureClass": {
+              "enum": ["backup-failed", "hash-mismatch", "device-disconnected"]
+            }
+          }
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9:.]+Z$"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{0,95}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

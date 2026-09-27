@@ -1,0 +1,41 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "source": {
+    "repository": "https://github.com/darknight1050/quest1-bootloader-unlocker-web",
+    "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+    "referenceRepository": "https://github.com/darknight1050/quest-bootloader-unlocker",
+    "referenceCommit": "e171bbee61e754863fd3a82fe9dc35cd18adf3ac",
+    "provenanceLimit": "Pinned source and deployed asset digests establish byte identity only; Meta did not authenticate the mirrored firmware archives and Mura did not reproduce either flow on hardware.",
+    "pinnedUrl": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/tree/7f34276ecef9021771e7bf4a2d53f10b26243334"
+  },
+  "procedureFixtures": [
+    {
+      "procedureId": "quest-1-monterey-v29-direct-unlock",
+      "path": "quest-1-monterey-v29-direct-unlock.json"
+    },
+    {
+      "procedureId": "quest-1-monterey-inactive-slot-unlock",
+      "path": "quest-1-monterey-inactive-slot-unlock.json"
+    },
+    {
+      "procedureId": "quest-2-hollywood-v29-direct-unlock",
+      "path": "quest-2-hollywood-v29-direct-unlock.json"
+    },
+    {
+      "procedureId": "quest-2-hollywood-50670960048600150-inactive-slot-unlock",
+      "path": "quest-2-hollywood-50670960048600150-inactive-slot-unlock.json"
+    }
+  ],
+  "sharedSourceGaps": [
+    "unlock-state-uses-logical-or-across-getvar-and-oem-device-info",
+    "rollback-reset-has-no-readback",
+    "fastboot-backup-restoration-has-no-partition-readback",
+    "mark-success-is-observed-by-the-user-after-full-android-boot",
+    "source-has-no-both-slots-lost-recovery"
+  ],
+  "muraPolicy": {
+    "proceduresEnabled": false,
+    "operationsEnabled": false,
+    "liveDestructiveAllowed": false
+  }
+}

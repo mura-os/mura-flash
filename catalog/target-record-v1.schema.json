@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/target-record-v1.schema.json",
+  "title": "Mura Flash target catalog record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "displayName",
+    "vendor",
+    "models",
+    "codenames",
+    "enabled",
+    "hardwareQualification",
+    "sourceBehavior",
+    "muraPolicy",
+    "procedureAvailability",
+    "sourceCitations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.target-record/v1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "displayName": {
+      "$ref": "#/$defs/nonempty"
+    },
+    "vendor": {
+      "$ref": "#/$defs/nonempty"
+    },
+    "models": {
+      "$ref": "#/$defs/stringList"
+    },
+    "codenames": {
+      "$ref": "#/$defs/stringList"
+    },
+    "enabled": {
+      "const": false
+    },
+    "hardwareQualification": {
+      "const": "unqualified"
+    },
+    "sourceBehavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unlockState",
+        "installState",
+        "summary"
+      ],
+      "properties": {
+        "unlockState": {
+          "enum": [
+            "unsupported",
+            "unknown",
+            "reported",
+            "documented",
+            "open"
+          ]
+        },
+        "installState": {
+          "enum": [
+            "unsupported",
+            "incomplete",
+            "procedure-available"
+          ]
+        },
+        "summary": {
+          "$ref": "#/$defs/nonempty"
+        }
+      }
+    },
+    "muraPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "writesAllowed",
+        "reason"
+      ],
+      "properties": {
+        "writesAllowed": {
+          "const": false
+        },
+        "reason": {
+          "$ref": "#/$defs/nonempty"
+        }
+      }
+    },
+    "buildEvidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "buildId",
+          "status",
+          "summary",
+          "sourceCitations"
+        ],
+        "properties": {
+          "buildId": {
+            "$ref": "#/$defs/nonempty"
+          },
+          "status": {
+            "enum": [
+              "temporary-root-target",
+              "temporary-root-vulnerable",
+              "temporary-root-patched",
+              "source-derived-unverified"
+            ]
+          },
+          "summary": {
+            "$ref": "#/$defs/nonempty"
+          },
+          "sourceCitations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/citation"
+            }
+          }
+        }
+      }
+    },
+    "procedureAvailability": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reasonCodes"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unavailable"
+            },
+            "reasonCodes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "procedureIds"
+          ],
+          "properties": {
+            "kind": {
+              "const": "available"
+            },
+            "procedureIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sourceCitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/citation"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{0,95}$"
+    },
+    "nonempty": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "stringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonempty"
+      }
+    },
+    "citation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "lineStart",
+            "lineEnd"
+          ],
+          "properties": {
+            "kind": {
+              "const": "repository"
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[a-zA-Z0-9._/-]+$"
+            },
+            "lineStart": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lineEnd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri",
+            "commit",
+            "path",
+            "lineStart",
+            "lineEnd"
+          ],
+          "properties": {
+            "kind": {
+              "const": "pinned-external"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lineStart": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lineEnd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri",
+            "retrieved"
+          ],
+          "properties": {
+            "kind": {
+              "const": "external"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "retrieved": {
+              "type": "string",
+              "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

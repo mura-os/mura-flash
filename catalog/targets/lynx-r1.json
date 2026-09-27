@@ -1,0 +1,38 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "lynx-r1",
+  "displayName": "Lynx R1",
+  "vendor": "Lynx",
+  "models": [
+    "R1"
+  ],
+  "codenames": [],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "open",
+    "installState": "procedure-available",
+    "summary": "The vendor documents an open bootloader, versioned ADB sideload, and exact-package QDL stock restore, but the current firmware artifact and protected-state closure are unavailable."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Neither procedure is enabled until official artifacts, protected backups, and hardware recovery are qualified."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "lynx-r1-versioned-sideload",
+      "lynx-r1-qdl-stock-restore"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 465,
+      "lineEnd": 534
+    }
+  ]
+}

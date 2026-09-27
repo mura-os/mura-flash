@@ -1,0 +1,10 @@
+{
+  "valid": {
+    "valid/disabled-destructive-procedure.json": "ok",
+    "valid/replay-string-list.json": "ok"
+  },
+  "invalid": {
+    "invalid/enabled-destructive-procedure.json": "schema-const",
+    "invalid/procedure-availability-exclusivity.json": "schema-one-of"
+  }
+}

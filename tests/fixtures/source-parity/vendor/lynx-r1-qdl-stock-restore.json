@@ -1,0 +1,91 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "lynx-r1-qdl-stock-restore",
+  "evidence": "vendor-prose",
+  "targetGate": {
+    "product": "Lynx-R1",
+    "transport": "Qualcomm QDLoader 9008",
+    "storage": "ufs"
+  },
+  "artifactSha256": {
+    "officialFirmwarePackage": null,
+    "prog_firehose_ddr.elf": null,
+    "rawprogram_unsparse0.xml": null,
+    "rawprogram1.xml": null,
+    "rawprogram2.xml": null,
+    "rawprogram3.xml": null,
+    "rawprogram4.xml": null,
+    "rawprogram5.xml": null,
+    "patch0.xml": null,
+    "patch1.xml": null,
+    "patch2.xml": null,
+    "patch3.xml": null,
+    "patch4.xml": null,
+    "patch5.xml": null
+  },
+  "qdlArgumentOrder": [
+    "--debug",
+    "--storage",
+    "ufs",
+    "--include",
+    "la12",
+    "la12/prog_firehose_ddr.elf",
+    "la12/rawprogram_unsparse0.xml",
+    "la12/rawprogram1.xml",
+    "la12/rawprogram2.xml",
+    "la12/rawprogram3.xml",
+    "la12/rawprogram4.xml",
+    "la12/rawprogram5.xml",
+    "la12/patch0.xml",
+    "la12/patch1.xml",
+    "la12/patch2.xml",
+    "la12/patch3.xml",
+    "la12/patch4.xml",
+    "la12/patch5.xml"
+  ],
+  "sourceOperationOrder": [
+    "temporarily-disable-modemmanager-on-linux",
+    "start-qdl-with-exact-ufs-package-members",
+    "adb-reboot-edl-in-another-terminal",
+    "load-prog-firehose-ddr-elf",
+    "apply-rawprogram-and-patch-set",
+    "observe-success-log-and-automatic-reboot"
+  ],
+  "fallback": {
+    "trigger": "port-or-download-error",
+    "physicalAction": "hold-power-volume-up-volume-down-10-to-20-seconds",
+    "expectedObservation": "QDLoader-9008",
+    "retry": "select-port-and-download-again"
+  },
+  "hardSafetyRule": {
+    "eraseAllBeforeDownload": false,
+    "reason": "avoid-loss-of-distortion-and-calibration-files"
+  },
+  "sourceGaps": [
+    "official-141-package-currently-unavailable",
+    "all-package-member-sha256-values-unknown",
+    "rawprogram-patch-gpt-and-partition-coverage-uninspected",
+    "read-only-firehose-backup-route-undocumented",
+    "exact-protected-calibration-partitions-unresolved",
+    "success-log-and-auto-reboot-have-no-partition-readback",
+    "generic-or-adjacent-firehose-and-rawprogram-substitution-prohibited"
+  ],
+  "citations": [
+    {
+      "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "uri": "https://portal.lynx-r.com/documentation/view/getting-started?version=30",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 464,
+      "lineEnd": 534
+    }
+  ]
+}

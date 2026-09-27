@@ -1,0 +1,131 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "sourceBehavior": {
+    "launchUnlock": "community-reported",
+    "aykeUnlockRemoval": "community-reported",
+    "aykeToAyiaRollback": "not-publicly-demonstrated",
+    "u2ToU1Rollback": "not-publicly-demonstrated",
+    "officialBuildLedger": [
+      "I610UEU1AYKE",
+      "I610UEU2AZCI",
+      "I610UEU2AZD8",
+      "I610UEU2AZF3"
+    ],
+    "ayiaBuildReport": "I610UEU1AYIA"
+  },
+  "sourceOperationOrder": [
+    "observe-launch-oem-unlock-setting",
+    "accept-device-side-unlock-warning",
+    "accept-data-wipe",
+    "observe-post-reboot-unlocked-warning"
+  ],
+  "muraSimulationOrder": {
+    "ayke-to-ayia-rollback": [
+      "probe-model",
+      "probe-build",
+      "probe-csc",
+      "enter-download-mode-unresolved",
+      "transcribe-complete-download-screen",
+      "inspect-user-supplied-ayia-full-package",
+      "simulate-full-bl-ap-cp-csc-package-write",
+      "reconnect",
+      "verify-ayia-model-build-csc"
+    ],
+    "ayia-oem-unlock": [
+      "probe-model",
+      "probe-build",
+      "probe-csc",
+      "enable-developer-options",
+      "enable-oem-unlocking",
+      "enter-device-side-unlock-confirmation",
+      "accept-wipe",
+      "reconnect",
+      "verify-ayia",
+      "observe-unlocked-warning"
+    ]
+  },
+  "closedFlashShape": {
+    "model": "SM-I610",
+    "expectedSourceSwrev": "U1",
+    "expectedTargetSwrev": "U1",
+    "exactPackageMembers": [
+      "BL",
+      "AP",
+      "CP",
+      "CSC"
+    ],
+    "repartition": false,
+    "pitSubstitution": false,
+    "arbitraryArgv": false
+  },
+  "artifact": {
+    "source": "user-supplied",
+    "build": "I610UEU1AYIA",
+    "sha256": null,
+    "liveUse": "blocked"
+  },
+  "protectedUnitBoundBackupRequirements": [
+    "/mnt/vendor/efs/device_profile.textproto",
+    "/mnt/vendor/persist/display/",
+    "/data/vendor/qvr/",
+    "/mnt/vendor/persist/sensors/"
+  ],
+  "muraPolicy": {
+    "procedureEnabled": false,
+    "flowsEnabled": false,
+    "operationsEnabled": false,
+    "testOnly": true,
+    "hardwareQualified": false,
+    "writesEnabled": false,
+    "automaticWriteRetry": false,
+    "recoverabilityAfterWriteStartClaimed": false
+  },
+  "sourceGaps": [
+    "launch-unlock-media-not-bound-to-ayia-build",
+    "ayia-package-uri-and-digest-unknown",
+    "exact-ayia-csc-and-member-filenames-unknown",
+    "download-mode-entry-and-host-transport-unknown",
+    "ayke-to-ayia-transcript-absent",
+    "sm-i610-u2-to-u1-failure-transcript-absent",
+    "pit-partition-avb-and-stock-restore-unqualified",
+    "protected-unit-state-backup-route-unqualified"
+  ],
+  "evidence": [
+    {
+      "path": "evidence/samsung/official-build-ledger.json",
+      "sha256": "04c6726868940b0b1dd4a163c89b90d67c6ce3ab33069b8d37b941444528bd8b"
+    },
+    {
+      "path": "evidence/samsung/ayia-community-report.json",
+      "sha256": "9ca5afe1a2e6b28743380177ed1ba34fd28433963f5bf50af15fbd63dbff6526"
+    },
+    {
+      "path": "evidence/samsung/launch-unlock-media.json",
+      "sha256": "eea2398195287dfe1e29a17708d996f6f5de6dc0b165b3c5bd5d90722fac7af2"
+    },
+    {
+      "path": "evidence/samsung/wall-of-shame-claims.json",
+      "sha256": "8e0a6c3730b44bfe9f7a4eb2768339497c4c17b39cd20804027d0e0618515019"
+    }
+  ],
+  "citations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 117,
+      "lineEnd": 201
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/zenfyrdev/bootloader-unlock-wall-of-shame/blob/92d55840269532ec0576c30a60db297a703f2daa/brands/samsung/README.md",
+      "commit": "92d55840269532ec0576c30a60db297a703f2daa",
+      "path": "brands/samsung/README.md",
+      "lineStart": 8,
+      "lineEnd": 40
+    }
+  ]
+}

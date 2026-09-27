@@ -1,0 +1,56 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "oculus-go-pacific-official-unlock",
+  "evidence": "vendor-prose",
+  "targetGate": {
+    "product": "Oculus Go",
+    "codename": "pacific",
+    "otherProductsExcluded": true,
+    "exactRetailBuild": null
+  },
+  "artifactSha256": {
+    "Oculus_Go_SW_Unlock_v1.zip": null,
+    "unlocked_build.zip": null
+  },
+  "sourceOperationOrder": [
+    "enable-developer-mode-and-adb",
+    "enter-boot-menu-sideload",
+    "extract-outer-zip",
+    "adb-sideload-unlocked-build-zip",
+    "reboot-bootloader",
+    "fastboot-oem-unlock-and-device-confirm-wipe",
+    "verify-fastboot-flash-and-adb-root-accepted"
+  ],
+  "vendorConsequences": [
+    "boot-img-signature-enforcement-disabled",
+    "dm-verity-disabled",
+    "boot-img-and-system-img-replacement-permitted",
+    "ota-service-permanently-ended",
+    "relock-wipes-and-only-oculus-signed-boot-img-boots"
+  ],
+  "sourceGaps": [
+    "durable-package-url-and-full-sha256-unknown",
+    "official-guide-volume-up-conflicts-with-owner-reported-volume-down",
+    "exact-partition-map-and-protected-state-unknown",
+    "stock-restore-after-unlock-untested",
+    "fastboot-flash-capability-check-would-be-a-write-and-is-not-silently-improved"
+  ],
+  "citations": [
+    {
+      "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "uri": "https://developers.meta.com/horizon/downloads/package/oculus-go-sw-unlock/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 536,
+      "lineEnd": 570
+    }
+  ]
+}

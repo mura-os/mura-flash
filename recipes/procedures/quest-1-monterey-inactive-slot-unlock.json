@@ -1,0 +1,6276 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "quest-1-monterey-inactive-slot-unlock",
+  "targetId": "quest-1-monterey",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "For exact final build 49845030443200410 on monterey, source code roots the running stock slot, backs up and re-verifies the exact 13-partition inactive-slot write set, writes and reads back v29 boot-chain images in profile order, queues the inactive slot, exploits v29 ABL, restores the original slot and then the target-slot backup over fastboot, erases userdata/misc/metadata, and relies on a fully booted Android to mark the original slot successful.",
+    "evidenceLevel": "source-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Live use is unavailable. The source does not separately confirm slot activation or the reset, accepts either of two unlock indicators, cannot read back the rollback reset, does not read back fastboot restoration, and leaves mark-success to user observation. Mura requires those stricter gates plus hardware qualification, authenticated final-stock recovery, same-unit reconnect identity, and protected-state closure.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "final-stock-adb",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "rooted-final-stock",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "inactive-backup-verified",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "inactive-v29-verified",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "inactive-v29-queued",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "v29-fastboot-locked",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "clean-fastboot-unlocked",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "original-slot-queued",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "inactive-stock-restored-unread",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "userdata-erased",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "mark-success-user-observed",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "safe-stop-good-slot",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "rollback-reset-unread",
+      "kind": "security",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "quest1-v29-firmware-archive",
+      "role": "stock",
+      "source": {
+        "kind": "local",
+        "path": "quest1/16476800119700000.zip"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "5e4d6f70f4287134e7cb1016625bcc551fd23852702d81d56156137c26335f6f"
+      }
+    },
+    {
+      "id": "quest1-ionstack",
+      "role": "payload",
+      "source": {
+        "kind": "local",
+        "path": "quest1/ionstack"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "d65c800a2a032d3af579b8c9e5e11c12ae9b344d95c545396f1c83ccc6d4fc47"
+      }
+    },
+    {
+      "id": "quest-bootctl-shim",
+      "role": "payload",
+      "source": {
+        "kind": "local",
+        "path": "bootctl_shim"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "a5a5a201c5d4318015b1f646729a5ec3ab8eee3bc2b856f46ed6ea887d225fcf"
+      }
+    },
+    {
+      "id": "quest1-v29-abl",
+      "role": "image",
+      "source": {
+        "kind": "local",
+        "path": "quest1/16476800119700000.zip!/abl.img"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "c2cc1f173bec2956fa5e068abc98db82e1cd2c651a4f4bb7ae31c79605e43707"
+      }
+    },
+    {
+      "id": "quest1-v29-linuxloader-pe",
+      "role": "payload",
+      "source": {
+        "kind": "local",
+        "path": "derived/quest1/16476800119700000-linuxloader.pe"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+      }
+    }
+  ],
+  "partitions": [
+    {
+      "id": "xbl-inactive",
+      "deviceName": "xbl_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "abl-inactive",
+      "deviceName": "abl_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "rpm-inactive",
+      "deviceName": "rpm_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "tz-inactive",
+      "deviceName": "tz_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "hyp-inactive",
+      "deviceName": "hyp_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "devcfg-inactive",
+      "deviceName": "devcfg_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "pmic-inactive",
+      "deviceName": "pmic_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "cmnlib-inactive",
+      "deviceName": "cmnlib_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "cmnlib64-inactive",
+      "deviceName": "cmnlib64_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "keymaster-inactive",
+      "deviceName": "keymaster_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "ovrtz-inactive",
+      "deviceName": "ovrtz_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "modem-inactive",
+      "deviceName": "modem_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "boot-inactive",
+      "deviceName": "boot_{inactive}",
+      "slot": "inactive",
+      "unitBound": true,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "userdata",
+      "deviceName": "userdata",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "misc",
+      "deviceName": "misc",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "metadata",
+      "deviceName": "metadata",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    }
+  ],
+  "backups": [
+    {
+      "id": "backup-xbl-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "xbl-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-abl-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "abl-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-rpm-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "rpm-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-tz-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "tz-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-hyp-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "hyp-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-devcfg-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "devcfg-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-pmic-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "pmic-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-cmnlib-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "cmnlib-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-cmnlib64-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "cmnlib64-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-keymaster-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "keymaster-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-ovrtz-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "ovrtz-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-modem-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "modem-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    },
+    {
+      "id": "backup-boot-inactive",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "boot-inactive"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    }
+  ],
+  "confirmations": [
+    {
+      "id": "confirm-root-monterey",
+      "safetyClasses": [
+        "device-code-execution"
+      ],
+      "prompt": "Type root monterey. ionstack intentionally corrupts kernel memory and may panic or damage the device."
+    },
+    {
+      "id": "confirm-overwrite-inactive",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Type the live phrase overwrite _a or overwrite _b for the observed inactive slot. Interruption can make that slot unbootable."
+    },
+    {
+      "id": "confirm-unlock-v29",
+      "safetyClasses": [
+        "security-state-change"
+      ],
+      "prompt": "Type unlock 16476800119700000. The stock unlock behavior erases userdata, misc and metadata."
+    }
+  ],
+  "operations": [
+    {
+      "id": "gate-codename",
+      "variant": "adb.property",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-adb-device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.product.device"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-codename",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "monterey-or-vr_monterey"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/data/profiles.ts",
+          "lineStart": 134,
+          "lineEnd": 139
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "gate-final-build",
+      "variant": "adb.property",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-adb-device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.build.version.incremental"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-final-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "49845030443200410"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/data/profiles.ts",
+          "lineStart": 140,
+          "lineEnd": 170
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 573,
+          "lineEnd": 580
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "acquire-exploit-root",
+      "variant": "root.acquire",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-adb-device"
+          }
+        },
+        {
+          "inputName": "payload",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-ionstack"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "monterey-or-vr_monterey"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "monterey-or-vr_monterey"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "49845030443200410"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "49845030443200410"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "acquire-exploit-root",
+            "outputName": "rootSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "reboot-good-slot-and-retry-root"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "reboot-good-slot-and-retry-root"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reboot-good-slot-and-retry-root"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 654,
+          "lineEnd": 688
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "rooted-final-stock"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reboot-good-slot-and-retry-root"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reboot-good-slot-and-retry-root"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-xbl-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "xbl-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-xbl-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-abl-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-abl-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-rpm-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "rpm-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-rpm-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-tz-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "tz-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-tz-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-hyp-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "hyp-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-hyp-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-devcfg-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devcfg-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-devcfg-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-pmic-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "pmic-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-pmic-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-cmnlib-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-cmnlib-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-cmnlib64-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib64-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-cmnlib64-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-keymaster-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "keymaster-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-keymaster-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-ovrtz-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "ovrtz-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-ovrtz-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-modem-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "modem-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-modem-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "backup-and-reread-boot-inactive",
+      "variant": "partition.backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "boot-inactive"
+          }
+        },
+        {
+          "inputName": "destination",
+          "value": {
+            "kind": "constant",
+            "valueType": "path",
+            "value": "opfs://unit-bound-backup"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "rooted-final-stock"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "backup-and-reread-boot-inactive",
+            "outputName": "backup"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "backup-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 691,
+          "lineEnd": 894
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 292,
+          "lineEnd": 332
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-backup-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-xbl-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "xbl-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-xbl-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-abl-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-abl-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-rpm-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "rpm-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-rpm-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-tz-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "tz-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-tz-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-hyp-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "hyp-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-hyp-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-devcfg-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devcfg-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-devcfg-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-pmic-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "pmic-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-pmic-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-cmnlib-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-cmnlib-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-cmnlib64-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib64-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-cmnlib64-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-keymaster-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "keymaster-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-keymaster-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-ovrtz-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "ovrtz-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-ovrtz-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-modem-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "modem-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-modem-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "write-and-readback-v29-boot-inactive",
+      "variant": "partition.write",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "boot-inactive"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-backup-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-and-readback-v29-boot-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 948,
+          "lineEnd": 991
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/partitions.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/partitions.ts",
+          "lineStart": 232,
+          "lineEnd": 290
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-verified"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "activate-inactive-without-source-confirmation",
+      "variant": "boot-control.set",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "slot",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "observed-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-v29-verified"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "activate-inactive-without-source-confirmation",
+            "outputName": "activeSlot"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 993,
+          "lineEnd": 1065
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-v29-verified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-v29-queued"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "restore-inactive-from-booting-good-slot"
+        }
+      ]
+    },
+    {
+      "id": "reboot-v29-bootloader",
+      "variant": "adb.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "rooted-adb-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-v29-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reboot-v29-bootloader",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1067,
+          "lineEnd": 1078
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-v29-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "v29-fastboot-locked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ]
+    },
+    {
+      "id": "gate-v29-bootloader-build",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-fastboot-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "oem.device-info.build-number"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-v29-bootloader-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1080,
+          "lineEnd": 1102
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ]
+    },
+    {
+      "id": "build-v29-overflow-payload",
+      "variant": "quest.payload-build",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "profile",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-abl"
+          }
+        },
+        {
+          "inputName": "archive",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        },
+        {
+          "inputName": "abl",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-abl"
+          }
+        },
+        {
+          "inputName": "linuxLoader",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-linuxloader-pe"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-v29-bootloader-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "artifact-extraction-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/data/profiles.ts",
+          "lineStart": 172,
+          "lineEnd": 198
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "wait-for-slot-fallback"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "wait-for-slot-fallback"
+        }
+      ]
+    },
+    {
+      "id": "send-payload-and-request-token",
+      "variant": "quest.payload-send",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-fastboot-device"
+          }
+        },
+        {
+          "inputName": "payload",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "build-v29-overflow-payload",
+            "outputName": "payload"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-v29-bootloader-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "send-payload-and-request-token",
+            "outputName": "payloadSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 620,
+          "lineEnd": 684
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "v29-fastboot-locked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        }
+      ]
+    },
+    {
+      "id": "restart-and-read-unlock-or",
+      "variant": "fastboot.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "patched-fastboot-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "restart-and-read-unlock-or",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1165,
+          "lineEnd": 1205
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 568,
+          "lineEnd": 617
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "clean-fastboot-unlocked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-clean-unlock"
+        }
+      ]
+    },
+    {
+      "id": "reset-rollback-without-readback",
+      "variant": "fastboot.reset-rollback",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "slot",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "downgraded-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "clean-fastboot-unlocked"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reset-rollback-without-readback",
+            "outputName": "resetAccepted"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "continue-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "continue-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "continue-unlocked-with-rollback-warning"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1207,
+          "lineEnd": 1229
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "rollback-reset-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "continue-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "continue-unlocked-with-rollback-warning"
+        }
+      ]
+    },
+    {
+      "id": "set-original-slot-and-clean-restart",
+      "variant": "fastboot.set-active",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "slot",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "remembered-original"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "clean-fastboot-unlocked"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "set-original-slot-and-clean-restart",
+            "outputName": "activeSlot"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-on-downgraded-slot"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-on-downgraded-slot"
+        },
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-on-downgraded-slot"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1233,
+          "lineEnd": 1353
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "original-slot-queued"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-on-downgraded-slot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-on-downgraded-slot"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-xbl-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "xbl-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-xbl-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-xbl-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-abl-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "abl-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-abl-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-abl-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-rpm-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "rpm-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-rpm-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-rpm-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-tz-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "tz-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-tz-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-tz-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-hyp-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "hyp-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-hyp-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-hyp-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-devcfg-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "devcfg-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-devcfg-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-devcfg-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-pmic-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "pmic-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-pmic-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-pmic-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-cmnlib-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-cmnlib-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-cmnlib-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-cmnlib64-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "cmnlib64-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-cmnlib64-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-cmnlib64-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-keymaster-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "keymaster-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-keymaster-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-keymaster-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-ovrtz-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "ovrtz-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-ovrtz-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-ovrtz-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-modem-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "modem-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-modem-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-modem-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "fastboot-restore-13-without-readback-boot-inactive",
+      "variant": "fastboot.restore-backup",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "boot-inactive"
+          }
+        },
+        {
+          "inputName": "backup",
+          "value": {
+            "kind": "backup",
+            "backupId": "backup-boot-inactive"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "original-slot-queued"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "fastboot-restore-13-without-readback-boot-inactive",
+            "outputName": "bytesWritten"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "restore-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "readback-mismatch",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "inactive-stock-restored-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "boot-original-and-restore-via-adb"
+        }
+      ]
+    },
+    {
+      "id": "reboot-and-user-observe-mark-success",
+      "variant": "fastboot.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "system"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "userdata-erased"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reboot-and-user-observe-mark-success",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 70,
+          "lineEnd": 97
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1355,
+          "lineEnd": 1374
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "userdata-erased"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "mark-success-user-observed"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop. Preserve the untouched slot and backup. Do not alter the other slot or delete browser storage."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "At least one stock slot remains bootable or USB Update Mode remains reachable."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-before-write"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 190,
+          "lineEnd": 216
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        },
+        {
+          "kind": "state",
+          "stateId": "inactive-v29-queued"
+        },
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        },
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        },
+        {
+          "kind": "state",
+          "stateId": "userdata-erased"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop-good-slot"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-write"
+        }
+      ]
+    },
+    {
+      "id": "erase-userdata-misc-metadata-no-source-confirmation-userdata",
+      "variant": "fastboot.erase",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "userdata"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-stock-restored-unread"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "erase-userdata-misc-metadata-no-source-confirmation-userdata",
+            "outputName": "erased"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-stock-restored-unread"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "userdata-erased"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ]
+    },
+    {
+      "id": "erase-userdata-misc-metadata-no-source-confirmation-misc",
+      "variant": "fastboot.erase",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "misc"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-stock-restored-unread"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "erase-userdata-misc-metadata-no-source-confirmation-misc",
+            "outputName": "erased"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-stock-restored-unread"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "userdata-erased"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ]
+    },
+    {
+      "id": "erase-userdata-misc-metadata-no-source-confirmation-metadata",
+      "variant": "fastboot.erase",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "partition",
+          "value": {
+            "kind": "partition",
+            "partitionId": "metadata"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "inactive-stock-restored-unread"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "erase-userdata-misc-metadata-no-source-confirmation-metadata",
+            "outputName": "erased"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 45,
+          "lineEnd": 53
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-stock-restored-unread"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "userdata-erased"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-fastboot-unlocked"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "inactive-slot-unlock",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "final-stock-adb"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "gate-codename"
+        },
+        {
+          "kind": "operation",
+          "operationId": "gate-final-build"
+        },
+        {
+          "kind": "operation",
+          "operationId": "acquire-exploit-root"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-xbl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-abl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-rpm-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-tz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-hyp-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-devcfg-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-pmic-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-cmnlib-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-cmnlib64-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-keymaster-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-ovrtz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-modem-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "backup-and-reread-boot-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-xbl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-abl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-rpm-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-tz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-hyp-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-devcfg-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-pmic-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-cmnlib-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-cmnlib64-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-keymaster-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-ovrtz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-modem-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-and-readback-v29-boot-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "activate-inactive-without-source-confirmation"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-v29-bootloader"
+        },
+        {
+          "kind": "operation",
+          "operationId": "gate-v29-bootloader-build"
+        },
+        {
+          "kind": "operation",
+          "operationId": "build-v29-overflow-payload"
+        },
+        {
+          "kind": "operation",
+          "operationId": "send-payload-and-request-token"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restart-and-read-unlock-or"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reset-rollback-without-readback"
+        },
+        {
+          "kind": "operation",
+          "operationId": "set-original-slot-and-clean-restart"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-xbl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-abl-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-rpm-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-tz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-hyp-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-devcfg-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-pmic-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-cmnlib-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-cmnlib64-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-keymaster-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-ovrtz-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-modem-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "fastboot-restore-13-without-readback-boot-inactive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "erase-userdata-misc-metadata-no-source-confirmation-userdata"
+        },
+        {
+          "kind": "operation",
+          "operationId": "erase-userdata-misc-metadata-no-source-confirmation-misc"
+        },
+        {
+          "kind": "operation",
+          "operationId": "erase-userdata-misc-metadata-no-source-confirmation-metadata"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-and-user-observe-mark-success"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-codename",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "monterey-or-vr_monterey"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "gate-final-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "49845030443200410"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-root-monterey"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-overwrite-inactive"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-unlock-v29"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-before-write",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop-good-slot"
+      }
+    },
+    {
+      "id": "reboot-good-slot-and-retry-root",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "final-stock-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "rooted-final-stock"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "final-stock-adb"
+      }
+    },
+    {
+      "id": "restore-inactive-from-booting-good-slot",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-backup-verified"
+        },
+        {
+          "kind": "state",
+          "stateId": "inactive-v29-verified"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "final-stock-adb"
+      }
+    },
+    {
+      "id": "wait-for-slot-fallback",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "inactive-v29-queued"
+        },
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "final-stock-adb"
+      }
+    },
+    {
+      "id": "reconnect-and-read-clean-unlock",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "restart-and-read-unlock-or"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "clean-fastboot-unlocked"
+      }
+    },
+    {
+      "id": "restart-before-exploit-retry",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-fastboot-locked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "restart-and-read-unlock-or"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "v29-fastboot-locked"
+      }
+    },
+    {
+      "id": "continue-unlocked-with-rollback-warning",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "clean-fastboot-unlocked"
+      }
+    },
+    {
+      "id": "stay-on-downgraded-slot",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "clean-fastboot-unlocked"
+      }
+    },
+    {
+      "id": "boot-original-and-restore-via-adb",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "original-slot-queued"
+        },
+        {
+          "kind": "state",
+          "stateId": "inactive-stock-restored-unread"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "final-stock-adb"
+      }
+    },
+    {
+      "id": "stay-in-fastboot-unlocked",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-fastboot-unlocked"
+        },
+        {
+          "kind": "state",
+          "stateId": "inactive-stock-restored-unread"
+        },
+        {
+          "kind": "state",
+          "stateId": "userdata-erased"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "clean-fastboot-unlocked"
+      }
+    },
+    {
+      "id": "observe-boot-or-fallback",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "userdata-erased"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "mark-success-user-observed"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "README.md",
+      "lineStart": 38,
+      "lineEnd": 139
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/data/profiles.ts",
+      "lineStart": 134,
+      "lineEnd": 198
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/flow.ts",
+      "lineStart": 488,
+      "lineEnd": 1374
+    }
+  ],
+  "sourceGaps": [
+    "The source has no both-slots-lost recovery path.",
+    "Rollback reset and backup restoration lack authoritative readback."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/quest/quest-1-monterey-inactive-slot-unlock.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "clean-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "connected-adb-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "connected-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "patched-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "rooted-adb-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

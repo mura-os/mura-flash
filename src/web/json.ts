@@ -1,11 +1,14 @@
 import { fail } from "./errors";
+import type { ErrorCode } from "./errors";
 
 class DuplicateKeyScanner {
   readonly #text: string;
+  readonly #errorCode: ErrorCode;
   #offset = 0;
 
-  constructor(text: string) {
+  constructor(text: string, errorCode: ErrorCode) {
     this.#text = text;
+    this.#errorCode = errorCode;
   }
 
   scan(): void {
@@ -13,7 +16,7 @@ class DuplicateKeyScanner {
     this.#value("$");
     this.#skipWhitespace();
     if (this.#offset !== this.#text.length) {
-      throw fail("recipe-invalid", "invalid JSON after root value");
+      throw fail(this.#errorCode, "invalid JSON after root value");
     }
   }
 
@@ -35,7 +38,7 @@ class DuplicateKeyScanner {
     } else if (token === "-" || (token !== undefined && /[0-9]/u.test(token))) {
       this.#number();
     } else {
-      throw fail("recipe-invalid", `invalid JSON value at ${path}`);
+      throw fail(this.#errorCode, `invalid JSON value at ${path}`);
     }
   }
 
@@ -50,12 +53,12 @@ class DuplicateKeyScanner {
     while (true) {
       this.#skipWhitespace();
       if (this.#text[this.#offset] !== '"') {
-        throw fail("recipe-invalid", `invalid JSON object at ${path}`);
+        throw fail(this.#errorCode, `invalid JSON object at ${path}`);
       }
       const key = this.#string();
       if (keys.has(key)) {
         throw fail(
-          "recipe-invalid",
+          this.#errorCode,
           `duplicate key ${JSON.stringify(key)} at ${path}`,
         );
       }
@@ -101,7 +104,7 @@ class DuplicateKeyScanner {
         try {
           return JSON.parse(token) as string;
         } catch (error) {
-          throw fail("recipe-invalid", "invalid JSON string", error);
+          throw fail(this.#errorCode, "invalid JSON string", error);
         }
       }
       if (character === "\\") {
@@ -111,26 +114,26 @@ class DuplicateKeyScanner {
           character === undefined ||
           character.charCodeAt(0) < 0x20
         ) {
-          throw fail("recipe-invalid", "invalid control character in JSON string");
+          throw fail(this.#errorCode, "invalid control character in JSON string");
         }
         this.#offset += 1;
       }
     }
-    throw fail("recipe-invalid", "unterminated JSON string");
+    throw fail(this.#errorCode, "unterminated JSON string");
   }
 
   #number(): void {
     const rest = this.#text.slice(this.#offset);
     const match = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/u.exec(rest);
     if (match === null) {
-      throw fail("recipe-invalid", "invalid JSON number");
+      throw fail(this.#errorCode, "invalid JSON number");
     }
     this.#offset += match[0].length;
   }
 
   #literal(literal: string): void {
     if (!this.#text.startsWith(literal, this.#offset)) {
-      throw fail("recipe-invalid", "invalid JSON literal");
+      throw fail(this.#errorCode, "invalid JSON literal");
     }
     this.#offset += literal.length;
   }
@@ -154,16 +157,58 @@ class DuplicateKeyScanner {
 
   #expect(character: string): void {
     if (!this.#consume(character)) {
-      throw fail("recipe-invalid", `expected ${JSON.stringify(character)} in JSON`);
+      throw fail(this.#errorCode, `expected ${JSON.stringify(character)} in JSON`);
     }
   }
 }
 
-export function parseJsonStrict(text: string): unknown {
-  new DuplicateKeyScanner(text).scan();
+export function parseJsonStrict(
+  text: string,
+  errorCode: ErrorCode = "recipe-invalid",
+): unknown {
+  new DuplicateKeyScanner(text, errorCode).scan();
   try {
-    return JSON.parse(text) as unknown;
+    const value = JSON.parse(text) as unknown;
+    assertRepresentableJson(value, errorCode);
+    return value;
   } catch (error) {
-    throw fail("recipe-invalid", "invalid JSON", error);
+    if (error instanceof Error && error.name === "MuraFlashError") {
+      throw error;
+    }
+    throw fail(errorCode, "invalid JSON", error);
+  }
+}
+
+function assertRepresentableJson(value: unknown, errorCode: ErrorCode): void {
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw fail(errorCode, "non-finite JSON number");
+    }
+    if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+      throw fail(errorCode, "JSON integer exceeds exact JavaScript range");
+    }
+    return;
+  }
+  if (typeof value === "string") {
+    for (let index = 0; index < value.length; index += 1) {
+      const unit = value.charCodeAt(index);
+      if (unit >= 0xd800 && unit <= 0xdbff) {
+        const next = value.charCodeAt(index + 1);
+        if (!(next >= 0xdc00 && next <= 0xdfff)) {
+          throw fail(errorCode, "JSON string contains an unpaired surrogate");
+        }
+        index += 1;
+      } else if (unit >= 0xdc00 && unit <= 0xdfff) {
+        throw fail(errorCode, "JSON string contains an unpaired surrogate");
+      }
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => assertRepresentableJson(item, errorCode));
+  } else if (value !== null && typeof value === "object") {
+    Object.values(value).forEach((item) =>
+      assertRepresentableJson(item, errorCode),
+    );
   }
 }

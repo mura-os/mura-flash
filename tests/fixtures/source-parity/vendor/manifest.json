@@ -1,0 +1,46 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "source": {
+    "kind": "external-vendor-and-community-prose",
+    "retrieved": "2026-09-27",
+    "provenanceLimit": "The cited pages document procedures and release identities, not locally acquired SHA-256-bound artifacts or Mura hardware qualification."
+  },
+  "procedureFixtures": [
+    {
+      "procedureId": "oculus-go-pacific-official-unlock",
+      "path": "oculus-go-pacific-official-unlock.json",
+      "authority": "vendor"
+    },
+    {
+      "procedureId": "htc-vive-xr-elite-10999738-unlock",
+      "path": "htc-vive-xr-elite-10999738-unlock.json",
+      "authority": "community-procedure-plus-vendor-release"
+    },
+    {
+      "procedureId": "lynx-r1-versioned-sideload",
+      "path": "lynx-r1-versioned-sideload.json",
+      "authority": "vendor"
+    },
+    {
+      "procedureId": "lynx-r1-qdl-stock-restore",
+      "path": "lynx-r1-qdl-stock-restore.json",
+      "authority": "vendor"
+    }
+  ],
+  "muraPolicy": {
+    "proceduresEnabled": false,
+    "operationsEnabled": false,
+    "liveDestructiveAllowed": false
+  },
+  "artifactDigestEncoding": {
+    "known": {
+      "kind": "known",
+      "sha256": "nonzero-lowercase-hex"
+    },
+    "unknown": {
+      "kind": "unknown",
+      "reason": "required"
+    },
+    "liveUseOfUnknown": "blocked"
+  }
+}

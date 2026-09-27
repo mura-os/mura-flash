@@ -1,0 +1,877 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "oculus-go-pacific-official-unlock",
+  "targetId": "oculus-go-pacific",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Meta's Go-only procedure extracts the official outer package, sideloads unlocked_build.zip from recovery, reboots to the bootloader, runs fastboot oem unlock with the device-side wipe confirmation, and then checks that fastboot flash and adb root are accepted. Unlock permanently ends OTA service; relocking wipes again and accepts only Oculus-signed boot images.",
+    "evidenceLevel": "vendor-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "The official package URL is not represented by an acquired SHA-256-bound artifact, and the retail partition/protected-state map and tested stock restore are unknown. All-zero digests explicitly mean unknown and block live use. Mura does not offer relock without an administrator-controlled trust root.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "stock-go-adb",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "recovery-sideload",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "software-unlock-installed",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "bootloader-locked",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "bootloader-unlocked",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "ota-permanently-ended",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "safe-stop",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "oculus-go-sw-unlock-v1-outer",
+      "role": "stock",
+      "source": {
+        "kind": "remote",
+        "uri": "https://developers.meta.com/horizon/downloads/package/oculus-go-sw-unlock/"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "oculus-go-unlocked-build-inner",
+      "role": "payload",
+      "source": {
+        "kind": "local",
+        "path": "Oculus_Go_SW_Unlock_v1.zip!/unlocked_build.zip"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    }
+  ],
+  "partitions": [],
+  "backups": [],
+  "confirmations": [
+    {
+      "id": "confirm-sideload-official-unlock",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Install Meta's Go-only software-unlock update. Its SHA-256 and complete partition effects are unknown, so this record remains disabled."
+    },
+    {
+      "id": "confirm-fastboot-unlock-wipe",
+      "safetyClasses": [
+        "security-state-change"
+      ],
+      "prompt": "Confirm fastboot oem unlock on the headset. This wipes user data, permanently ends OTA service, and is only documented for Oculus Go."
+    }
+  ],
+  "operations": [
+    {
+      "id": "enter-sideload-by-boot-menu",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Power off and enter the Go boot menu, then choose sideload. The official guide says Volume Up; owner reports say Volume Down."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Recovery exposes ADB sideload."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "stock-go-adb"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "enter-sideload-by-boot-menu",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-with-stock-go"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-with-stock-go"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "stock-go-adb"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "recovery-sideload"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-with-stock-go"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-with-stock-go"
+        }
+      ]
+    },
+    {
+      "id": "sideload-unlocked-build",
+      "variant": "adb.sideload",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "go-recovery-device"
+          }
+        },
+        {
+          "inputName": "verifiedArtifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "oculus-go-unlocked-build-inner"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "recovery-sideload"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "sideload-unlocked-build",
+            "outputName": "result"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-recovery"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop-in-recovery"
+        },
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stop-in-recovery"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "recovery-sideload"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "software-unlock-installed"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-recovery"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-recovery"
+        }
+      ]
+    },
+    {
+      "id": "reboot-bootloader",
+      "variant": "adb.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "software-unlocked-go"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "software-unlock-installed"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reboot-bootloader",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "manual-enter-bootloader"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "manual-enter-bootloader"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "manual-enter-bootloader"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "software-unlock-installed"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "bootloader-locked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "manual-enter-bootloader"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "manual-enter-bootloader"
+        }
+      ]
+    },
+    {
+      "id": "official-oem-unlock",
+      "variant": "fastboot.unlock",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "go-fastboot-device"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "bootloader-locked"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "official-oem-unlock",
+            "outputName": "accepted"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "confirmation-declined",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "bootloader-unlocked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ]
+    },
+    {
+      "id": "read-unlocked-after-clean-bootloader",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "go-fastboot-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "unlocked"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-unlocked-after-clean-bootloader",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "yes"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "read-unlock-after-reconnect"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "read-unlock-after-reconnect"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "read-unlock-after-reconnect"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-unlocked"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "read-unlock-after-reconnect"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "read-unlock-after-reconnect"
+        }
+      ]
+    },
+    {
+      "id": "record-ota-end-and-unmodeled-capability-checks",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that OTA service has permanently ended. The vendor asks the operator to verify fastboot flash and adb root acceptance; this procedure registry has no non-writing capability probe for either and does not substitute a command."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The limitation is acknowledged without issuing an arbitrary test write."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "bootloader-unlocked"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "record-ota-end-and-unmodeled-capability-checks",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-unlocked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "ota-permanently-ended"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-bootloader"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-bootloader"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop in the current vendor mode. Do not relock or flash because stock restore and protected-state coverage are unknown."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No additional destructive action is taken."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-with-stock-go"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-with-stock-go"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "stock-go-adb"
+        },
+        {
+          "kind": "state",
+          "stateId": "recovery-sideload"
+        },
+        {
+          "kind": "state",
+          "stateId": "software-unlock-installed"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-with-stock-go"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-with-stock-go"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "official-go-unlock",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "stock-go-adb"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "enter-sideload-by-boot-menu"
+        },
+        {
+          "kind": "operation",
+          "operationId": "sideload-unlocked-build"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reboot-bootloader"
+        },
+        {
+          "kind": "operation",
+          "operationId": "official-oem-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-unlocked-after-clean-bootloader"
+        },
+        {
+          "kind": "operation",
+          "operationId": "record-ota-end-and-unmodeled-capability-checks"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "pacific"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "pacific"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-sideload-official-unlock"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-fastboot-unlock-wipe"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-with-stock-go",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "stock-go-adb"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "stop-in-recovery",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "recovery-sideload"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "manual-enter-bootloader",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "software-unlock-installed"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "bootloader-locked"
+      }
+    },
+    {
+      "id": "stop-in-bootloader",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop"
+      }
+    },
+    {
+      "id": "read-unlock-after-reconnect",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "bootloader-locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "bootloader-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "read-unlocked-after-clean-bootloader"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "bootloader-unlocked"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "external",
+      "uri": "https://developers.meta.com/horizon/blog/unlocking-oculus-go/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "external",
+      "uri": "https://developers.meta.com/horizon/downloads/package/oculus-go-sw-unlock/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 536,
+      "lineEnd": 570
+    }
+  ],
+  "sourceGaps": [
+    "The cited source does not establish Mura hardware qualification or complete recovery.",
+    "One or more required artifact digests are unknown, so live verification is impossible."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/vendor/oculus-go-pacific-official-unlock.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "go-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "go-recovery-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "software-unlocked-go",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

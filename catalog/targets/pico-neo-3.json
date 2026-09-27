@@ -1,0 +1,37 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "pico-neo-3",
+  "displayName": "PICO Neo 3",
+  "vendor": "PICO",
+  "models": [
+    "PICO Neo 3"
+  ],
+  "codenames": [],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "reported",
+    "installState": "procedure-available",
+    "summary": "The tool maintainer reports support through 5.11.2, but the discoverer tested PICO 4 and Neo 3-specific programmer, partition, and recovery closure is absent."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Maintainer-reported support is insufficient to enable a Neo 3 write path."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "pico-neo-3-unlock"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 382,
+      "lineEnd": 405
+    }
+  ]
+}

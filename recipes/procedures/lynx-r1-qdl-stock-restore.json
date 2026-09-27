@@ -1,0 +1,983 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "lynx-r1-qdl-stock-restore",
+  "targetId": "lynx-r1",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Lynx documents a full stock restore using the firmware package's prog_firehose_ddr.elf, rawprogram_unsparse0.xml, rawprogram1.xml through rawprogram5.xml, and patch0.xml through patch5.xml on UFS. Linux temporarily disables ModemManager, starts qdl, and enters EDL with adb reboot edl; if port selection fails, Power + Volume Up + Volume Down exposes QDLoader 9008. Erase All Before Download must remain off to avoid losing distortion and calibration files.",
+    "evidenceLevel": "vendor-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Live use is unavailable. The official 1.4.1 package is currently unavailable, every package-member SHA-256 is unknown, rawprogram/patch contents and exact GPT/partition coverage are uninspected, and no pre-write Firehose backup or calibration completeness proof exists. All-zero digests explicitly mean unknown and block live use.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "lynx-stock-adb-or-recovery",
+      "kind": "device-mode",
+      "initial": true
+    },
+    {
+      "id": "qualcomm-9008",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
+      "id": "firehose-session",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "stock-restore-written-unread",
+      "kind": "storage",
+      "initial": false
+    },
+    {
+      "id": "vendor-auto-reboot",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "safe-stop-edl",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "lynx-r1-official-firmware-package",
+      "role": "stock",
+      "source": {
+        "kind": "remote",
+        "uri": "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "prog-firehose-ddr-elf",
+      "role": "programmer",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/prog_firehose_ddr.elf"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram-unsparse0",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram_unsparse0.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram1",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram1.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram2",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram2.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram3",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram3.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram4",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram4.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "rawprogram5",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/rawprogram5.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch0",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch0.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch1",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch1.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch2",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch2.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch3",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch3.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch4",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch4.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    },
+    {
+      "id": "patch5",
+      "role": "metadata",
+      "source": {
+        "kind": "local",
+        "path": "official-firmware/patch5.xml"
+      },
+      "digest": {
+        "kind": "unknown",
+        "reason": "No authenticated SHA-256 digest is available from the cited source."
+      }
+    }
+  ],
+  "partitions": [
+    {
+      "id": "vendor-rawprogram-exact-set",
+      "deviceName": "partitions named by inspected official rawprogram XML only",
+      "slot": "none",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "distortion-calibration-preserve",
+      "deviceName": "vendor distortion and calibration files/partitions unresolved",
+      "slot": "none",
+      "unitBound": true,
+      "protected": true,
+      "qualifiedForWrite": false
+    }
+  ],
+  "backups": [
+    {
+      "id": "required-calibration-backup-unavailable",
+      "partition": {
+        "kind": "partition",
+        "partitionId": "distortion-calibration-preserve"
+      },
+      "requiredBeforeWrites": true,
+      "minimumMatchingReads": 2,
+      "unitBound": true
+    }
+  ],
+  "confirmations": [
+    {
+      "id": "confirm-full-vendor-qdl-restore",
+      "safetyClasses": [
+        "device-code-execution",
+        "device-write"
+      ],
+      "prompt": "Execute the exact official Lynx UFS restore set only after every package member is SHA-256-bound and rawprogram/patch XML has been reviewed. This is a full destructive stock restore."
+    },
+    {
+      "id": "confirm-erase-all-disabled",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Confirm Erase All Before Download is OFF. Lynx warns that enabling it loses distortion and calibration files."
+    }
+  ],
+  "operations": [
+    {
+      "id": "enter-edl-by-adb",
+      "variant": "adb.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "lynx-r1-adb-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "edl"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "lynx-stock-adb-or-recovery"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "enter-edl-by-adb",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "physical-9008-fallback"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "physical-9008-fallback"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "physical-9008-fallback"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb-or-recovery"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "qualcomm-9008"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "physical-9008-fallback"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "physical-9008-fallback"
+        }
+      ]
+    },
+    {
+      "id": "load-exact-firehose",
+      "variant": "edl.load-programmer",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "lynx-r1-9008-device"
+          }
+        },
+        {
+          "inputName": "verifiedProgrammer",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "prog-firehose-ddr-elf"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "qualcomm-9008"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "load-exact-firehose",
+            "outputName": "edlSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "stay-in-9008"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stay-in-9008"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-9008"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "qualcomm-9008"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "firehose-session"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-9008"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-9008"
+        }
+      ]
+    },
+    {
+      "id": "write-exact-rawprogram-patch-set-no-readback",
+      "variant": "qdl.apply-package",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "edlSession",
+          "value": {
+            "kind": "state",
+            "stateId": "firehose-session"
+          }
+        },
+        {
+          "inputName": "verifiedPackage",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "lynx-r1-official-firmware-package"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "firehose-session"
+          },
+          "expected": true
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "write-exact-rawprogram-patch-set-no-readback",
+            "outputName": "result"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "stay-in-firehose-after-partial-write"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stay-in-firehose-after-partial-write"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "stay-in-firehose-after-partial-write"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "stock-restore-written-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stay-in-firehose-after-partial-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stay-in-firehose-after-partial-write"
+        }
+      ]
+    },
+    {
+      "id": "observe-vendor-auto-reboot",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The vendor says the headset should reboot automatically after a Success log. Do not treat the log or disconnect as partition readback."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The stock OS boots and calibration/distortion behavior is present."
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "state-assertion",
+          "state": {
+            "kind": "state",
+            "stateId": "stock-restore-written-unread"
+          },
+          "expected": true
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "observe-vendor-auto-reboot",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "reenter-9008-after-partial-write"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reenter-9008-after-partial-write"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "stock-restore-written-unread"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "vendor-auto-reboot"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reenter-9008-after-partial-write"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reenter-9008-after-partial-write"
+        }
+      ]
+    },
+    {
+      "id": "physical-9008-chord",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "With the headset connected, hold Power + Volume Up + Volume Down for about 10\u201320 seconds."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "QDLoader 9008 appears as the available port."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "physical-9008-chord",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-before-edl"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-before-edl"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb-or-recovery"
+        },
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "qualcomm-9008"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-edl"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-edl"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Stop without enabling Erase All, substituting a Firehose/rawprogram, or retrying a partially written package until exact package state and support guidance are known."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The device remains in its current recovery state and calibration data is not intentionally erased."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-before-edl"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-before-edl"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "external",
+          "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+          "retrieved": "2026-09-27"
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb-or-recovery"
+        },
+        {
+          "kind": "state",
+          "stateId": "qualcomm-9008"
+        },
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop-edl"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-before-edl"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-before-edl"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "vendor-qdl-full-stock-restore",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "lynx-stock-adb-or-recovery"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "enter-edl-by-adb"
+        },
+        {
+          "kind": "operation",
+          "operationId": "load-exact-firehose"
+        },
+        {
+          "kind": "operation",
+          "operationId": "write-exact-rawprogram-patch-set-no-readback"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-vendor-auto-reboot"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "ufs"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "ufs"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-full-vendor-qdl-restore"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-erase-all-disabled"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-before-edl",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb-or-recovery"
+        },
+        {
+          "kind": "state",
+          "stateId": "qualcomm-9008"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop-edl"
+      }
+    },
+    {
+      "id": "physical-9008-fallback",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "lynx-stock-adb-or-recovery"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "physical-9008-chord"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "qualcomm-9008"
+      }
+    },
+    {
+      "id": "stay-in-9008",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "qualcomm-9008"
+        },
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "qualcomm-9008"
+      }
+    },
+    {
+      "id": "stay-in-firehose-after-partial-write",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        },
+        {
+          "kind": "state",
+          "stateId": "stock-restore-written-unread"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "firehose-session"
+      }
+    },
+    {
+      "id": "reenter-9008-after-partial-write",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "firehose-session"
+        },
+        {
+          "kind": "state",
+          "stateId": "stock-restore-written-unread"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "physical-9008-chord"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "qualcomm-9008"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "external",
+      "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "external",
+      "uri": "https://portal.lynx-r.com/documentation/view/getting-started?version=30",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 464,
+      "lineEnd": 534
+    }
+  ],
+  "sourceGaps": [
+    "The cited source does not establish Mura hardware qualification or complete recovery.",
+    "One or more required artifact digests are unknown, so live verification is impossible."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/vendor/lynx-r1-qdl-stock-restore.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "lynx-r1-9008-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "lynx-r1-adb-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

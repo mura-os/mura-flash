@@ -1,0 +1,48 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "lynx-r1-versioned-sideload",
+  "evidence": "vendor-prose",
+  "targetGate": {
+    "product": "Lynx-R1",
+    "selectedVersion": "user-selected-from-vendor-portal",
+    "downgradeAllowedByVendor": true
+  },
+  "artifactSha256": {
+    "YourVersion.zip": null
+  },
+  "sourceOperationOrder": [
+    "enable-file-transfer",
+    "enable-debug",
+    "select-and-download-version-from-lynx-portal",
+    "adb-reboot-sideload-auto-reboot",
+    "adb-wait-for-sideload",
+    "adb-sideload-your-version-zip",
+    "automatic-reboot"
+  ],
+  "sourceGaps": [
+    "current-141-download-redirect-returned-404",
+    "vendor-portal-provides-md5-not-full-sha256",
+    "selected-package-partition-and-avb-effects-uninspected",
+    "rollback-floor-unknown",
+    "protected-state-backup-unknown",
+    "disconnect-or-auto-reboot-is-not-independent-success-readback"
+  ],
+  "citations": [
+    {
+      "uri": "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "uri": "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 464,
+      "lineEnd": 534
+    }
+  ]
+}

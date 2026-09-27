@@ -1,0 +1,1195 @@
+{
+  "schema": "org.mura.flash.install-procedure/v1",
+  "id": "quest-1-monterey-v29-direct-unlock",
+  "targetId": "quest-1-monterey",
+  "enabled": false,
+  "sourceBehavior": {
+    "summary": "Source direct mode selects the Quest profile from only bootloader-reported build 16476800119700000, derives the CVE-2021-1931 payload, sends it immediately before flash:unlock_token, accepts unlocked when either getvar:unlocked or oem device-info is truthy, and trusts only the reading after a clean bootloader restart. The optional slot/reset cleanup lacks the inactive-flow identity and backup context.",
+    "evidenceLevel": "source-documented"
+  },
+  "muraPolicy": {
+    "writeBoundary": "Research-only source parity. Mura additionally requires exact non-build target identity, same-unit continuity, hardware qualification, authenticated stock provenance, an exact recovery boundary, separate activation/reset confirmations, and rollback readback before any live use; none is supplied by direct mode.",
+    "liveDestructiveAllowed": false
+  },
+  "states": [
+    {
+      "id": "v29-bootloader-locked",
+      "kind": "security",
+      "initial": true
+    },
+    {
+      "id": "patched-bootloader-tentative",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "clean-bootloader-unlocked",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "rollback-reset-unread",
+      "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "safe-stop-fastboot",
+      "kind": "flow",
+      "initial": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "quest1-v29-firmware-archive",
+      "role": "stock",
+      "source": {
+        "kind": "local",
+        "path": "quest1/16476800119700000.zip"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "5e4d6f70f4287134e7cb1016625bcc551fd23852702d81d56156137c26335f6f"
+      }
+    },
+    {
+      "id": "quest1-v29-abl",
+      "role": "image",
+      "source": {
+        "kind": "local",
+        "path": "quest1/16476800119700000.zip!/abl.img"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "c2cc1f173bec2956fa5e068abc98db82e1cd2c651a4f4bb7ae31c79605e43707"
+      }
+    },
+    {
+      "id": "quest1-v29-linuxloader-pe",
+      "role": "payload",
+      "source": {
+        "kind": "local",
+        "path": "derived/quest1/16476800119700000-linuxloader.pe"
+      },
+      "digest": {
+        "kind": "known",
+        "sha256": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+      }
+    }
+  ],
+  "partitions": [
+    {
+      "id": "xbl-inactive",
+      "deviceName": "xbl_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "abl-inactive",
+      "deviceName": "abl_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "rpm-inactive",
+      "deviceName": "rpm_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "tz-inactive",
+      "deviceName": "tz_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "hyp-inactive",
+      "deviceName": "hyp_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "devcfg-inactive",
+      "deviceName": "devcfg_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "pmic-inactive",
+      "deviceName": "pmic_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "cmnlib-inactive",
+      "deviceName": "cmnlib_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "cmnlib64-inactive",
+      "deviceName": "cmnlib64_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "keymaster-inactive",
+      "deviceName": "keymaster_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "ovrtz-inactive",
+      "deviceName": "ovrtz_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "modem-inactive",
+      "deviceName": "modem_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    },
+    {
+      "id": "boot-inactive",
+      "deviceName": "boot_{inactive}",
+      "slot": "inactive",
+      "unitBound": false,
+      "protected": false,
+      "qualifiedForWrite": false
+    }
+  ],
+  "backups": [],
+  "confirmations": [
+    {
+      "id": "confirm-direct-unlock-v29",
+      "safetyClasses": [
+        "device-code-execution",
+        "security-state-change"
+      ],
+      "prompt": "Type unlock 16476800119700000. The source says unlock erases userdata, misc and metadata; direct mode has no source backup contract."
+    }
+  ],
+  "operations": [
+    {
+      "id": "read-build-only-identity",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-fastboot-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "oem.device-info.build-number"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-build-only-identity",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 343,
+          "lineEnd": 400
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ]
+    },
+    {
+      "id": "verify-v29-archive",
+      "variant": "artifact.verify",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "artifact",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "5e4d6f70f4287134e7cb1016625bcc551fd23852702d81d56156137c26335f6f"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "verify-v29-archive",
+            "outputName": "actualDigest"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "5e4d6f70f4287134e7cb1016625bcc551fd23852702d81d56156137c26335f6f"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/asset-hashes.json",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/data/asset-hashes.json",
+          "lineStart": 1,
+          "lineEnd": 9
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ]
+    },
+    {
+      "id": "derive-v29-overflow-payload",
+      "variant": "quest.payload-build",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "profile",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-abl"
+          }
+        },
+        {
+          "inputName": "archive",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-firmware-archive"
+          }
+        },
+        {
+          "inputName": "abl",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-abl"
+          }
+        },
+        {
+          "inputName": "linuxLoader",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "quest1-v29-linuxloader-pe"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "digest-equals",
+          "left": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "digest",
+            "value": "7663280938b54f8dc061b502f581cba4bea638473080c44a8dcfec88a570f74c"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "artifact-extraction-failed",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/data/profiles.ts",
+          "lineStart": 172,
+          "lineEnd": 198
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest-bootloader-unlocker/blob/e171bbee61e754863fd3a82fe9dc35cd18adf3ac/Patches.cs",
+          "commit": "e171bbee61e754863fd3a82fe9dc35cd18adf3ac",
+          "path": "Patches.cs",
+          "lineStart": 40,
+          "lineEnd": 47
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ]
+    },
+    {
+      "id": "send-payload-and-request-token",
+      "variant": "quest.payload-send",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "connected-fastboot-device"
+          }
+        },
+        {
+          "inputName": "payload",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "derive-v29-overflow-payload",
+            "outputName": "payload"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-build-only-identity",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "send-payload-and-request-token",
+            "outputName": "payloadSession"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 620,
+          "lineEnd": 684
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "patched-bootloader-tentative"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ]
+    },
+    {
+      "id": "read-tentative-unlock-or",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "patched-fastboot-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "unlocked-or-oem-device-info-device-unlocked"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-tentative-unlock-or",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "true-by-either-source"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 552,
+          "lineEnd": 617
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ]
+    },
+    {
+      "id": "restart-clean-bootloader",
+      "variant": "fastboot.reboot",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "patched-fastboot-device"
+          }
+        },
+        {
+          "inputName": "mode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "bootloader"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "restart-clean-bootloader",
+            "outputName": "expectedMode"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1165,
+          "lineEnd": 1205
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "clean-bootloader-unlocked"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ]
+    },
+    {
+      "id": "read-authoritative-unlock-or",
+      "variant": "fastboot.probe",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "variable",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "unlocked-or-oem-device-info-device-unlocked"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-authoritative-unlock-or",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "true-by-either-source"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1178,
+          "lineEnd": 1205
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 568,
+          "lineEnd": 617
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-bootloader-unlocked"
+        },
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        }
+      ],
+      "toState": null,
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "reconnect-and-read-authoritative-state"
+        }
+      ]
+    },
+    {
+      "id": "reset-rollback-without-readback",
+      "variant": "fastboot.reset-rollback",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "clean-fastboot-device"
+          }
+        },
+        {
+          "inputName": "slot",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "current"
+          }
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-authoritative-unlock-or",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "true-by-either-source"
+          }
+        }
+      ],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "reset-rollback-without-readback",
+            "outputName": "resetAccepted"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "stop-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "stop-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "authentication-failed",
+          "recoveryId": "stop-unlocked-with-rollback-warning"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/flow.ts",
+          "lineStart": 1207,
+          "lineEnd": 1229
+        },
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "src/lib/fastboot.ts",
+          "lineStart": 525,
+          "lineEnd": 551
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-bootloader-unlocked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "rollback-reset-unread"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-unlocked-with-rollback-warning"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-unlocked-with-rollback-warning"
+        }
+      ]
+    },
+    {
+      "id": "safe-stop-message",
+      "variant": "manual.action",
+      "enabled": false,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Leave the headset in USB Update Mode and do not issue slot, erase, restore, or relock commands."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "USB Update Mode remains visible."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "safe-stop-message",
+            "outputName": "acknowledged"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/README.md",
+          "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+          "path": "README.md",
+          "lineStart": 131,
+          "lineEnd": 144
+        }
+      ],
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "rollback-reset-unread"
+        },
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "clean-bootloader-unlocked"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "safe-stop-fastboot"
+      },
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "stop-in-fastboot"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "stop-in-fastboot"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "direct-v29-unlock",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "v29-bootloader-locked"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "read-build-only-identity"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-v29-archive"
+        },
+        {
+          "kind": "operation",
+          "operationId": "derive-v29-overflow-payload"
+        },
+        {
+          "kind": "operation",
+          "operationId": "send-payload-and-request-token"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-tentative-unlock-or"
+        },
+        {
+          "kind": "operation",
+          "operationId": "restart-clean-bootloader"
+        },
+        {
+          "kind": "operation",
+          "operationId": "read-authoritative-unlock-or"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reset-rollback-without-readback"
+        },
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "read-build-only-identity",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "16476800119700000"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-direct-unlock-v29"
+        }
+      ]
+    }
+  ],
+  "recovery": [
+    {
+      "id": "stop-in-fastboot",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "v29-bootloader-locked"
+        },
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop-fastboot"
+      }
+    },
+    {
+      "id": "reconnect-and-read-authoritative-state",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        },
+        {
+          "kind": "state",
+          "stateId": "clean-bootloader-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "read-authoritative-unlock-or"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "clean-bootloader-unlocked"
+      }
+    },
+    {
+      "id": "restart-before-retry",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "patched-bootloader-tentative"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "restart-clean-bootloader"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "v29-bootloader-locked"
+      }
+    },
+    {
+      "id": "stop-unlocked-with-rollback-warning",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "clean-bootloader-unlocked"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "safe-stop-message"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "safe-stop-fastboot"
+      }
+    }
+  ],
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/flow.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/flow.ts",
+      "lineStart": 343,
+      "lineEnd": 400
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/data/profiles.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/data/profiles.ts",
+      "lineStart": 134,
+      "lineEnd": 198
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/darknight1050/quest1-bootloader-unlocker-web/blob/7f34276ecef9021771e7bf4a2d53f10b26243334/src/lib/fastboot.ts",
+      "commit": "7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "path": "src/lib/fastboot.ts",
+      "lineStart": 552,
+      "lineEnd": 684
+    }
+  ],
+  "sourceGaps": [
+    "The source has no both-slots-lost recovery path.",
+    "Rollback reset and backup restoration lack authoritative readback."
+  ],
+  "sourceParity": {
+    "path": "tests/fixtures/source-parity/quest/quest-1-monterey-v29-direct-unlock.json"
+  },
+  "runtimeInputs": [
+    {
+      "id": "clean-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "connected-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    },
+    {
+      "id": "patched-fastboot-device",
+      "type": "device-ref",
+      "required": true
+    }
+  ]
+}

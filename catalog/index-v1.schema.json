@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/target-catalog-index-v1.schema.json",
+  "title": "Mura Flash deterministic target and procedure index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "targets",
+    "procedures"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.target-catalog-index/v1"
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "sha256",
+          "canonicalSize"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^catalog/targets/[a-z][a-z0-9.-]{0,95}\\.json$"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "canonicalSize": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "procedures": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "sha256",
+          "canonicalSize",
+          "targetId"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^recipes/procedures/[a-z][a-z0-9.-]{0,95}\\.json$"
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "canonicalSize": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "targetId": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{0,95}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

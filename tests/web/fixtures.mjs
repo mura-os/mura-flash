@@ -102,3 +102,149 @@ export class FakeAdapter {
     this.closed += 1;
   }
 }
+
+const citation = {
+  kind: "repository",
+  path: "tests/web/fixtures.mjs",
+  lineStart: 1,
+  lineEnd: 1,
+};
+
+function stateRef(stateId) {
+  return { kind: "state", stateId };
+}
+
+function waitOperation(
+  id,
+  {
+    fromState = "ready",
+    toState = null,
+    recover = true,
+  } = {},
+) {
+  return {
+    id,
+    variant: "wait",
+    enabled: false,
+    fromStates: [stateRef(fromState)],
+    toState: toState === null ? null : stateRef(toState),
+    arguments: [
+      {
+        inputName: "duration",
+        value: { kind: "constant", valueType: "duration-ms", value: 1 },
+      },
+    ],
+    guards: [],
+    postconditions: [
+      {
+        kind: "equals",
+        left: { kind: "constant", valueType: "duration-ms", value: 1 },
+        right: { kind: "constant", valueType: "duration-ms", value: 1 },
+      },
+    ],
+    failureEdges: [
+      recover
+        ? { failureClass: "interrupted", recoveryId: "safe-stop" }
+        : { failureClass: "interrupted", terminalFailure: true },
+    ],
+    engineFailureEdges: [
+      recover
+        ? { failureClass: "postcondition-failed", recoveryId: "safe-stop" }
+        : { failureClass: "postcondition-failed", terminalFailure: true },
+      recover
+        ? { failureClass: "interrupted", recoveryId: "safe-stop" }
+        : { failureClass: "interrupted", terminalFailure: true },
+    ],
+    idempotence: "idempotent",
+    sourceCitations: [citation],
+  };
+}
+
+export function procedure(overrides = {}) {
+  return {
+    schema: "org.mura.flash.install-procedure/v1",
+    id: "install.synthetic",
+    targetId: "synthetic-target",
+    enabled: false,
+    sourceBehavior: {
+      summary: "Synthetic deterministic replay procedure.",
+      evidenceLevel: "source-documented",
+    },
+    sourceGaps: ["synthetic-test-only"],
+    sourceParity: {
+      path: "tests/fixtures/source-parity/vendor/oculus-go-pacific-official-unlock.json",
+    },
+    runtimeInputs: [],
+    states: [
+      { id: "ready", kind: "flow", initial: true },
+      { id: "completed", kind: "flow", initial: false },
+    ],
+    artifacts: [],
+    partitions: [],
+    backups: [],
+    confirmations: [],
+    operations: [
+      waitOperation("main-wait", { toState: "completed" }),
+      waitOperation("recovery-wait", { recover: false }),
+    ],
+    flows: [
+      {
+        id: "install",
+        enabled: false,
+        initialState: stateRef("ready"),
+        steps: [{ kind: "operation", operationId: "main-wait" }],
+        guards: [],
+        confirmations: [],
+      },
+    ],
+    recovery: [
+      {
+        id: "safe-stop",
+        fromStates: [stateRef("ready")],
+        steps: [{ kind: "operation", operationId: "recovery-wait" }],
+        terminalState: stateRef("ready"),
+      },
+    ],
+    sourceCitations: [citation],
+    ...overrides,
+  };
+}
+
+export function replayScenario(overrides = {}) {
+  return {
+    schema: "org.mura.flash.replay-scenario/v1",
+    id: "synthetic-replay",
+    procedureId: "install.synthetic",
+    flowId: "install",
+    simulateDisabled: true,
+    clock: {
+      startTimestamp: "2000-01-01T00:00:00.000000Z",
+      tickMs: 1,
+    },
+    operationDurations: [
+      { operationId: "main-wait", durationMs: 1 },
+      { operationId: "recovery-wait", durationMs: 1 },
+    ],
+    adapterCapabilities: [],
+    inputs: [],
+    responses: [
+      {
+        kind: "success",
+        operationId: "main-wait",
+        outputs: [{ name: "elapsed", type: "duration-ms", value: 1 }],
+      },
+    ],
+    expected: {
+      terminalStateId: "completed",
+      eventKinds: [
+        "session-start",
+        "operation-would-execute",
+        "state-transition",
+        "operation-success",
+        "session-end",
+      ],
+      errorCode: null,
+    },
+    ...overrides,
+  };
+}

@@ -2,7 +2,9 @@ import { contract } from "./catalog";
 
 const redaction = "[REDACTED]";
 const sensitiveKeys =
-  /^(?:authorization|credential|privateKey|secret|serial|serialNumber|token)$/iu;
+  /^(?:account|authorization|calibration|chipId|credential|deviceIdentity|encryptionKey|imei|macAddress|meid|partitionContents|privateKey|secret|serial|serialNumber|token|unlockToken|wifiMac)$/iu;
+const sensitiveNames =
+  /(?:account|authorization|calibration|chip|credential|encryption|imei|mac|meid|private|secret|serial|token)/iu;
 const privateKeyPattern =
   /-----BEGIN [^-]*PRIVATE KEY-----[\s\S]*?-----END [^-]*PRIVATE KEY-----/gu;
 const labeledSecretPattern =
@@ -44,10 +46,14 @@ function redactValue(
   const result: Record<string, unknown> = {};
   seen.set(value, result);
   const fact = typeof source["fact"] === "string" ? source["fact"] : undefined;
+  const typedName =
+    typeof source["name"] === "string" ? source["name"] : undefined;
   for (const [key, child] of Object.entries(source)) {
     if (
       sensitiveKeys.test(key) ||
-      (key === "value" && fact !== undefined && redactFacts.has(fact))
+      (key === "value" &&
+        ((fact !== undefined && redactFacts.has(fact)) ||
+          (typedName !== undefined && sensitiveNames.test(typedName))))
     ) {
       result[key] = redaction;
     } else {

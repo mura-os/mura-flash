@@ -1,0 +1,20 @@
+{
+  "schema": "org.mura.flash.v0-immutability/v1",
+  "files": [
+    {
+      "path": "contracts/v0.json",
+      "sha256": "8024035cddbe02b4ddeda0adc10864fe71dc9c90c180eb9ce10703135571080e",
+      "size": 4050
+    },
+    {
+      "path": "contracts/v0.schema.json",
+      "sha256": "8f1aeb2371e9363f6c08a3b360eff966660990fbb9429530bd0cd766637c9759",
+      "size": 2732
+    },
+    {
+      "path": "recipes/inspection-recipe-v1.schema.json",
+      "sha256": "9261f8266eabf4619f745157067589d5e30f7869b83079416d348183c800eba8",
+      "size": 3175
+    }
+  ]
+}

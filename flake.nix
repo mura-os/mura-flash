@@ -88,7 +88,15 @@
             installPhase = ''
               runHook preInstall
               mkdir -p "$out"
-              cp -r dist ${self}/contracts ${self}/recipes "$out/"
+              cp -r \
+                dist \
+                ${self}/catalog \
+                ${self}/contracts \
+                ${self}/evidence \
+                ${self}/recipes \
+                ${self}/records \
+                ${self}/replay \
+                "$out/"
               runHook postInstall
             '';
           }
@@ -145,6 +153,23 @@
                 chmod -R u+w source
                 cd source
                 python tools/generate_catalog.py --check
+                touch "$out"
+              '';
+
+          replay-parity =
+            pkgs.runCommand "mura-flash-replay-parity"
+              {
+                nativeBuildInputs = [
+                  devPython
+                  nodejs
+                ];
+              }
+              ''
+                cp -r ${self} source
+                chmod -R u+w source
+                cd source
+                unset PYTHONPATH
+                python tools/check_replay_parity.py
                 touch "$out"
               '';
 

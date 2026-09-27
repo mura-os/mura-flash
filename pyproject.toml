@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mura-flash"
-version = "0.1.0"
-description = "Inspection-only host tooling for Mura target headsets"
+version = "0.2.0"
+description = "Safe inspection and deterministic procedure replay for Mura targets"
 readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
@@ -29,6 +29,10 @@ packages = ["src/mura_flash"]
 [tool.hatch.build.targets.wheel.force-include]
 "contracts" = "mura_flash/data/contracts"
 "recipes" = "mura_flash/data/recipes"
+"catalog" = "mura_flash/data/catalog"
+"evidence" = "mura_flash/data/evidence"
+"records" = "mura_flash/data/records"
+"replay" = "mura_flash/data/replay"
 
 [tool.pytest.ini_options]
 addopts = "-ra"

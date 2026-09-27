@@ -1,0 +1,40 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "pico-4-enterprise-phoenix",
+  "displayName": "PICO 4 Enterprise",
+  "vendor": "PICO",
+  "models": [
+    "PICO 4 Enterprise"
+  ],
+  "codenames": [
+    "phoenix"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "unsupported",
+    "installState": "unsupported",
+    "summary": "The available tool's DDR4-labelled programmer choice conflicts with the vendor LPDDR5 specification and pinned loader guidance."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "The programmer-selection conflict prevents any qualified EDL operation."
+  },
+  "procedureAvailability": {
+    "kind": "unavailable",
+    "reasonCodes": [
+      "programmer-selection-conflict",
+      "no-qualified-recovery"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 249,
+      "lineEnd": 278
+    }
+  ]
+}

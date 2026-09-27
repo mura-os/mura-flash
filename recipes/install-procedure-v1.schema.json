@@ -1,0 +1,999 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/install-procedure-v1.schema.json",
+  "title": "Mura Flash install procedure",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "targetId",
+    "enabled",
+    "sourceBehavior",
+    "sourceGaps",
+    "sourceParity",
+    "runtimeInputs",
+    "states",
+    "artifacts",
+    "partitions",
+    "backups",
+    "confirmations",
+    "operations",
+    "flows",
+    "recovery",
+    "sourceCitations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.install-procedure/v1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "targetId": {
+      "$ref": "#/$defs/id"
+    },
+    "enabled": {
+      "const": false
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "use",
+        "hardware",
+        "writesEnabled"
+      ],
+      "properties": {
+        "use": {
+          "const": "test-only"
+        },
+        "hardware": {
+          "const": "unqualified"
+        },
+        "writesEnabled": {
+          "const": false
+        }
+      }
+    },
+    "sourceBehavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "evidenceLevel"
+      ],
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/nonempty"
+        },
+        "evidenceLevel": {
+          "enum": [
+            "source-documented",
+            "vendor-documented",
+            "community-reproduced",
+            "community-reported"
+          ]
+        }
+      }
+    },
+    "sourceGaps": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonempty"
+      }
+    },
+    "sourceParity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^tests/fixtures/source-parity/[a-z0-9.-]+/[a-z0-9.-]+\\.json$"
+        }
+      }
+    },
+    "muraPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "writeBoundary",
+        "liveDestructiveAllowed"
+      ],
+      "properties": {
+        "writeBoundary": {
+          "$ref": "#/$defs/nonempty"
+        },
+        "liveDestructiveAllowed": {
+          "const": false
+        }
+      }
+    },
+    "runtimeInputs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "required"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "type": {
+            "$ref": "#/$defs/id"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "initial"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "kind": {
+            "enum": [
+              "device-mode",
+              "security",
+              "storage",
+              "flow"
+            ]
+          },
+          "initial": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "role",
+          "source",
+          "digest"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "role": {
+            "enum": [
+              "stock",
+              "payload",
+              "programmer",
+              "image",
+              "metadata"
+            ]
+          },
+          "source": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "uri"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "remote"
+                  },
+                  "uri": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "path"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "local"
+                  },
+                  "path": {
+                    "$ref": "#/$defs/nonempty"
+                  }
+                }
+              }
+            ]
+          },
+          "digest": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "sha256"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "known"
+                  },
+                  "sha256": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "reason"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "unknown"
+                  },
+                  "reason": {
+                    "$ref": "#/$defs/nonempty"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "partitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "deviceName",
+          "slot",
+          "unitBound",
+          "protected",
+          "qualifiedForWrite"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "deviceName": {
+            "$ref": "#/$defs/nonempty"
+          },
+          "slot": {
+            "enum": [
+              "none",
+              "a",
+              "b",
+              "active",
+              "inactive"
+            ]
+          },
+          "unitBound": {
+            "type": "boolean"
+          },
+          "protected": {
+            "type": "boolean"
+          },
+          "qualifiedForWrite": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "backups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "partition",
+          "requiredBeforeWrites",
+          "minimumMatchingReads",
+          "unitBound"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "partition": {
+            "$ref": "#/$defs/partitionRef"
+          },
+          "requiredBeforeWrites": {
+            "type": "boolean"
+          },
+          "minimumMatchingReads": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "unitBound": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "confirmations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "safetyClasses",
+          "prompt"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "safetyClasses": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "prompt": {
+            "$ref": "#/$defs/nonempty"
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    },
+    "flows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "enabled",
+          "initialState",
+          "steps",
+          "guards",
+          "confirmations"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "enabled": {
+            "const": false
+          },
+          "initialState": {
+            "$ref": "#/$defs/stateRef"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/operationRef"
+            }
+          },
+          "guards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/predicate"
+            }
+          },
+          "confirmations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/confirmationRef"
+            }
+          }
+        }
+      }
+    },
+    "recovery": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fromStates",
+          "steps",
+          "terminalState"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "fromStates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/stateRef"
+            }
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/operationRef"
+            }
+          },
+          "terminalState": {
+            "$ref": "#/$defs/stateRef"
+          }
+        }
+      }
+    },
+    "sourceCitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/citation"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{0,95}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][A-Za-z0-9]{0,63}$"
+    },
+    "nonempty": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^(?!0{64}$)[0-9a-f]{64}$"
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "artifactId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "artifact"
+        },
+        "artifactId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "partitionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "partitionId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "partition"
+        },
+        "partitionId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "backupRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "backupId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "backup"
+        },
+        "backupId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "stateRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "stateId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "state"
+        },
+        "stateId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "operationRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "operationId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "operation"
+        },
+        "operationId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "confirmationRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "confirmationId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "confirmation"
+        },
+        "confirmationId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "runtimeInputRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "inputId"
+      ],
+      "properties": {
+        "kind": {
+          "const": "runtime-input"
+        },
+        "inputId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "operationOutputRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "operationId",
+        "outputName"
+      ],
+      "properties": {
+        "kind": {
+          "const": "operation-output"
+        },
+        "operationId": {
+          "$ref": "#/$defs/id"
+        },
+        "outputName": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]{0,63}$"
+        }
+      }
+    },
+    "constant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "valueType",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "constant"
+        },
+        "valueType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "not": {
+                "enum": [
+                  "artifact-ref",
+                  "backup-ref",
+                  "device-ref",
+                  "partition-ref",
+                  "state-ref"
+                ]
+              }
+            }
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "valueRef": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/artifactRef"
+        },
+        {
+          "$ref": "#/$defs/partitionRef"
+        },
+        {
+          "$ref": "#/$defs/backupRef"
+        },
+        {
+          "$ref": "#/$defs/stateRef"
+        },
+        {
+          "$ref": "#/$defs/runtimeInputRef"
+        },
+        {
+          "$ref": "#/$defs/operationOutputRef"
+        },
+        {
+          "$ref": "#/$defs/constant"
+        }
+      ]
+    },
+    "predicate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "left",
+            "right"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "equals",
+                "not-equals",
+                "digest-equals"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/valueRef"
+            },
+            "right": {
+              "$ref": "#/$defs/valueRef"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "state",
+            "expected"
+          ],
+          "properties": {
+            "kind": {
+              "const": "state-assertion"
+            },
+            "state": {
+              "$ref": "#/$defs/stateRef"
+            },
+            "expected": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "output-present"
+            },
+            "value": {
+              "$ref": "#/$defs/operationOutputRef"
+            }
+          }
+        }
+      ]
+    },
+    "argument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputName",
+        "value"
+      ],
+      "properties": {
+        "inputName": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]{0,63}$"
+        },
+        "value": {
+          "$ref": "#/$defs/valueRef"
+        }
+      }
+    },
+    "failureEdge": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "failureClass",
+            "recoveryId"
+          ],
+          "properties": {
+            "failureClass": {
+              "$ref": "#/$defs/id"
+            },
+            "recoveryId": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "failureClass",
+            "terminalFailure"
+          ],
+          "properties": {
+            "failureClass": {
+              "$ref": "#/$defs/id"
+            },
+            "terminalFailure": {
+              "const": true
+            }
+          }
+        }
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "variant",
+        "enabled",
+        "fromStates",
+        "toState",
+        "arguments",
+        "guards",
+        "postconditions",
+        "failureEdges",
+        "engineFailureEdges",
+        "idempotence",
+        "sourceCitations"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "variant": {
+          "$ref": "#/$defs/id"
+        },
+        "enabled": {
+          "const": false
+        },
+        "fromStates": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/stateRef"
+          }
+        },
+        "toState": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stateRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/argument"
+          }
+        },
+        "guards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/predicate"
+          }
+        },
+        "postconditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/predicate"
+          }
+        },
+        "failureEdges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/failureEdge"
+          }
+        },
+        "engineFailureEdges": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/failureEdge"
+          }
+        },
+        "idempotence": {
+          "enum": [
+            "idempotent",
+            "retry-after-observation",
+            "non-idempotent",
+            "manual-decision"
+          ]
+        },
+        "sourceCitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/citation"
+          }
+        }
+      }
+    },
+    "citation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "lineStart",
+            "lineEnd"
+          ],
+          "properties": {
+            "kind": {
+              "const": "repository"
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[a-zA-Z0-9._/-]+$"
+            },
+            "lineStart": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lineEnd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri",
+            "commit",
+            "path",
+            "lineStart",
+            "lineEnd"
+          ],
+          "properties": {
+            "kind": {
+              "const": "pinned-external"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lineStart": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lineEnd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri",
+            "retrieved"
+          ],
+          "properties": {
+            "kind": {
+              "const": "external"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "retrieved": {
+              "type": "string",
+              "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

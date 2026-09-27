@@ -1,0 +1,25 @@
+{
+  "schema": "org.mura.flash.evidence-record/v1",
+  "id": "samsung-galaxy-xr-ayia-community-report",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "immutable": true,
+  "capturedAt": "2026-09-27",
+  "authority": "community-report",
+  "source": {
+    "uri": "https://www.reddit.com/r/GalaxyXR/comments/1oyc7v5/no_software_updates_since_july_5th/",
+    "retrieved": "2026-09-27",
+    "postId": "1oyc7v5",
+    "postedAt": "2025-11-16T04:19:00Z"
+  },
+  "claims": [
+    {
+      "build": "I610UEU1AYIA",
+      "observation": "The author reports this full build string on a retail Galaxy XR during the launch period."
+    }
+  ],
+  "limits": [
+    "This is a single community report, not a Samsung release ledger entry.",
+    "It does not include a firmware package, digest, CSC, Download-screen transcript, or rollback result.",
+    "It does not bind the separate launch unlock demonstration to this build."
+  ]
+}

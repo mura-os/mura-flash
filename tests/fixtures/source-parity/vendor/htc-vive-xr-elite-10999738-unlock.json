@@ -1,0 +1,58 @@
+{
+  "schema": "org.mura.flash.source-parity-fixture/v1",
+  "procedureId": "htc-vive-xr-elite-10999738-unlock",
+  "evidence": "community-prose-plus-vendor-release-identity",
+  "targetGate": {
+    "displayedRelease": "1.0.999.738",
+    "fullFingerprint": null,
+    "bootloaderRevision": null,
+    "hardwareRevision": null,
+    "sku": null
+  },
+  "artifactSha256": {
+    "vendorFactoryPackage": null
+  },
+  "sourceOperationOrder": [
+    "enable-launcher-usb-debugging",
+    "adb-shell-am-start-com-android-settings",
+    "adb-settings-development-settings-enabled-1",
+    "adb-settings-user-setup-complete-1",
+    "adb-settings-device-provisioned-1",
+    "enable-oem-unlocking-in-android-settings",
+    "adb-reboot-bootloader",
+    "observe-device-state-locked",
+    "fastboot-flashing-unlock",
+    "select-unlock-with-volume-down-and-power",
+    "enter-recovery-menu-from-no-command",
+    "wipe-data-factory-reset",
+    "reboot-and-complete-first-boot",
+    "optionally-observe-device-state-unlocked"
+  ],
+  "sourceGaps": [
+    "single-author-report",
+    "displayed-release-not-bound-to-full-device-identity",
+    "no-vendor-unlock-procedure",
+    "no-factory-package-or-sha256",
+    "no-partition-avb-rollback-calibration-or-stock-restore-record",
+    "optional-final-unlock-check-is-screen-observation-not-machine-transcript",
+    "reported-20999960-update-relock-and-download-downgrade-corruption-not-vendor-confirmed"
+  ],
+  "citations": [
+    {
+      "uri": "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "uri": "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-10999738/",
+      "retrieved": "2026-09-27"
+    },
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 669,
+      "lineEnd": 708
+    }
+  ]
+}

@@ -10,10 +10,17 @@ const sharedFixtureRoot = new URL("../fixtures/recipes/", import.meta.url);
 test("exports only the contracted ESM surface", () => {
   assert.deepEqual(Object.keys(api).sort(), [
     "createBrowserSession",
+    "createReplaySession",
+    "getProcedure",
     "getTarget",
     "loadCatalog",
+    "loadProcedureCatalog",
+    "loadTargetCatalog",
+    "planProcedure",
     "redactTranscript",
+    "validateProcedure",
     "validateRecipe",
+    "validateReplayScenario",
   ]);
 });
 

@@ -1,0 +1,42 @@
+{
+  "schema": "org.mura.flash.target-record/v1",
+  "id": "quest-1-monterey",
+  "displayName": "Invalid exclusivity fixture",
+  "vendor": "Meta",
+  "models": [
+    "Quest 1"
+  ],
+  "codenames": [
+    "monterey"
+  ],
+  "enabled": false,
+  "hardwareQualification": "unqualified",
+  "sourceBehavior": {
+    "unlockState": "documented",
+    "installState": "procedure-available",
+    "summary": "This fixture deliberately mixes available and unavailable fields."
+  },
+  "muraPolicy": {
+    "writesAllowed": false,
+    "reason": "Fixture only."
+  },
+  "procedureAvailability": {
+    "kind": "available",
+    "procedureIds": [
+      "quest-1-monterey-v29-direct-unlock"
+    ],
+    "reasonCodes": [
+      "not-allowed-with-procedure-ids"
+    ]
+  },
+  "sourceCitations": [
+    {
+      "kind": "pinned-external",
+      "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+      "commit": "48699362710177854ebeedb7c25f30277296d401",
+      "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+      "lineStart": 572,
+      "lineEnd": 610
+    }
+  ]
+}

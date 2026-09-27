@@ -1,0 +1,255 @@
+{
+  "schema": "org.mura.flash.replay-scenario/v1",
+  "id": "samsung-ayia-direct-unlock-success",
+  "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+  "flowId": "ayia-oem-unlock",
+  "simulateDisabled": true,
+  "clock": {
+    "startTimestamp": "2026-09-27T12:00:00.000Z",
+    "tickMs": 10
+  },
+  "operationDurations": [
+    {
+      "operationId": "probe-model",
+      "durationMs": 100
+    },
+    {
+      "operationId": "probe-build",
+      "durationMs": 110
+    },
+    {
+      "operationId": "probe-csc",
+      "durationMs": 120
+    },
+    {
+      "operationId": "enable-developer-options",
+      "durationMs": 130
+    },
+    {
+      "operationId": "enable-oem-unlocking",
+      "durationMs": 140
+    },
+    {
+      "operationId": "enter-oem-unlock-confirmation",
+      "durationMs": 150
+    },
+    {
+      "operationId": "accept-oem-unlock-and-wipe",
+      "durationMs": 160
+    },
+    {
+      "operationId": "reconnect-after-unlock",
+      "durationMs": 170
+    },
+    {
+      "operationId": "verify-ayia-after-unlock",
+      "durationMs": 180
+    },
+    {
+      "operationId": "observe-unlocked-warning",
+      "durationMs": 190
+    }
+  ],
+  "adapterCapabilities": [],
+  "inputs": [
+    {
+      "name": "device",
+      "type": "device-ref",
+      "value": "simulated-sm-i610"
+    },
+    {
+      "name": "expected-csc",
+      "type": "string",
+      "value": "SIM"
+    },
+    {
+      "name": "expected-source-build",
+      "type": "string",
+      "value": "I610UEU1AYIA"
+    },
+    {
+      "name": "expected-current-binary",
+      "type": "string",
+      "value": "Samsung Official"
+    },
+    {
+      "name": "expected-system-status",
+      "type": "string",
+      "value": "Official"
+    },
+    {
+      "name": "expected-oem-lock",
+      "type": "string",
+      "value": "ON"
+    },
+    {
+      "name": "expected-frp-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
+      "name": "expected-kg-status",
+      "type": "string",
+      "value": "NORMAL"
+    },
+    {
+      "name": "expected-secure-download",
+      "type": "string",
+      "value": "ENABLED"
+    },
+    {
+      "name": "ayia-full-package",
+      "type": "artifact-ref",
+      "value": "simulated-user-supplied-ayia-package"
+    },
+    {
+      "name": "confirm-simulated-oem-unlock-wipe",
+      "type": "boolean",
+      "value": true
+    }
+  ],
+  "responses": [
+    {
+      "kind": "success",
+      "operationId": "probe-model",
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "value": "SM-I610"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "probe-build",
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "value": "I610UEU1AYIA"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "probe-csc",
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "value": "SIM"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "enable-developer-options",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "enable-oem-unlocking",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "enter-oem-unlock-confirmation",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "accept-oem-unlock-and-wipe",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "reconnect-after-unlock",
+      "outputs": [
+        {
+          "name": "reconnectedDevice",
+          "type": "device-ref",
+          "value": "simulated-sm-i610-after-unlock"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "verify-ayia-after-unlock",
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "value": "I610UEU1AYIA"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "observe-unlocked-warning",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "terminalStateId": "unlocked-observed",
+    "eventKinds": [
+      "session-start",
+      "confirmation",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
+      "session-end"
+    ],
+    "errorCode": null
+  }
+}

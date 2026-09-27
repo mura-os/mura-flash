@@ -1,0 +1,43 @@
+{
+  "schema": "org.mura.flash.evidence-record/v1",
+  "id": "samsung-galaxy-xr-official-build-ledger",
+  "targetId": "samsung-galaxy-xr-sm-i610",
+  "immutable": true,
+  "capturedAt": "2026-09-27",
+  "authority": "vendor",
+  "source": {
+    "uri": "https://doc.samsungmobile.com/SM-I610/036371251209/eng.html",
+    "retrieved": "2026-09-27"
+  },
+  "claims": [
+    {
+      "build": "I610UEU1AYKE",
+      "releaseDate": "2025-12-09",
+      "securityPatchLevel": "2025-11-05",
+      "swrev": "U1"
+    },
+    {
+      "build": "I610UEU2AZCI",
+      "releaseDate": "2026-04-08",
+      "securityPatchLevel": "2026-02-05",
+      "swrev": "U2"
+    },
+    {
+      "build": "I610UEU2AZD8",
+      "releaseDate": "2026-05-06",
+      "securityPatchLevel": "2026-02-05",
+      "swrev": "U2"
+    },
+    {
+      "build": "I610UEU2AZF3",
+      "releaseDate": "2026-07-07",
+      "securityPatchLevel": "2026-06-01",
+      "swrev": "U2"
+    }
+  ],
+  "limits": [
+    "The vendor ledger does not list I610UEU1AYIA.",
+    "The U1 and U2 tokens are parsed from Samsung build identifiers; the ledger does not document an SM-I610 downgrade attempt.",
+    "The ledger is build history, not an unlock or rollback procedure."
+  ]
+}

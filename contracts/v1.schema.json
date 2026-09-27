@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/flash-contract-v1.schema.json",
+  "title": "Mura Flash v1 machine contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "procedureRegistry",
+    "documentSchemas",
+    "canonicalJson",
+    "eventRules",
+    "transitionAlgorithm",
+    "capabilityPreflight",
+    "liveDestructivePolicyGate",
+    "errorCodes",
+    "disabledOperationSemantics",
+    "engineFailures"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.contract/v1"
+    },
+    "procedureRegistry": {
+      "$ref": "#/$defs/documentRef"
+    },
+    "documentSchemas": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/documentRef"
+      }
+    },
+    "canonicalJson": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "encoding",
+        "unicodeNormalization",
+        "keyOrder",
+        "whitespace",
+        "trailingNewline",
+        "duplicateKeys",
+        "nonFiniteNumbers"
+      ],
+      "properties": {
+        "encoding": {
+          "const": "UTF-8"
+        },
+        "unicodeNormalization": {
+          "const": "none"
+        },
+        "keyOrder": {
+          "const": "lexicographic-code-point"
+        },
+        "whitespace": {
+          "const": "none"
+        },
+        "trailingNewline": {
+          "const": false
+        },
+        "duplicateKeys": {
+          "const": "reject"
+        },
+        "nonFiniteNumbers": {
+          "const": "reject"
+        }
+      }
+    },
+    "eventRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "sequenceStartsAt",
+        "sequenceStep",
+        "timestampFormat",
+        "hashAlgorithm",
+        "previousHashForFirstEvent",
+        "hashInput"
+      ],
+      "properties": {
+        "schema": {
+          "const": "org.mura.flash.transcript-event/v1"
+        },
+        "sequenceStartsAt": {
+          "const": 0
+        },
+        "sequenceStep": {
+          "const": 1
+        },
+        "timestampFormat": {
+          "const": "RFC3339-UTC"
+        },
+        "hashAlgorithm": {
+          "const": "sha256"
+        },
+        "previousHashForFirstEvent": {
+          "const": null
+        },
+        "hashInput": {
+          "const": "canonical-json-event-without-eventHash"
+        }
+      }
+    },
+    "transitionAlgorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "flowSelection",
+        "operationOrdering",
+        "guardEvaluation",
+        "confirmationTiming",
+        "eventTiming",
+        "successTransition",
+        "failureTransition",
+        "interruptionTransition",
+        "postconditionFailure"
+      ],
+      "properties": {
+        "flowSelection": {
+          "const": "exactly-one-enabled-flow"
+        },
+        "operationOrdering": {
+          "const": "ascending-step-index"
+        },
+        "guardEvaluation": {
+          "const": "all-before-capability-preflight"
+        },
+        "confirmationTiming": {
+          "const": "after-preflight-before-first-covered-operation"
+        },
+        "eventTiming": {
+          "const": "append-before-and-after-operation"
+        },
+        "successTransition": {
+          "const": "apply-declared-state-effect-then-postconditions"
+        },
+        "failureTransition": {
+          "const": "take-exact-failure-edge-without-assuming-state-effect"
+        },
+        "interruptionTransition": {
+          "const": "engine-failure-interrupted"
+        },
+        "postconditionFailure": {
+          "const": "engine-failure-postcondition-failed"
+        }
+      }
+    },
+    "capabilityPreflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "match",
+        "missingCapabilityError",
+        "beforeConfirmation"
+      ],
+      "properties": {
+        "scope": {
+          "const": "all-reachable-enabled-operations"
+        },
+        "match": {
+          "const": "operation-requiredAdapterCapability-subset-of-adapter-capabilities"
+        },
+        "missingCapabilityError": {
+          "const": "capability-missing"
+        },
+        "beforeConfirmation": {
+          "const": true
+        }
+      }
+    },
+    "liveDestructivePolicyGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coveredSafetyClasses",
+        "requirements",
+        "denialError"
+      ],
+      "properties": {
+        "coveredSafetyClasses": {
+          "const": [
+            "device-write",
+            "device-erase",
+            "security-state-change"
+          ]
+        },
+        "requirements": {
+          "const": [
+            "target-hardware-qualified",
+            "procedure-enabled",
+            "flow-enabled",
+            "operation-enabled",
+            "all-guards-pass",
+            "capability-preflight-pass",
+            "required-backups-verified",
+            "required-confirmations-accepted",
+            "live-destructive-explicitly-authorized"
+          ]
+        },
+        "denialError": {
+          "const": "live-destructive-policy-denied"
+        }
+      }
+    },
+    "errorCodes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 10,
+        "maximum": 99
+      }
+    },
+    "disabledOperationSemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalPlan",
+        "explicitReplaySimulation"
+      ],
+      "properties": {
+        "normalPlan": {
+          "const": {
+            "simulateDisabled": false,
+            "wouldExecute": false,
+            "event": null
+          }
+        },
+        "explicitReplaySimulation": {
+          "const": {
+            "simulateDisabled": true,
+            "wouldExecute": true,
+            "event": "operation-would-execute",
+            "adapterInvocation": false
+          }
+        }
+      }
+    },
+    "engineFailures": {
+      "const": {
+        "classes": [
+          "postcondition-failed",
+          "interrupted"
+        ],
+        "validation": "every-operation-declares-exact-disposition",
+        "recovery": "take-declared-recovery-or-end-explicit-terminal-failure",
+        "stateRule": "do-not-infer-success-state-transition"
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._/-]*\\.json$"
+    },
+    "documentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "path"
+      ],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "pattern": "^org\\.mura\\.flash\\.[a-z-]+/v1$"
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        }
+      }
+    }
+  }
+}
