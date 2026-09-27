@@ -17,6 +17,16 @@ test("exports only the contracted ESM surface", () => {
   ]);
 });
 
+test("contains no CSP-blocked dynamic code generation", () => {
+  for (const name of ["mura-flash.mjs", "mura-flash.min.mjs"]) {
+    const distribution = fs.readFileSync(
+      new URL(`../../dist/${name}`, import.meta.url),
+      "utf8",
+    );
+    assert.doesNotMatch(distribution, /\b(?:eval|Function)\s*\(/u, name);
+  }
+});
+
 test("loads the complete committed target catalog", () => {
   const catalog = api.loadCatalog();
   assert.equal(catalog.length, 15);
@@ -62,6 +72,41 @@ test("rejects unknown fields and non-allowlisted probes", () => {
       error.code === "recipe-invalid" &&
       error.message.includes("is not allowlisted"),
   );
+});
+
+test("strictly rejects malformed recipe structures", () => {
+  const cases = [
+    {
+      value: recipe({ models: "Oculus Go" }),
+      message: "$/models: must be an array",
+    },
+    {
+      value: (() => {
+        const { vendor: _vendor, ...missingVendor } = recipe();
+        return missingVendor;
+      })(),
+      message: '$: missing required field "vendor"',
+    },
+    {
+      value: recipe({
+        builds: [{ id: "all", status: "future-status" }],
+      }),
+      message: "$/builds/0/status: must be one of",
+    },
+    {
+      value: recipe({ sources: ["not a URL"] }),
+      message: "$/sources/0: must be a valid URI",
+    },
+  ];
+
+  for (const { value, message } of cases) {
+    assert.throws(
+      () => api.validateRecipe(value),
+      (error) =>
+        error.code === "recipe-invalid" && error.message.includes(message),
+      message,
+    );
+  }
 });
 
 test("requires sensitive facts to be redacted", () => {
