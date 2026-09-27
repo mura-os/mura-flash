@@ -140,7 +140,7 @@
       }
     },
     "simulateDisabled": {
-      "const": true
+      "type": "boolean"
     },
     "clock": {
       "type": "object",

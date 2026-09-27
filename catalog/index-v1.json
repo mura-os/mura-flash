@@ -78,10 +78,10 @@
       "targetId": "quest-2-hollywood"
     },
     {
-      "canonicalSize": 65809,
+      "canonicalSize": 83157,
       "id": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
       "path": "recipes/procedures/samsung-galaxy-xr-ayke-to-ayia-rollback-unlock.json",
-      "sha256": "15217398c1beb0c446aea02f4307467c39fe300c792c81764ceae67c10657af7",
+      "sha256": "bbba54996d3c1fe0175342265dd20efe4354167d0daf7eb1ebb2891cc6268326",
       "targetId": "samsung-galaxy-xr-sm-i610"
     }
   ],
@@ -166,10 +166,10 @@
       "sha256": "a8dd3faf18344e0758e9d8e756deb670f532b2c46bbc744f0705b9ecc03c4e04"
     },
     {
-      "canonicalSize": 1624,
+      "canonicalSize": 1652,
       "id": "samsung-galaxy-xr-sm-i610",
       "path": "catalog/targets/samsung-galaxy-xr-sm-i610.json",
-      "sha256": "1855974b0e1241773acf3f6aa155559b8633fa4bf3a7f0970d65a90ae08a63f9"
+      "sha256": "fe6887379af8d2aaddae29e7d356180439cd8ca0c7087b5001a4a2eb197a33e3"
     },
     {
       "canonicalSize": 1040,

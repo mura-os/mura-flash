@@ -1,6 +1,6 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-u2-rollback-refusal",
+  "id": "samsung-download-entry-unresolved",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
   "flowId": "u2-rollback-protected",
   "simulateDisabled": true,
@@ -26,12 +26,8 @@
       "durationMs": 130
     },
     {
-      "operationId": "observe-download-u2",
+      "operationId": "record-download-entry-unresolved",
       "durationMs": 140
-    },
-    {
-      "operationId": "refuse-u2-to-u1-rollback",
-      "durationMs": 150
     }
   ],
   "adapterCapabilities": [],
@@ -132,70 +128,13 @@
       ]
     },
     {
-      "kind": "success",
+      "kind": "failure",
       "operationId": "enter-download-mode",
-      "outputs": [
-        {
-          "name": "acknowledged",
-          "type": "boolean",
-          "value": true
-        }
-      ]
+      "failureClass": "manual-action-declined"
     },
     {
       "kind": "success",
-      "operationId": "observe-download-u2",
-      "outputs": [
-        {
-          "name": "productName",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "currentBinary",
-          "type": "string",
-          "value": "Samsung Official"
-        },
-        {
-          "name": "systemStatus",
-          "type": "string",
-          "value": "Official"
-        },
-        {
-          "name": "oemLock",
-          "type": "string",
-          "value": "ON"
-        },
-        {
-          "name": "frpLock",
-          "type": "string",
-          "value": "OFF"
-        },
-        {
-          "name": "kgStatus",
-          "type": "string",
-          "value": "NORMAL"
-        },
-        {
-          "name": "rpSwrev",
-          "type": "string",
-          "value": "U2"
-        },
-        {
-          "name": "warrantyVoid",
-          "type": "string",
-          "value": "SIMULATED-PRE-CAPTURE"
-        },
-        {
-          "name": "secureDownload",
-          "type": "string",
-          "value": "ENABLED"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "refuse-u2-to-u1-rollback",
+      "operationId": "record-download-entry-unresolved",
       "outputs": [
         {
           "name": "acknowledged",
@@ -206,7 +145,7 @@
     }
   ],
   "expected": {
-    "terminalStateId": "rollback-protected",
+    "terminalStateId": "download-entry-unresolved",
     "eventKinds": [
       "session-start",
       "operation-would-execute",
@@ -216,14 +155,13 @@
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
+      "operation-failure",
+      "recovery-start",
       "operation-would-execute",
       "state-transition",
       "operation-success",
       "session-end"
     ],
-    "errorCode": null
+    "errorCode": "manual-action-declined"
   }
 }

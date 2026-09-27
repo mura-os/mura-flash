@@ -18,7 +18,6 @@ import type {
   InstallProcedure,
   Predicate,
   ProcedureFlow,
-  ProcedurePlan,
   ProcedureRecovery,
   ReplayResult,
   ReplayScenario,
@@ -53,6 +52,9 @@ function scalarMatchesType(value: ScalarValue, type: string): boolean {
   if (type === "digest") {
     return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
   }
+  if (type === "string-list") {
+    return Array.isArray(value) && value.every((item) => typeof item === "string");
+  }
   return typeof value === "string";
 }
 
@@ -85,13 +87,6 @@ interface Values {
 
 function refValue(reference: ValueRef, values: Values): TypedValue {
   if (reference.kind === "constant") {
-    if (
-      typeof reference.value !== "string" &&
-      typeof reference.value !== "number" &&
-      typeof reference.value !== "boolean"
-    ) {
-      throw fail("contract-mismatch", "string-list cannot be used as a replay scalar");
-    }
     return { name: "constant", type: reference.valueType, value: reference.value };
   }
   if (reference.kind === "operation-output") {
@@ -133,11 +128,41 @@ function predicatePasses(predicate: Predicate, values: Values): boolean {
   }
   const left = refValue(predicate.left, values);
   const right = refValue(predicate.right, values);
+  const valuesEqual =
+    Array.isArray(left.value) && Array.isArray(right.value)
+      ? canonicalJson(left.value) === canonicalJson(right.value)
+      : typeof left.value === typeof right.value && Object.is(left.value, right.value);
   const equal =
     left.type === right.type &&
-    typeof left.value === typeof right.value &&
-    Object.is(left.value, right.value);
+    valuesEqual;
   return predicate.kind === "not-equals" ? !equal : equal;
+}
+
+function predicateOperationIds(predicate: Predicate): readonly string[] {
+  if (predicate.kind === "state-assertion") return [];
+  if (predicate.kind === "output-present") {
+    return [predicate.value.operationId];
+  }
+  return [predicate.left, predicate.right].flatMap((reference) =>
+    reference.kind === "operation-output" ? [reference.operationId] : []
+  );
+}
+
+function requirePredicates(
+  predicates: readonly Predicate[],
+  values: Values,
+  completedOperations: ReadonlySet<string>,
+  deferUnresolved: boolean,
+): void {
+  for (const predicate of predicates) {
+    const unresolved = predicateOperationIds(predicate).some(
+      (operationId) => !completedOperations.has(operationId),
+    );
+    if (unresolved && deferUnresolved) continue;
+    if (unresolved || !predicatePasses(predicate, values)) {
+      throw new ReplayAbort("guard-failed");
+    }
+  }
 }
 
 function validateOutputs(
@@ -256,6 +281,7 @@ type Outcome =
 
 interface RunState {
   readonly activeRecoveries: Set<string>;
+  readonly completedOperations: Set<string>;
   readonly durations: ReadonlyMap<string, number>;
   readonly operations: ReadonlyMap<string, InstallProcedure["operations"][number]>;
   readonly procedure: InstallProcedure;
@@ -267,6 +293,7 @@ interface RunState {
   }[];
   readonly transcript: Transcript;
   readonly values: Values;
+  readonly simulateDisabled: boolean;
   responseIndex: number;
 }
 
@@ -412,6 +439,7 @@ async function execute(
     outputs,
     durationMs,
   });
+  state.completedOperations.add(operation.id);
   return { kind: "success" };
 }
 
@@ -453,6 +481,7 @@ async function runRecovery(
     for (const reference of selected.steps) {
       const operation = state.operations.get(reference.operationId);
       if (operation === undefined) throw fail("contract-mismatch", reference.operationId);
+      if (!operation.enabled && !state.simulateDisabled) continue;
       const outcome = await execute(operation, state);
       if (outcome.kind === "failure") {
         await handleFailure(operation, outcome, state);
@@ -527,13 +556,6 @@ function resolveProcedure(
   return validateProcedure(input, options);
 }
 
-function simulatedPlan(plan: ProcedurePlan): ProcedurePlan {
-  return deepFreeze({
-    ...plan,
-    steps: plan.steps.map((step) => ({ ...step, wouldExecute: true })),
-  });
-}
-
 function mismatches(
   scenario: ReplayScenario,
   terminalStateId: string,
@@ -592,14 +614,12 @@ export class ReplaySession {
       throw fail("invalid-document", "scenario procedureId does not match procedure");
     }
     const flow = selectedFlow(procedure, scenario.flowId);
-    const plan = simulatedPlan(
-      planProcedure(procedure, {
-        ...this.#options,
-        flowId: flow.id,
-        adapterCapabilities: scenario.adapterCapabilities,
-        simulateDisabled: scenario.simulateDisabled,
-      }),
-    );
+    const plan = planProcedure(procedure, {
+      ...this.#options,
+      flowId: flow.id,
+      adapterCapabilities: scenario.adapterCapabilities,
+      simulateDisabled: scenario.simulateDisabled,
+    });
     const inputs = typedMap(scenario.inputs, "replay input");
     for (const declared of procedure.runtimeInputs) {
       const supplied = inputs.get(declared.id);
@@ -672,11 +692,13 @@ export class ReplaySession {
     const operations = new Map(procedure.operations.map((item) => [item.id, item]));
     const state: RunState = {
       activeRecoveries: new Set(),
+      completedOperations: new Set(),
       durations,
       operations,
       procedure,
       responses: scenario.responses,
       effects: [],
+      simulateDisabled: scenario.simulateDisabled,
       transcript,
       values,
       responseIndex: 0,
@@ -689,32 +711,38 @@ export class ReplaySession {
 
     let errorCode: string | null = null;
     try {
-      const preflightPredicates = [
-        ...flow.guards,
-        ...reachable(procedure, flow).flatMap(
-          (id) => operations.get(id)?.guards ?? [],
-        ),
-      ];
-      for (const predicate of preflightPredicates) {
-        try {
-          if (!predicatePasses(predicate, values)) throw new ReplayAbort("guard-failed");
-        } catch (error) {
-          if (error instanceof MuraFlashError && error.code === "guard-failed") continue;
-          throw error;
+      requirePredicates(flow.guards, values, state.completedOperations, true);
+      for (const operationId of reachable(procedure, flow)) {
+        const operation = operations.get(operationId);
+        if (operation === undefined) {
+          throw fail("contract-mismatch", operationId);
+        }
+        if (operation.enabled || scenario.simulateDisabled) {
+          requirePredicates(
+            operation.guards,
+            values,
+            state.completedOperations,
+            true,
+          );
         }
       }
       if (plan.missingCapabilities.length > 0) throw new ReplayAbort("capability-missing");
-      for (const [index, reference] of flow.confirmations.entries()) {
-        const answer = inputs.get(reference.confirmationId) ?? inputs.get(`confirmation${index}`);
-        const accepted = answer?.type === "boolean" && answer.value === true;
-        await transcript.append({
-          kind: "confirmation",
-          confirmationId: reference.confirmationId,
-          accepted,
-        });
-        if (!accepted) throw new ReplayAbort("confirmation-declined");
+      const willExecute = plan.steps.some((step) => step.wouldExecute);
+      if (willExecute) {
+        for (const [index, reference] of flow.confirmations.entries()) {
+          const answer =
+            inputs.get(reference.confirmationId) ?? inputs.get(`confirmation${index}`);
+          const accepted = answer?.type === "boolean" && answer.value === true;
+          await transcript.append({
+            kind: "confirmation",
+            confirmationId: reference.confirmationId,
+            accepted,
+          });
+          if (!accepted) throw new ReplayAbort("confirmation-declined");
+        }
       }
-      for (const reference of flow.steps) {
+      for (const [index, reference] of flow.steps.entries()) {
+        if (plan.steps[index]?.wouldExecute !== true) continue;
         const operation = operations.get(reference.operationId);
         if (operation === undefined) throw fail("contract-mismatch", reference.operationId);
         const outcome = await execute(operation, state);
@@ -722,9 +750,10 @@ export class ReplaySession {
           await handleFailure(operation, outcome, state);
           throw new ReplayAbort(outcome.failureClass);
         }
+        requirePredicates(flow.guards, values, state.completedOperations, true);
       }
-      if (!flow.guards.every((predicate) => predicatePasses(predicate, values))) {
-        throw new ReplayAbort("guard-failed");
+      if (willExecute) {
+        requirePredicates(flow.guards, values, state.completedOperations, false);
       }
       if (state.responseIndex !== scenario.responses.length) {
         throw new ReplayAbort("replay-mismatch");

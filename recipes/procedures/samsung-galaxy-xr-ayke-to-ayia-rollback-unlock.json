@@ -9,7 +9,7 @@
     "writesEnabled": false
   },
   "sourceBehavior": {
-    "summary": "Community reports show launch-era Galaxy XR unlock behavior and say AYKE removed eligibility. AYIA and AYKE both encode U1, but no public SM-I610 AYKE-to-AYIA write transcript, package digest, Download transcript, or restore proof exists. U2 builds are therefore represented only by a non-writing rollback-protection refusal.",
+    "summary": "Launch-era unlock is community-reported but not bound to a complete AYIA identity capture. AYKE-to-AYIA rollback is unverified, so the normal AYKE flow stops at rollback-unverified. A separate disabled, simulation-only, unqualified plan records the complete hypothetical order and synthetic edge cases without authorizing hardware behavior.",
     "evidenceLevel": "community-reported"
   },
   "sourceGaps": [
@@ -17,15 +17,15 @@
     "No exact AYIA CSC/package/PIT/member filenames are public.",
     "No SM-I610 AYKE-to-AYIA signed-flash transcript exists.",
     "No SM-I610 U2-to-U1 SW REV CHECK FAIL capture exists.",
-    "No exact Galaxy XR Download-mode key chord or supported host transport is established.",
+    "No exact Galaxy XR Download-mode key chord, USB identity, or supported host transport is established.",
     "No complete EFS, persist, QVR, partition map, backup, or stock-restore path is qualified.",
-    "Launch unlock media is not bound to a full build, CSC, RP SWREV, or host transcript."
+    "Launch unlock media is not bound to a full build, CSC, RP SWREV, or post-reboot Download lock-state transcript."
   ],
   "sourceParity": {
     "path": "tests/fixtures/source-parity/samsung/samsung-galaxy-xr-ayke-to-ayia-rollback-unlock.json"
   },
   "muraPolicy": {
-    "writeBoundary": "Source behavior is preserved as disabled simulation data. Mura authorizes no live Samsung write: the AYIA artifact digest and transport are unknown, Download entry is unresolved, protected unit-bound backups cannot be completed, and no stock restore has been qualified. U2 and unknown builds always stop without state-changing operations.",
+    "writeBoundary": "The normal AYKE runtime flow ends at rollback-unverified before package inspection or writes. The complete rollback-plus-unlock order and package/write edge cases are separate disabled simulation-only unqualified flows. They require fixture-marked typed evidence, authorize no live adapter, and make no hardware-success claim.",
     "liveDestructiveAllowed": false
   },
   "runtimeInputs": [
@@ -60,6 +60,11 @@
       "required": true
     },
     {
+      "id": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "required": true
+    },
+    {
       "id": "expected-frp-lock",
       "type": "string",
       "required": true
@@ -70,9 +75,34 @@
       "required": true
     },
     {
+      "id": "expected-warranty-void",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "required": true
+    },
+    {
       "id": "expected-secure-download",
       "type": "string",
       "required": true
+    },
+    {
+      "id": "fixture-expected-package-digest",
+      "type": "digest",
+      "required": false
+    },
+    {
+      "id": "fixture-exact-package-members",
+      "type": "string-list",
+      "required": false
+    },
+    {
+      "id": "fixture-download-transport-evidence",
+      "type": "string",
+      "required": false
     }
   ],
   "states": [
@@ -80,31 +110,6 @@
       "id": "ready",
       "kind": "flow",
       "initial": true
-    },
-    {
-      "id": "download-observed",
-      "kind": "device-mode",
-      "initial": false
-    },
-    {
-      "id": "package-inspected",
-      "kind": "storage",
-      "initial": false
-    },
-    {
-      "id": "flash-completed-unverified",
-      "kind": "storage",
-      "initial": false
-    },
-    {
-      "id": "system-reconnected",
-      "kind": "device-mode",
-      "initial": false
-    },
-    {
-      "id": "ayia-verified",
-      "kind": "flow",
-      "initial": false
     },
     {
       "id": "unlock-wipe-accepted",
@@ -117,8 +122,18 @@
       "initial": false
     },
     {
+      "id": "unlock-download-observed",
+      "kind": "device-mode",
+      "initial": false
+    },
+    {
       "id": "unlocked-observed",
       "kind": "security",
+      "initial": false
+    },
+    {
+      "id": "rollback-unverified",
+      "kind": "flow",
       "initial": false
     },
     {
@@ -137,22 +152,7 @@
       "initial": false
     },
     {
-      "id": "artifact-unavailable",
-      "kind": "flow",
-      "initial": false
-    },
-    {
-      "id": "bad-artifact",
-      "kind": "flow",
-      "initial": false
-    },
-    {
       "id": "download-blocked",
-      "kind": "flow",
-      "initial": false
-    },
-    {
-      "id": "post-flash-mismatch",
       "kind": "flow",
       "initial": false
     },
@@ -167,12 +167,62 @@
       "initial": false
     },
     {
-      "id": "unlock-not-observed",
+      "id": "unlock-outcome-unknown",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "unlock-unverified",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "flash-outcome-unknown",
       "kind": "flow",
       "initial": false
     },
     {
       "id": "safe-stop",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-download-observed",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-package-inspected",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-backup-gates-recorded",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-flash-completed-unverified",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-system-reconnected",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-package-unavailable",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-package-hash-failure",
+      "kind": "flow",
+      "initial": false
+    },
+    {
+      "id": "simulation-only-unqualified-package-member-failure",
       "kind": "flow",
       "initial": false
     }
@@ -183,11 +233,11 @@
       "role": "stock",
       "source": {
         "kind": "local",
-        "path": "user-supplied/I610UEU1AYIA-full-package"
+        "path": "user-supplied/unresolved-package"
       },
       "digest": {
         "kind": "unknown",
-        "reason": "No vendor-authenticated or independently reproduced SHA-256 digest is available. Inspection records an actual digest for simulation but cannot qualify live use."
+        "reason": "No vendor-authenticated or independently reproduced SHA-256 digest is available. Inspection cannot produce a verified output until an expected digest and exact member filenames are independently established."
       }
     }
   ],
@@ -269,19 +319,19 @@
   ],
   "confirmations": [
     {
-      "id": "confirm-simulated-full-package-write",
-      "safetyClasses": [
-        "device-write"
-      ],
-      "prompt": "Simulation only: a full BL/AP/CP/CSC package write would be non-idempotent. Repartition and PIT substitution remain false, and no live adapter is authorized."
-    },
-    {
       "id": "confirm-simulated-oem-unlock-wipe",
       "safetyClasses": [
         "security-state-change",
         "device-erase"
       ],
       "prompt": "Simulation only: Samsung's device-side unlock interaction wipes user data and may trip Knox. No live unlock or wipe is authorized."
+    },
+    {
+      "id": "confirm-simulation-only-unqualified-package-write",
+      "safetyClasses": [
+        "device-write"
+      ],
+      "prompt": "Contract simulation only: expose the disabled unqualified package-write step to replay. This does not authorize a live adapter, identify a transport, or claim hardware behavior."
     }
   ],
   "operations": [
@@ -293,6 +343,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
         }
       ],
       "toState": null,
@@ -373,6 +427,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
         }
       ],
       "toState": null,
@@ -452,6 +510,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
         }
       ],
       "toState": null,
@@ -524,7 +586,7 @@
       ]
     },
     {
-      "id": "enter-download-mode",
+      "id": "refuse-ayke-rollback-unverified",
       "variant": "manual.action",
       "enabled": false,
       "fromStates": [
@@ -533,14 +595,17 @@
           "stateId": "ready"
         }
       ],
-      "toState": null,
+      "toState": {
+        "kind": "state",
+        "stateId": "rollback-unverified"
+      },
       "arguments": [
         {
           "inputName": "instruction",
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Place the Galaxy XR in Samsung Download mode using independently verified device instructions. No key chord or host command is supplied by this procedure."
+            "value": "Stop the AYKE path before package inspection or any write. Matching U1 tokens do not establish that AYKE can safely return to AYIA."
           }
         },
         {
@@ -548,7 +613,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "The complete Download screen is visible and unchanged long enough to photograph and transcribe."
+            "value": "The executable flow ends at rollback-unverified with zero device writes."
           }
         }
       ],
@@ -558,7 +623,7 @@
           "kind": "equals",
           "left": {
             "kind": "operation-output",
-            "operationId": "enter-download-mode",
+            "operationId": "refuse-ayke-rollback-unverified",
             "outputName": "acknowledged"
           },
           "right": {
@@ -571,709 +636,24 @@
       "failureEdges": [
         {
           "failureClass": "manual-action-declined",
-          "recoveryId": "download-entry-unresolved"
+          "recoveryId": "safe-stop"
         },
         {
           "failureClass": "operation-timeout",
-          "recoveryId": "download-entry-unresolved"
+          "recoveryId": "safe-stop"
         }
       ],
       "engineFailureEdges": [
         {
           "failureClass": "postcondition-failed",
-          "recoveryId": "download-entry-unresolved"
-        },
-        {
-          "failureClass": "interrupted",
-          "recoveryId": "download-entry-unresolved"
-        }
-      ],
-      "idempotence": "manual-decision",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "observe-download-u1",
-      "variant": "samsung.download-observe",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "download-observed"
-      },
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "model",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "inputName": "csc",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "inputName": "expectedSourceSwrev",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "productName"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "csc"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "currentBinary"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-current-binary"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "systemStatus"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-system-status"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "oemLock"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-oem-lock"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "frpLock"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-frp-lock"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "kgStatus"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-kg-status"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "rpSwrev"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "secureDownload"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-secure-download"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "manual-action-declined",
-          "recoveryId": "download-blocked"
-        },
-        {
-          "failureClass": "operation-timeout",
-          "recoveryId": "download-blocked"
-        },
-        {
-          "failureClass": "device-disconnected",
-          "recoveryId": "download-blocked"
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "recoveryId": "download-blocked"
-        },
-        {
-          "failureClass": "interrupted",
-          "recoveryId": "download-entry-unresolved"
-        }
-      ],
-      "idempotence": "manual-decision",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "inspect-ayia-package",
-      "variant": "samsung.package-inspect",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "package-inspected"
-      },
-      "arguments": [
-        {
-          "inputName": "package",
-          "value": {
-            "kind": "artifact",
-            "artifactId": "ayia-full-package"
-          }
-        },
-        {
-          "inputName": "model",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "inputName": "csc",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "inputName": "expectedTargetBuild",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "I610UEU1AYIA"
-          }
-        },
-        {
-          "inputName": "expectedTargetSwrev",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "inputName": "exactPackageMembers",
-          "value": {
-            "kind": "constant",
-            "valueType": "string-list",
-            "value": [
-              "BL",
-              "AP",
-              "CP",
-              "CSC"
-            ]
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "output-present",
-          "value": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "verifiedPackage"
-          }
-        },
-        {
-          "kind": "output-present",
-          "value": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "actualDigest"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "model"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "csc"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "targetBuild"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "I610UEU1AYIA"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "targetSwrev"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "artifact-verification-failed",
-          "recoveryId": "artifact-unavailable"
-        },
-        {
-          "failureClass": "artifact-extraction-failed",
-          "recoveryId": "bad-artifact"
-        },
-        {
-          "failureClass": "hash-mismatch",
-          "recoveryId": "bad-artifact"
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "recoveryId": "bad-artifact"
+          "recoveryId": "safe-stop"
         },
         {
           "failureClass": "interrupted",
           "recoveryId": "safe-stop"
         }
       ],
-      "idempotence": "idempotent",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "flash-ayia-full-package",
-      "variant": "samsung.download-flash-package",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "flash-completed-unverified"
-      },
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "verifiedPackage",
-          "value": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "verifiedPackage"
-          }
-        },
-        {
-          "inputName": "model",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "inputName": "csc",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "inputName": "expectedSourceSwrev",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "inputName": "expectedTargetSwrev",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "inputName": "exactPackageMembers",
-          "value": {
-            "kind": "constant",
-            "valueType": "string-list",
-            "value": [
-              "BL",
-              "AP",
-              "CP",
-              "CSC"
-            ]
-          }
-        },
-        {
-          "inputName": "repartition",
-          "value": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": false
-          }
-        },
-        {
-          "inputName": "pitSubstitution",
-          "value": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": false
-          }
-        }
-      ],
-      "guards": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "productName"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "csc"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "rpSwrev"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "frpLock"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-frp-lock"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "kgStatus"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-kg-status"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "secureDownload"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-secure-download"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "model"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "csc"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "inspect-ayia-package",
-            "outputName": "targetSwrev"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "U1"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "currentBinary"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-current-binary"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "systemStatus"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-system-status"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "observe-download-u1",
-            "outputName": "oemLock"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-oem-lock"
-          }
-        }
-      ],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "flash-ayia-full-package",
-            "outputName": "result"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "PASS"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "flash-ayia-full-package",
-            "outputName": "writeStarted"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": true
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "write-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "transport-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "device-disconnected",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "device-rejected",
-          "terminalFailure": true
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "interrupted",
-          "terminalFailure": true
-        }
-      ],
-      "idempotence": "non-idempotent",
+      "idempotence": "manual-decision",
       "sourceCitations": [
         {
           "kind": "pinned-external",
@@ -1294,334 +674,6 @@
       ]
     },
     {
-      "id": "reconnect-after-flash",
-      "variant": "transport.reconnect",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "flash-completed-unverified"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "system-reconnected"
-      },
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "expectedMode",
-          "value": {
-            "kind": "constant",
-            "valueType": "mode",
-            "value": "system"
-          }
-        },
-        {
-          "inputName": "timeout",
-          "value": {
-            "kind": "constant",
-            "valueType": "duration-ms",
-            "value": 300000
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "output-present",
-          "value": {
-            "kind": "operation-output",
-            "operationId": "reconnect-after-flash",
-            "outputName": "reconnectedDevice"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "device-disconnected",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "operation-timeout",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "transport-failed",
-          "terminalFailure": true
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "interrupted",
-          "terminalFailure": true
-        }
-      ],
-      "idempotence": "retry-after-observation",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "verify-ayia-model",
-      "variant": "adb.property",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        }
-      ],
-      "toState": null,
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "property",
-          "value": {
-            "kind": "constant",
-            "valueType": "property-name",
-            "value": "ro.product.model"
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "verify-ayia-model",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "transport-failed",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "device-disconnected",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "operation-timeout",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "recoveryId": "post-flash-mismatch"
-        },
-        {
-          "failureClass": "interrupted",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "idempotence": "idempotent",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "verify-ayia-build",
-      "variant": "adb.property",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        }
-      ],
-      "toState": null,
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "property",
-          "value": {
-            "kind": "constant",
-            "valueType": "property-name",
-            "value": "ro.build.version.incremental"
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "verify-ayia-build",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "I610UEU1AYIA"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "transport-failed",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "device-disconnected",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "operation-timeout",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "recoveryId": "post-flash-mismatch"
-        },
-        {
-          "failureClass": "interrupted",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "idempotence": "idempotent",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "verify-ayia-csc",
-      "variant": "adb.property",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "ayia-verified"
-      },
-      "arguments": [
-        {
-          "inputName": "device",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "device"
-          }
-        },
-        {
-          "inputName": "property",
-          "value": {
-            "kind": "constant",
-            "valueType": "property-name",
-            "value": "ro.csc.sales_code"
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "verify-ayia-csc",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "transport-failed",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "device-disconnected",
-          "recoveryId": "safe-stop"
-        },
-        {
-          "failureClass": "operation-timeout",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "recoveryId": "post-flash-mismatch"
-        },
-        {
-          "failureClass": "interrupted",
-          "recoveryId": "safe-stop"
-        }
-      ],
-      "idempotence": "idempotent",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
       "id": "enable-developer-options",
       "variant": "manual.action",
       "enabled": false,
@@ -1629,6 +681,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
         }
       ],
       "toState": null,
@@ -1638,7 +694,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "In the running AYIA system, enable Android Developer options through the stock user interface."
+            "value": "In the exact AYIA running system, enable Android Developer options through the stock user interface."
           }
         },
         {
@@ -1711,6 +767,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
         }
       ],
       "toState": null,
@@ -1793,6 +853,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
         }
       ],
       "toState": null,
@@ -1802,7 +866,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Enter Samsung's device-side bootloader unlock confirmation using independently captured instructions. This recipe intentionally supplies no key chord."
+            "value": "Enter Samsung's device-side bootloader unlock confirmation using independently captured instructions. This recipe supplies no key chord or host command."
           }
         },
         {
@@ -1875,6 +939,10 @@
         {
           "kind": "state",
           "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
         }
       ],
       "toState": {
@@ -1887,7 +955,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "On the device, accept the bootloader-unlock confirmation and its mandatory data wipe."
+            "value": "On the device, accept the bootloader-unlock confirmation and mandatory data wipe."
           }
         },
         {
@@ -1895,7 +963,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "The device accepts the unlock request, wipes user data, and begins rebooting."
+            "value": "The device accepts the request, wipes user data, and begins rebooting."
           }
         }
       ],
@@ -1922,17 +990,17 @@
         },
         {
           "failureClass": "operation-timeout",
-          "recoveryId": "unlock-declined"
+          "recoveryId": "unlock-outcome-unknown"
         }
       ],
       "engineFailureEdges": [
         {
           "failureClass": "postcondition-failed",
-          "recoveryId": "unlock-declined"
+          "recoveryId": "unlock-outcome-unknown"
         },
         {
           "failureClass": "interrupted",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         }
       ],
       "idempotence": "manual-decision",
@@ -2005,25 +1073,25 @@
       "failureEdges": [
         {
           "failureClass": "device-disconnected",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         },
         {
           "failureClass": "operation-timeout",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         },
         {
           "failureClass": "transport-failed",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         }
       ],
       "engineFailureEdges": [
         {
           "failureClass": "postcondition-failed",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         },
         {
           "failureClass": "interrupted",
-          "terminalFailure": true
+          "recoveryId": "unlock-outcome-unknown"
         }
       ],
       "idempotence": "retry-after-observation",
@@ -2045,7 +1113,7 @@
       "fromStates": [
         {
           "kind": "state",
-          "stateId": "ready"
+          "stateId": "unlock-rebooted"
         }
       ],
       "toState": null,
@@ -2085,28 +1153,293 @@
       "failureEdges": [
         {
           "failureClass": "transport-failed",
-          "recoveryId": "safe-stop"
+          "recoveryId": "unlock-unverified"
         },
         {
           "failureClass": "device-disconnected",
-          "recoveryId": "safe-stop"
+          "recoveryId": "unlock-unverified"
         },
         {
           "failureClass": "operation-timeout",
-          "recoveryId": "safe-stop"
+          "recoveryId": "unlock-unverified"
         }
       ],
       "engineFailureEdges": [
         {
           "failureClass": "postcondition-failed",
-          "recoveryId": "unlock-not-observed"
+          "recoveryId": "unlock-unverified"
         },
         {
           "failureClass": "interrupted",
-          "recoveryId": "safe-stop"
+          "recoveryId": "unlock-unverified"
         }
       ],
       "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "enter-post-unlock-download-mode",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "After the clean reboot, enter Samsung Download mode using independently captured device instructions. This recipe supplies no key chord or host transport command."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "A new complete Download screen is visible for independent post-reboot lock-state capture."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "enter-post-unlock-download-mode",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "unlock-unverified"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "unlock-unverified"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "unlock-unverified"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "unlock-unverified"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "observe-post-unlock-download-u1",
+      "variant": "samsung.download-observe",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "unlock-download-observed"
+      },
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "model",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "inputName": "expectedSourceSwrev",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "productName"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "currentBinary"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-current-binary"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "systemStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-system-status"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "oemLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-post-unlock-oem-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "frpLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-frp-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "kgStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-kg-status"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "rpSwrev"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "warrantyVoid"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-post-unlock-warranty-void"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-post-unlock-download-u1",
+            "outputName": "secureDownload"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-secure-download"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "unlock-unverified"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "unlock-unverified"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "unlock-unverified"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "unlock-unverified"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "unlock-unverified"
+        }
+      ],
+      "idempotence": "manual-decision",
       "sourceCitations": [
         {
           "kind": "pinned-external",
@@ -2125,7 +1458,7 @@
       "fromStates": [
         {
           "kind": "state",
-          "stateId": "ready"
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -2138,7 +1471,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "After a clean boot, observe and photograph the persistent bootloader-unlocked warning without dismissing it as proof from an earlier boot."
+            "value": "After the independently captured post-reboot Download lock state, observe and photograph the persistent bootloader-unlocked warning."
           }
         },
         {
@@ -2146,7 +1479,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "A persistent bootloader-unlocked warning is visible after the clean reboot."
+            "value": "The warning is visible on the same post-reboot verification cycle."
           }
         }
       ],
@@ -2169,21 +1502,21 @@
       "failureEdges": [
         {
           "failureClass": "manual-action-declined",
-          "recoveryId": "unlock-not-observed"
+          "recoveryId": "unlock-unverified"
         },
         {
           "failureClass": "operation-timeout",
-          "recoveryId": "unlock-not-observed"
+          "recoveryId": "unlock-unverified"
         }
       ],
       "engineFailureEdges": [
         {
           "failureClass": "postcondition-failed",
-          "recoveryId": "unlock-not-observed"
+          "recoveryId": "unlock-unverified"
         },
         {
           "failureClass": "interrupted",
-          "recoveryId": "unlock-not-observed"
+          "recoveryId": "unlock-unverified"
         }
       ],
       "idempotence": "manual-decision",
@@ -2204,8 +1537,8 @@
       ]
     },
     {
-      "id": "observe-download-u2",
-      "variant": "samsung.download-observe",
+      "id": "enter-download-mode",
+      "variant": "manual.action",
       "enabled": false,
       "fromStates": [
         {
@@ -2213,10 +1546,88 @@
           "stateId": "ready"
         }
       ],
-      "toState": {
-        "kind": "state",
-        "stateId": "download-observed"
-      },
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Place the Galaxy XR in Samsung Download mode using independently verified device instructions. No key chord or host command is supplied."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The complete Download screen is visible and unchanged long enough to photograph and transcribe."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "enter-download-mode",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "download-entry-unresolved"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "download-entry-unresolved"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "download-entry-unresolved"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "download-entry-unresolved"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "observe-download-u2",
+      "variant": "samsung.download-observe",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
+        }
+      ],
+      "toState": null,
       "arguments": [
         {
           "inputName": "device",
@@ -2231,13 +1642,6 @@
             "kind": "constant",
             "valueType": "string",
             "value": "SM-I610"
-          }
-        },
-        {
-          "inputName": "csc",
-          "value": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
           }
         },
         {
@@ -2269,11 +1673,59 @@
           "left": {
             "kind": "operation-output",
             "operationId": "observe-download-u2",
-            "outputName": "csc"
+            "outputName": "currentBinary"
           },
           "right": {
             "kind": "runtime-input",
-            "inputId": "expected-csc"
+            "inputId": "expected-current-binary"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "systemStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-system-status"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "oemLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-oem-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "frpLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-frp-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "kgStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-kg-status"
           }
         },
         {
@@ -2287,6 +1739,30 @@
             "kind": "constant",
             "valueType": "string",
             "value": "U2"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "warrantyVoid"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-warranty-void"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "observe-download-u2",
+            "outputName": "secureDownload"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-secure-download"
           }
         }
       ],
@@ -2510,23 +1986,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -2539,7 +2007,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record a safe stop before any qualified write."
+            "value": "Record a safe stop."
           }
         },
         {
@@ -2610,23 +2078,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -2639,7 +2099,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record that exact Galaxy XR Download-mode entry remains unresolved."
+            "value": "Record that exact Galaxy XR Download-mode entry or transport remains unresolved."
           }
         },
         {
@@ -2647,7 +2107,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "No key chord or host command is invented."
+            "value": "No key chord or host command is invented and no write occurs."
           }
         }
       ],
@@ -2700,206 +2160,6 @@
       ]
     },
     {
-      "id": "record-artifact-unavailable",
-      "variant": "manual.action",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "artifact-unavailable"
-      },
-      "arguments": [
-        {
-          "inputName": "instruction",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "Record that the user-supplied full AYIA package is unavailable or unreadable."
-          }
-        },
-        {
-          "inputName": "expectedObservation",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "No package write is attempted."
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "record-artifact-unavailable",
-            "outputName": "acknowledged"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": true
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "manual-action-declined",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "operation-timeout",
-          "terminalFailure": true
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "interrupted",
-          "terminalFailure": true
-        }
-      ],
-      "idempotence": "manual-decision",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
-      "id": "record-bad-artifact",
-      "variant": "manual.action",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "bad-artifact"
-      },
-      "arguments": [
-        {
-          "inputName": "instruction",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "Record that package inspection, exact member matching, or package identity failed."
-          }
-        },
-        {
-          "inputName": "expectedObservation",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "No package write is attempted."
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "record-bad-artifact",
-            "outputName": "acknowledged"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": true
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "manual-action-declined",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "operation-timeout",
-          "terminalFailure": true
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "interrupted",
-          "terminalFailure": true
-        }
-      ],
-      "idempotence": "manual-decision",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
       "id": "record-download-blocked",
       "variant": "manual.action",
       "enabled": false,
@@ -2910,23 +2170,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -2939,7 +2191,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record a model, CSC, SWREV, OEM, FRP, KG, status, or secure-download mismatch."
+            "value": "Record a Download observation mismatch."
           }
         },
         {
@@ -3000,106 +2252,6 @@
       ]
     },
     {
-      "id": "record-post-flash-mismatch",
-      "variant": "manual.action",
-      "enabled": false,
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "toState": {
-        "kind": "state",
-        "stateId": "post-flash-mismatch"
-      },
-      "arguments": [
-        {
-          "inputName": "instruction",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "Record that the cleanly reconnected device did not verify as exact AYIA/SM-I610/CSC."
-          }
-        },
-        {
-          "inputName": "expectedObservation",
-          "value": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "Do not retry or claim stock recovery; manual support is required."
-          }
-        }
-      ],
-      "guards": [],
-      "postconditions": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "record-post-flash-mismatch",
-            "outputName": "acknowledged"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "boolean",
-            "value": true
-          }
-        }
-      ],
-      "failureEdges": [
-        {
-          "failureClass": "manual-action-declined",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "operation-timeout",
-          "terminalFailure": true
-        }
-      ],
-      "engineFailureEdges": [
-        {
-          "failureClass": "postcondition-failed",
-          "terminalFailure": true
-        },
-        {
-          "failureClass": "interrupted",
-          "terminalFailure": true
-        }
-      ],
-      "idempotence": "manual-decision",
-      "sourceCitations": [
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
-          "commit": "48699362710177854ebeedb7c25f30277296d401",
-          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
-          "lineStart": 117,
-          "lineEnd": 201
-        }
-      ]
-    },
-    {
       "id": "record-oem-unlock-absent",
       "variant": "manual.action",
       "enabled": false,
@@ -3110,23 +2262,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -3139,7 +2283,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record that the AYIA OEM unlocking control is absent, disabled, or ineligible."
+            "value": "Record that the exact AYIA OEM unlocking control is absent, disabled, or ineligible."
           }
         },
         {
@@ -3210,23 +2354,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
@@ -3239,7 +2375,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record that device-side unlock confirmation was declined or not completed."
+            "value": "Record that device-side unlock confirmation was declined before the destructive action."
           }
         },
         {
@@ -3247,7 +2383,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "No success state is inferred."
+            "value": "No unlock success is inferred."
           }
         }
       ],
@@ -3300,7 +2436,7 @@
       ]
     },
     {
-      "id": "record-unlock-not-observed",
+      "id": "record-unlock-outcome-unknown",
       "variant": "manual.action",
       "enabled": false,
       "fromStates": [
@@ -3310,28 +2446,20 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "toState": {
         "kind": "state",
-        "stateId": "unlock-not-observed"
+        "stateId": "unlock-outcome-unknown"
       },
       "arguments": [
         {
@@ -3339,7 +2467,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Record that the persistent unlocked warning was not observed after clean reboot."
+            "value": "Record that the wipe/unlock action may have started but its outcome is unknown."
           }
         },
         {
@@ -3347,7 +2475,7 @@
           "value": {
             "kind": "constant",
             "valueType": "string",
-            "value": "Unlock success is not claimed."
+            "value": "Do not retry automatically or infer success."
           }
         }
       ],
@@ -3357,7 +2485,1518 @@
           "kind": "equals",
           "left": {
             "kind": "operation-output",
-            "operationId": "record-unlock-not-observed",
+            "operationId": "record-unlock-outcome-unknown",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "operation-timeout",
+          "terminalFailure": true
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "interrupted",
+          "terminalFailure": true
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "record-unlock-unverified",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-wipe-accepted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "unlock-unverified"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that independent post-reboot Download lock-state verification did not complete or did not show the expected unlocked state."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Unlock success is not claimed and no automatic retry occurs."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "record-unlock-unverified",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "operation-timeout",
+          "terminalFailure": true
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "interrupted",
+          "terminalFailure": true
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-enter-download-mode",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Simulation-only contract fixture: represent independently evidenced Download-mode entry. No key chord, USB identity, or host transport is supplied."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "A contract-fixture Download observation boundary is recorded; no hardware action is claimed."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-enter-download-mode",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "download-entry-unresolved"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "download-entry-unresolved"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "download-entry-unresolved"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "download-entry-unresolved"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-observe-download-u1",
+      "variant": "samsung.download-observe",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-download-observed"
+      },
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "model",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "inputName": "expectedSourceSwrev",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "productName"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "currentBinary"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-current-binary"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "systemStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-system-status"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "oemLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-oem-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "frpLock"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-frp-lock"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "kgStatus"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-kg-status"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "rpSwrev"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "warrantyVoid"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-warranty-void"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-observe-download-u1",
+            "outputName": "secureDownload"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-secure-download"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "download-blocked"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "download-blocked"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "download-blocked"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "download-blocked"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "download-entry-unresolved"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-inspect-package",
+      "variant": "samsung.package-inspect",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-inspected"
+      },
+      "arguments": [
+        {
+          "inputName": "package",
+          "value": {
+            "kind": "artifact",
+            "artifactId": "ayia-full-package"
+          }
+        },
+        {
+          "inputName": "expectedDigest",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "fixture-expected-package-digest"
+          }
+        },
+        {
+          "inputName": "model",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "inputName": "csc",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "expected-csc"
+          }
+        },
+        {
+          "inputName": "expectedTargetBuild",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "I610UEU1AYIA"
+          }
+        },
+        {
+          "inputName": "expectedTargetSwrev",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        },
+        {
+          "inputName": "exactPackageMembers",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "fixture-exact-package-members"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "verifiedPackage"
+          }
+        },
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "actualDigest"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "model"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "csc"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-csc"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "targetBuild"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "I610UEU1AYIA"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "targetSwrev"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "artifact-verification-failed",
+          "recoveryId": "simulation-only-unqualified-package-unavailable"
+        },
+        {
+          "failureClass": "artifact-extraction-failed",
+          "recoveryId": "simulation-only-unqualified-package-member-failure"
+        },
+        {
+          "failureClass": "hash-mismatch",
+          "recoveryId": "simulation-only-unqualified-package-hash-failure"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-package-member-failure"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-package-member-failure"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-confirm-offline-inspection",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Simulation-only contract gate: require independently qualified PIT, image, and AVB inspection evidence before the hypothetical write."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The fixture records only that the unresolved offline-inspection gate was supplied; it does not claim a Samsung package was inspected."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-confirm-offline-inspection",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "safe-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "safe-stop"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "safe-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "safe-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-confirm-protected-backups",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-backup-gates-recorded"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Simulation-only contract gate: require two matching reads for every declared protected unit-bound state class before the hypothetical write."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The fixture records only the backup prerequisites already declared by the procedure; it performs no device read and claims no recoverability."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-confirm-protected-backups",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "recoveryId": "safe-stop"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "safe-stop"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "safe-stop"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "safe-stop"
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-write-package",
+      "variant": "samsung.download-flash-package",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-backup-gates-recorded"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-flash-completed-unverified"
+      },
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "verifiedPackage",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-inspect-package",
+            "outputName": "verifiedPackage"
+          }
+        },
+        {
+          "inputName": "model",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "inputName": "expectedSourceSwrev",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        },
+        {
+          "inputName": "expectedTargetSwrev",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "U1"
+          }
+        },
+        {
+          "inputName": "transportEvidence",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "fixture-download-transport-evidence"
+          }
+        },
+        {
+          "inputName": "repartition",
+          "value": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        },
+        {
+          "inputName": "pitSubstitution",
+          "value": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": false
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-write-package",
+            "outputName": "writeStarted"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        },
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-write-package",
+            "outputName": "result"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "write-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "device-rejected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "idempotence": "non-idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-reconnect-after-write",
+      "variant": "transport.reconnect",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-flash-completed-unverified"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-system-reconnected"
+      },
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "expectedMode",
+          "value": {
+            "kind": "constant",
+            "valueType": "mode",
+            "value": "system"
+          }
+        },
+        {
+          "inputName": "timeout",
+          "value": {
+            "kind": "constant",
+            "valueType": "duration-ms",
+            "value": 300000
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "output-present",
+          "value": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-reconnect-after-write",
+            "outputName": "reconnectedDevice"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "idempotence": "retry-after-observation",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-verify-ayia-model",
+      "variant": "adb.property",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.product.model"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-verify-ayia-model",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-verify-ayia-build",
+      "variant": "adb.property",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.build.version.incremental"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-verify-ayia-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "I610UEU1AYIA"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-verify-ayia-csc",
+      "variant": "adb.property",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
+        }
+      ],
+      "toState": null,
+      "arguments": [
+        {
+          "inputName": "device",
+          "value": {
+            "kind": "runtime-input",
+            "inputId": "device"
+          }
+        },
+        {
+          "inputName": "property",
+          "value": {
+            "kind": "constant",
+            "valueType": "property-name",
+            "value": "ro.csc.sales_code"
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "simulation-only-unqualified-verify-ayia-csc",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-csc"
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "transport-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "device-disconnected",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "operation-timeout",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        },
+        {
+          "failureClass": "interrupted",
+          "recoveryId": "simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "idempotence": "idempotent",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "record-simulation-only-unqualified-package-unavailable",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-unavailable"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that the synthetic package fixture was unavailable before any write."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No package availability or hardware behavior is inferred."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "record-simulation-only-unqualified-package-unavailable",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "operation-timeout",
+          "terminalFailure": true
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "interrupted",
+          "terminalFailure": true
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "record-simulation-only-unqualified-package-hash-failure",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-hash-failure"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that the synthetic package fixture did not match its fixture digest before any write."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No package write is attempted."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "record-simulation-only-unqualified-package-hash-failure",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "operation-timeout",
+          "terminalFailure": true
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "interrupted",
+          "terminalFailure": true
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "record-simulation-only-unqualified-package-member-failure",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-member-failure"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that the synthetic package fixture did not contain its fixture member names before any write."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "No Samsung filename is inferred and no package write is attempted."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "record-simulation-only-unqualified-package-member-failure",
+            "outputName": "acknowledged"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "boolean",
+            "value": true
+          }
+        }
+      ],
+      "failureEdges": [
+        {
+          "failureClass": "manual-action-declined",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "operation-timeout",
+          "terminalFailure": true
+        }
+      ],
+      "engineFailureEdges": [
+        {
+          "failureClass": "postcondition-failed",
+          "terminalFailure": true
+        },
+        {
+          "failureClass": "interrupted",
+          "terminalFailure": true
+        }
+      ],
+      "idempotence": "manual-decision",
+      "sourceCitations": [
+        {
+          "kind": "pinned-external",
+          "uri": "https://github.com/mura-os/mura/blob/48699362710177854ebeedb7c25f30277296d401/docs/research/72-xr-unlock-and-flash-targets.md",
+          "commit": "48699362710177854ebeedb7c25f30277296d401",
+          "path": "docs/research/72-xr-unlock-and-flash-targets.md",
+          "lineStart": 117,
+          "lineEnd": 201
+        }
+      ]
+    },
+    {
+      "id": "record-simulation-only-unqualified-flash-outcome-unknown",
+      "variant": "manual.action",
+      "enabled": false,
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-backup-gates-recorded"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-flash-completed-unverified"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
+        }
+      ],
+      "toState": {
+        "kind": "state",
+        "stateId": "flash-outcome-unknown"
+      },
+      "arguments": [
+        {
+          "inputName": "instruction",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "Record that the simulated write may have started and its outcome is unknown."
+          }
+        },
+        {
+          "inputName": "expectedObservation",
+          "value": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "The terminal is flash-outcome-unknown; automatic retry is forbidden and no pre-write state is restored."
+          }
+        }
+      ],
+      "guards": [],
+      "postconditions": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "record-simulation-only-unqualified-flash-outcome-unknown",
             "outputName": "acknowledged"
           },
           "right": {
@@ -3423,35 +4062,7 @@
         },
         {
           "kind": "operation",
-          "operationId": "enter-download-mode"
-        },
-        {
-          "kind": "operation",
-          "operationId": "observe-download-u1"
-        },
-        {
-          "kind": "operation",
-          "operationId": "inspect-ayia-package"
-        },
-        {
-          "kind": "operation",
-          "operationId": "flash-ayia-full-package"
-        },
-        {
-          "kind": "operation",
-          "operationId": "reconnect-after-flash"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-model"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-build"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-csc"
+          "operationId": "refuse-ayke-rollback-unverified"
         }
       ],
       "guards": [
@@ -3494,12 +4105,7 @@
           }
         }
       ],
-      "confirmations": [
-        {
-          "kind": "confirmation",
-          "confirmationId": "confirm-simulated-full-package-write"
-        }
-      ]
+      "confirmations": []
     },
     {
       "id": "ayia-oem-unlock",
@@ -3547,6 +4153,14 @@
         },
         {
           "kind": "operation",
+          "operationId": "enter-post-unlock-download-mode"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-post-unlock-download-u1"
+        },
+        {
+          "kind": "operation",
           "operationId": "observe-unlocked-warning"
         }
       ],
@@ -3591,138 +4205,6 @@
         }
       ],
       "confirmations": [
-        {
-          "kind": "confirmation",
-          "confirmationId": "confirm-simulated-oem-unlock-wipe"
-        }
-      ]
-    },
-    {
-      "id": "ayke-rollback-and-unlock",
-      "enabled": false,
-      "initialState": {
-        "kind": "state",
-        "stateId": "ready"
-      },
-      "steps": [
-        {
-          "kind": "operation",
-          "operationId": "probe-model"
-        },
-        {
-          "kind": "operation",
-          "operationId": "probe-build"
-        },
-        {
-          "kind": "operation",
-          "operationId": "probe-csc"
-        },
-        {
-          "kind": "operation",
-          "operationId": "enter-download-mode"
-        },
-        {
-          "kind": "operation",
-          "operationId": "observe-download-u1"
-        },
-        {
-          "kind": "operation",
-          "operationId": "inspect-ayia-package"
-        },
-        {
-          "kind": "operation",
-          "operationId": "flash-ayia-full-package"
-        },
-        {
-          "kind": "operation",
-          "operationId": "reconnect-after-flash"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-model"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-build"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-csc"
-        },
-        {
-          "kind": "operation",
-          "operationId": "enable-developer-options"
-        },
-        {
-          "kind": "operation",
-          "operationId": "enable-oem-unlocking"
-        },
-        {
-          "kind": "operation",
-          "operationId": "enter-oem-unlock-confirmation"
-        },
-        {
-          "kind": "operation",
-          "operationId": "accept-oem-unlock-and-wipe"
-        },
-        {
-          "kind": "operation",
-          "operationId": "reconnect-after-unlock"
-        },
-        {
-          "kind": "operation",
-          "operationId": "verify-ayia-after-unlock"
-        },
-        {
-          "kind": "operation",
-          "operationId": "observe-unlocked-warning"
-        }
-      ],
-      "guards": [
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "probe-model",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "SM-I610"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "probe-build",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "constant",
-            "valueType": "string",
-            "value": "I610UEU1AYKE"
-          }
-        },
-        {
-          "kind": "equals",
-          "left": {
-            "kind": "operation-output",
-            "operationId": "probe-csc",
-            "outputName": "value"
-          },
-          "right": {
-            "kind": "runtime-input",
-            "inputId": "expected-csc"
-          }
-        }
-      ],
-      "confirmations": [
-        {
-          "kind": "confirmation",
-          "confirmationId": "confirm-simulated-full-package-write"
-        },
         {
           "kind": "confirmation",
           "confirmationId": "confirm-simulated-oem-unlock-wipe"
@@ -3792,6 +4274,187 @@
       ],
       "guards": [],
       "confirmations": []
+    },
+    {
+      "id": "simulation-only-unqualified-ayke-rollback-unlock-disabled-plan",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "ready"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "probe-model"
+        },
+        {
+          "kind": "operation",
+          "operationId": "probe-build"
+        },
+        {
+          "kind": "operation",
+          "operationId": "probe-csc"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-enter-download-mode"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-observe-download-u1"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-inspect-package"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-confirm-offline-inspection"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-confirm-protected-backups"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-write-package"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-reconnect-after-write"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-verify-ayia-model"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-verify-ayia-build"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-verify-ayia-csc"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enable-developer-options"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enable-oem-unlocking"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-oem-unlock-confirmation"
+        },
+        {
+          "kind": "operation",
+          "operationId": "accept-oem-unlock-and-wipe"
+        },
+        {
+          "kind": "operation",
+          "operationId": "reconnect-after-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "verify-ayia-after-unlock"
+        },
+        {
+          "kind": "operation",
+          "operationId": "enter-post-unlock-download-mode"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-post-unlock-download-u1"
+        },
+        {
+          "kind": "operation",
+          "operationId": "observe-unlocked-warning"
+        }
+      ],
+      "guards": [
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "probe-model",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "SM-I610"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "probe-build",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "constant",
+            "valueType": "string",
+            "value": "I610UEU1AYKE"
+          }
+        },
+        {
+          "kind": "equals",
+          "left": {
+            "kind": "operation-output",
+            "operationId": "probe-csc",
+            "outputName": "value"
+          },
+          "right": {
+            "kind": "runtime-input",
+            "inputId": "expected-csc"
+          }
+        }
+      ],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-simulation-only-unqualified-package-write"
+        },
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-simulated-oem-unlock-wipe"
+        }
+      ]
+    },
+    {
+      "id": "simulation-only-unqualified-package-write-edge-cases",
+      "enabled": false,
+      "initialState": {
+        "kind": "state",
+        "stateId": "ready"
+      },
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-inspect-package"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-confirm-offline-inspection"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-confirm-protected-backups"
+        },
+        {
+          "kind": "operation",
+          "operationId": "simulation-only-unqualified-write-package"
+        }
+      ],
+      "guards": [],
+      "confirmations": [
+        {
+          "kind": "confirmation",
+          "confirmationId": "confirm-simulation-only-unqualified-package-write"
+        }
+      ]
     }
   ],
   "recovery": [
@@ -3804,23 +4467,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
@@ -3843,23 +4498,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
@@ -3874,84 +4521,6 @@
       }
     },
     {
-      "id": "artifact-unavailable",
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "steps": [
-        {
-          "kind": "operation",
-          "operationId": "record-artifact-unavailable"
-        }
-      ],
-      "terminalState": {
-        "kind": "state",
-        "stateId": "artifact-unavailable"
-      }
-    },
-    {
-      "id": "bad-artifact",
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "steps": [
-        {
-          "kind": "operation",
-          "operationId": "record-bad-artifact"
-        }
-      ],
-      "terminalState": {
-        "kind": "state",
-        "stateId": "bad-artifact"
-      }
-    },
-    {
       "id": "download-blocked",
       "fromStates": [
         {
@@ -3960,23 +4529,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
@@ -3991,45 +4552,6 @@
       }
     },
     {
-      "id": "post-flash-mismatch",
-      "fromStates": [
-        {
-          "kind": "state",
-          "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-wipe-accepted"
-        },
-        {
-          "kind": "state",
-          "stateId": "unlock-rebooted"
-        }
-      ],
-      "steps": [
-        {
-          "kind": "operation",
-          "operationId": "record-post-flash-mismatch"
-        }
-      ],
-      "terminalState": {
-        "kind": "state",
-        "stateId": "post-flash-mismatch"
-      }
-    },
-    {
       "id": "oem-unlock-absent",
       "fromStates": [
         {
@@ -4038,23 +4560,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
@@ -4077,23 +4591,15 @@
         },
         {
           "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
-        },
-        {
-          "kind": "state",
           "stateId": "unlock-wipe-accepted"
         },
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
@@ -4108,23 +4614,11 @@
       }
     },
     {
-      "id": "unlock-not-observed",
+      "id": "unlock-outcome-unknown",
       "fromStates": [
         {
           "kind": "state",
           "stateId": "ready"
-        },
-        {
-          "kind": "state",
-          "stateId": "download-observed"
-        },
-        {
-          "kind": "state",
-          "stateId": "package-inspected"
-        },
-        {
-          "kind": "state",
-          "stateId": "system-reconnected"
         },
         {
           "kind": "state",
@@ -4133,17 +4627,160 @@
         {
           "kind": "state",
           "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
         }
       ],
       "steps": [
         {
           "kind": "operation",
-          "operationId": "record-unlock-not-observed"
+          "operationId": "record-unlock-outcome-unknown"
         }
       ],
       "terminalState": {
         "kind": "state",
-        "stateId": "unlock-not-observed"
+        "stateId": "unlock-outcome-unknown"
+      }
+    },
+    {
+      "id": "unlock-unverified",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-wipe-accepted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-rebooted"
+        },
+        {
+          "kind": "state",
+          "stateId": "unlock-download-observed"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "record-unlock-unverified"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "unlock-unverified"
+      }
+    },
+    {
+      "id": "simulation-only-unqualified-package-unavailable",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "record-simulation-only-unqualified-package-unavailable"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-unavailable"
+      }
+    },
+    {
+      "id": "simulation-only-unqualified-package-hash-failure",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "record-simulation-only-unqualified-package-hash-failure"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-hash-failure"
+      }
+    },
+    {
+      "id": "simulation-only-unqualified-package-member-failure",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "ready"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-download-observed"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-package-inspected"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "record-simulation-only-unqualified-package-member-failure"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "simulation-only-unqualified-package-member-failure"
+      }
+    },
+    {
+      "id": "simulation-only-unqualified-flash-outcome-unknown",
+      "fromStates": [
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-backup-gates-recorded"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-flash-completed-unverified"
+        },
+        {
+          "kind": "state",
+          "stateId": "simulation-only-unqualified-system-reconnected"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "operation",
+          "operationId": "record-simulation-only-unqualified-flash-outcome-unknown"
+        }
+      ],
+      "terminalState": {
+        "kind": "state",
+        "stateId": "flash-outcome-unknown"
       }
     }
   ],
@@ -4151,26 +4788,26 @@
     {
       "kind": "repository",
       "path": "evidence/samsung/official-build-ledger.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 12,
+      "lineEnd": 42
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/ayia-community-report.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 14,
+      "lineEnd": 24
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/launch-unlock-media.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 13,
+      "lineEnd": 40
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/wall-of-shame-claims.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 16,
+      "lineEnd": 35
     },
     {
       "kind": "pinned-external",

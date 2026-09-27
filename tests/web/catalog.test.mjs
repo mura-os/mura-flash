@@ -15,6 +15,7 @@ test("exports only the contracted ESM surface", () => {
     "getTarget",
     "loadCatalog",
     "loadProcedureCatalog",
+    "loadReplayScenarioCatalog",
     "loadTargetCatalog",
     "planProcedure",
     "redactTranscript",

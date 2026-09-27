@@ -6,6 +6,7 @@ import {
   createReplaySession,
   getProcedure,
   loadProcedureCatalog,
+  loadReplayScenarioCatalog,
   loadTargetCatalog,
   planProcedure,
   validateProcedure,
@@ -57,6 +58,11 @@ test("strictly loads and freezes the v1 target catalog", () => {
   assert.equal(Object.isFrozen(targets), true);
   assert.equal(Object.isFrozen(targets[0]), true);
   assert.ok(loadProcedureCatalog().length > 0);
+  const scenarios = loadReplayScenarioCatalog();
+  assert.ok(scenarios.some((scenario) => scenario.procedureId ===
+    "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock"));
+  assert.equal(Object.isFrozen(scenarios), true);
+  assert.equal(Object.isFrozen(scenarios[0]), true);
 });
 
 test("validates procedure closure and plans disabled operations", () => {
@@ -227,6 +233,81 @@ test("normal planning skips disabled capabilities before confirmation", async ()
   assert.equal(result.errorCode, "confirmation-declined");
 });
 
+test("normal replay skips disabled steps and confirmation", async () => {
+  const disabled = procedure({
+    confirmations: [
+      {
+        id: "confirmrun",
+        safetyClasses: ["host-read"],
+        prompt: "Run the replay step?",
+      },
+    ],
+    flows: [{
+      ...procedure().flows[0],
+      confirmations: [{ kind: "confirmation", confirmationId: "confirmrun" }],
+    }],
+  });
+  const scenario = replayScenario({
+    simulateDisabled: false,
+    responses: [],
+    expected: {
+      terminalStateId: "ready",
+      eventKinds: ["session-start", "session-end"],
+      errorCode: null,
+    },
+  });
+
+  const result = await createReplaySession().run(disabled, scenario);
+
+  assert.equal(result.matchedExpected, true);
+  assert.equal(result.plan.steps[0].wouldExecute, false);
+});
+
+test("flow guard stops before a later operation", async () => {
+  const base = procedure();
+  const guarded = procedure({
+    flows: [{
+      ...base.flows[0],
+      steps: [
+        { kind: "operation", operationId: "main-wait" },
+        { kind: "operation", operationId: "recovery-wait" },
+      ],
+      guards: [{
+        kind: "equals",
+        left: {
+          kind: "operation-output",
+          operationId: "main-wait",
+          outputName: "elapsed",
+        },
+        right: { kind: "constant", valueType: "duration-ms", value: 2 },
+      }],
+    }],
+  });
+  const scenario = replayScenario({
+    expected: {
+      terminalStateId: "completed",
+      eventKinds: [
+        "session-start",
+        "operation-would-execute",
+        "state-transition",
+        "operation-success",
+        "session-end",
+      ],
+      errorCode: "guard-failed",
+    },
+  });
+
+  const result = await createReplaySession().run(guarded, scenario);
+
+  assert.equal(result.matchedExpected, true);
+  assert.equal(
+    result.events.some(
+      (event) => event.payload.operationId === "recovery-wait",
+    ),
+    false,
+  );
+});
+
 test("takes the exact failure edge and executes recovery", async () => {
   const scenario = replayScenario({
     responses: [
@@ -335,6 +416,24 @@ test("strictly validates runtime inputs and digest tags", async () => {
       error.code === "invalid-document" &&
       error.message.includes("does not match digest"),
   );
+
+  const withMemberFilenames = procedure({
+    runtimeInputs: [
+      { id: "member-filenames", type: "string-list", required: true },
+    ],
+  });
+  const memberScenario = replayScenario({
+    inputs: [{
+      name: "member-filenames",
+      type: "string-list",
+      value: ["exact-member-one", "exact-member-two"],
+    }],
+  });
+  const memberResult = await createReplaySession().run(
+    withMemberFilenames,
+    memberScenario,
+  );
+  assert.equal(memberResult.matchedExpected, true);
 });
 
 test("records typed confirmation acceptance and decline", async () => {
@@ -398,4 +497,60 @@ test("replays by scenario against an injected procedure catalog", async () => {
     procedureCatalog: catalog,
   }).replay(replayScenario());
   assert.equal(result.procedureId, "install.synthetic");
+});
+
+test("Samsung refusal paths emit no write or unlock operations", async () => {
+  const procedures = loadProcedureCatalog();
+  const scenarios = loadReplayScenarioCatalog();
+  const safeScenarioIds = new Set([
+    "samsung-ayia-wrong-build-guard",
+    "samsung-ayke-rollback-unverified",
+    "samsung-normal-disabled-plan",
+    "samsung-u2-rollback-refusal",
+    "samsung-unknown-build-refusal",
+  ]);
+  const forbidden = [
+    "flash",
+    "accept-oem-unlock",
+    "enable-oem-unlocking",
+    "enter-oem-unlock-confirmation",
+  ];
+  for (const scenario of scenarios.filter(({ id }) => safeScenarioIds.has(id))) {
+    const result = await createReplaySession({
+      procedureCatalog: procedures,
+    }).replay(scenario);
+    assert.equal(result.matchedExpected, true, scenario.id);
+    const operationIds = result.events
+      .map((event) => event.payload.operationId ?? "")
+      .filter(Boolean);
+    assert.equal(
+      operationIds.some((operationId) =>
+        forbidden.some((marker) => operationId.includes(marker))
+      ),
+      false,
+      scenario.id,
+    );
+  }
+
+  const interrupted = scenarios.find(
+    ({ id }) => id === "samsung-unlock-wipe-interruption",
+  );
+  assert.notEqual(interrupted, undefined);
+  const interruptedResult = await createReplaySession({
+    procedureCatalog: procedures,
+  }).replay(interrupted);
+  assert.equal(interruptedResult.terminalStateId, "unlock-outcome-unknown");
+
+  for (const scenarioId of [
+    "samsung-simulation-only-unqualified-write-failure",
+    "samsung-simulation-only-unqualified-write-interruption",
+  ]) {
+    const scenario = scenarios.find(({ id }) => id === scenarioId);
+    assert.notEqual(scenario, undefined);
+    const result = await createReplaySession({
+      procedureCatalog: procedures,
+    }).replay(scenario);
+    assert.equal(result.matchedExpected, true, scenarioId);
+    assert.equal(result.terminalStateId, "flash-outcome-unknown", scenarioId);
+  }
 });

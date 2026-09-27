@@ -1,8 +1,8 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-csc-mismatch",
+  "id": "samsung-download-observation-blocked",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
-  "flowId": "ayke-to-ayia-rollback",
+  "flowId": "u2-rollback-protected",
   "simulateDisabled": true,
   "clock": {
     "startTimestamp": "2026-09-27T12:00:00.000Z",
@@ -26,7 +26,7 @@
       "durationMs": 130
     },
     {
-      "operationId": "observe-download-u1",
+      "operationId": "observe-download-u2",
       "durationMs": 140
     },
     {
@@ -49,7 +49,7 @@
     {
       "name": "expected-source-build",
       "type": "string",
-      "value": "I610UEU1AYKE"
+      "value": "I610UEU2AZCI"
     },
     {
       "name": "expected-current-binary",
@@ -67,6 +67,11 @@
       "value": "ON"
     },
     {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
       "name": "expected-frp-lock",
       "type": "string",
       "value": "OFF"
@@ -77,19 +82,19 @@
       "value": "NORMAL"
     },
     {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-PRE-CAPTURE"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-POST-CAPTURE"
+    },
+    {
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
-    },
-    {
-      "name": "ayia-full-package",
-      "type": "artifact-ref",
-      "value": "simulated-user-supplied-ayia-package"
-    },
-    {
-      "name": "confirm-simulated-full-package-write",
-      "type": "boolean",
-      "value": true
     }
   ],
   "responses": [
@@ -111,7 +116,7 @@
         {
           "name": "value",
           "type": "string",
-          "value": "I610UEU1AYKE"
+          "value": "I610UEU2AZCI"
         }
       ]
     },
@@ -138,55 +143,9 @@
       ]
     },
     {
-      "kind": "success",
-      "operationId": "observe-download-u1",
-      "outputs": [
-        {
-          "name": "productName",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "csc",
-          "type": "string",
-          "value": "BAD"
-        },
-        {
-          "name": "currentBinary",
-          "type": "string",
-          "value": "Samsung Official"
-        },
-        {
-          "name": "systemStatus",
-          "type": "string",
-          "value": "Official"
-        },
-        {
-          "name": "oemLock",
-          "type": "string",
-          "value": "ON"
-        },
-        {
-          "name": "frpLock",
-          "type": "string",
-          "value": "OFF"
-        },
-        {
-          "name": "kgStatus",
-          "type": "string",
-          "value": "NORMAL"
-        },
-        {
-          "name": "rpSwrev",
-          "type": "string",
-          "value": "U1"
-        },
-        {
-          "name": "secureDownload",
-          "type": "string",
-          "value": "ENABLED"
-        }
-      ]
+      "kind": "failure",
+      "operationId": "observe-download-u2",
+      "failureClass": "device-disconnected"
     },
     {
       "kind": "success",
@@ -204,7 +163,6 @@
     "terminalStateId": "download-blocked",
     "eventKinds": [
       "session-start",
-      "confirmation",
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
@@ -221,6 +179,6 @@
       "operation-success",
       "session-end"
     ],
-    "errorCode": "postcondition-failed"
+    "errorCode": "device-disconnected"
   }
 }

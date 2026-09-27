@@ -1,6 +1,6 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-ayia-artifact-bad",
+  "id": "samsung-ayke-rollback-unverified",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
   "flowId": "ayke-to-ayia-rollback",
   "simulateDisabled": true,
@@ -22,20 +22,8 @@
       "durationMs": 120
     },
     {
-      "operationId": "enter-download-mode",
+      "operationId": "refuse-ayke-rollback-unverified",
       "durationMs": 130
-    },
-    {
-      "operationId": "observe-download-u1",
-      "durationMs": 140
-    },
-    {
-      "operationId": "inspect-ayia-package",
-      "durationMs": 150
-    },
-    {
-      "operationId": "record-bad-artifact",
-      "durationMs": 160
     }
   ],
   "adapterCapabilities": [],
@@ -71,6 +59,11 @@
       "value": "ON"
     },
     {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
       "name": "expected-frp-lock",
       "type": "string",
       "value": "OFF"
@@ -81,19 +74,19 @@
       "value": "NORMAL"
     },
     {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-PRE-CAPTURE"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-POST-CAPTURE"
+    },
+    {
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
-    },
-    {
-      "name": "ayia-full-package",
-      "type": "artifact-ref",
-      "value": "simulated-user-supplied-ayia-package"
-    },
-    {
-      "name": "confirm-simulated-full-package-write",
-      "type": "boolean",
-      "value": true
     }
   ],
   "responses": [
@@ -132,74 +125,7 @@
     },
     {
       "kind": "success",
-      "operationId": "enter-download-mode",
-      "outputs": [
-        {
-          "name": "acknowledged",
-          "type": "boolean",
-          "value": true
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "observe-download-u1",
-      "outputs": [
-        {
-          "name": "productName",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "csc",
-          "type": "string",
-          "value": "SIM"
-        },
-        {
-          "name": "currentBinary",
-          "type": "string",
-          "value": "Samsung Official"
-        },
-        {
-          "name": "systemStatus",
-          "type": "string",
-          "value": "Official"
-        },
-        {
-          "name": "oemLock",
-          "type": "string",
-          "value": "ON"
-        },
-        {
-          "name": "frpLock",
-          "type": "string",
-          "value": "OFF"
-        },
-        {
-          "name": "kgStatus",
-          "type": "string",
-          "value": "NORMAL"
-        },
-        {
-          "name": "rpSwrev",
-          "type": "string",
-          "value": "U1"
-        },
-        {
-          "name": "secureDownload",
-          "type": "string",
-          "value": "ENABLED"
-        }
-      ]
-    },
-    {
-      "kind": "failure",
-      "operationId": "inspect-ayia-package",
-      "failureClass": "artifact-extraction-failed"
-    },
-    {
-      "kind": "success",
-      "operationId": "record-bad-artifact",
+      "operationId": "refuse-ayke-rollback-unverified",
       "outputs": [
         {
           "name": "acknowledged",
@@ -210,29 +136,20 @@
     }
   ],
   "expected": {
-    "terminalStateId": "bad-artifact",
+    "terminalStateId": "rollback-unverified",
     "eventKinds": [
       "session-start",
-      "confirmation",
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
       "operation-success",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "state-transition",
-      "operation-success",
-      "operation-would-execute",
-      "operation-failure",
-      "recovery-start",
       "operation-would-execute",
       "state-transition",
       "operation-success",
       "session-end"
     ],
-    "errorCode": "artifact-extraction-failed"
+    "errorCode": null
   }
 }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from pathlib import Path
 
 import pytest
 
@@ -238,6 +239,68 @@ def test_disabled_simulation_requires_no_adapter_capability() -> None:
     assert result.plan.missing_capabilities == ()
 
 
+def test_normal_replay_skips_disabled_steps_and_confirmation() -> None:
+    procedure = _procedure()
+    procedure["confirmations"] = [
+        {
+            "id": "confirm-simulation",
+            "safetyClasses": ["host-read"],
+            "prompt": "Confirm the synthetic simulation.",
+        }
+    ]
+    procedure["flows"][0]["confirmations"] = [
+        {"kind": "confirmation", "confirmationId": "confirm-simulation"}
+    ]
+    scenario = _scenario()
+    scenario["simulateDisabled"] = False
+    scenario["responses"] = []
+    scenario["expected"] = {
+        "terminalStateId": "ready",
+        "eventKinds": ["session-start", "session-end"],
+        "errorCode": None,
+    }
+
+    result = replay_scenario(procedure, scenario)
+
+    assert result.matched_expected is True
+    assert result.plan.steps[0].would_execute is False
+
+
+def test_flow_guard_stops_before_later_operation() -> None:
+    procedure = _procedure()
+    procedure["flows"][0]["steps"] = [
+        {"kind": "operation", "operationId": "main-wait"},
+        {"kind": "operation", "operationId": "recovery-wait"},
+    ]
+    procedure["flows"][0]["guards"] = [
+        {
+            "kind": "equals",
+            "left": {
+                "kind": "operation-output",
+                "operationId": "main-wait",
+                "outputName": "elapsed",
+            },
+            "right": {"kind": "constant", "valueType": "duration-ms", "value": 6},
+        }
+    ]
+    scenario = _scenario()
+    scenario["expected"] = {
+        "terminalStateId": "ready",
+        "eventKinds": [
+            "session-start",
+            "operation-would-execute",
+            "operation-success",
+            "session-end",
+        ],
+        "errorCode": "guard-failed",
+    }
+
+    result = replay_scenario(procedure, scenario)
+
+    assert result.matched_expected is True
+    assert all(event["payload"].get("operationId") != "recovery-wait" for event in result.events)
+
+
 def test_confirmation_decline_stops_before_operation() -> None:
     procedure = _procedure()
     procedure["confirmations"] = [
@@ -386,6 +449,20 @@ def test_runtime_input_and_digest_tags_are_strict() -> None:
     with pytest.raises(RecipeInvalidError, match="lowercase SHA-256"):
         replay_scenario(_procedure(), invalid_digest)
 
+    list_procedure = _procedure()
+    list_procedure["runtimeInputs"] = [
+        {"id": "member-filenames", "type": "string-list", "required": True}
+    ]
+    list_scenario = _scenario()
+    list_scenario["inputs"] = [
+        {
+            "name": "member-filenames",
+            "type": "string-list",
+            "value": ["exact-member-one", "exact-member-two"],
+        }
+    ]
+    assert replay_scenario(list_procedure, list_scenario).matched_expected is True
+
 
 def test_graph_validator_checks_explicit_state_references() -> None:
     procedure = _procedure()
@@ -426,3 +503,50 @@ def test_samsung_live_refusal_precedes_adapter_factory() -> None:
     with pytest.raises(SafetyRefusalError):
         create_live_adapter(procedure, target, factory)
     assert called is False
+
+
+def test_samsung_refusal_paths_emit_no_write_or_unlock_operations() -> None:
+    procedure = load_procedure_catalog().procedures[
+        "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock"
+    ]
+    scenario_root = Path("replay/scenarios/samsung")
+    safe_scenarios = [
+        "samsung-ayia-wrong-build-guard",
+        "samsung-ayke-rollback-unverified",
+        "samsung-normal-disabled-plan",
+        "samsung-u2-rollback-refusal",
+        "samsung-unknown-build-refusal",
+    ]
+    forbidden = (
+        "flash",
+        "accept-oem-unlock",
+        "enable-oem-unlocking",
+        "enter-oem-unlock-confirmation",
+    )
+    for scenario_id in safe_scenarios:
+        scenario = decode_v1_document((scenario_root / f"{scenario_id}.json").read_text())
+        result = replay_scenario(procedure, scenario)
+        assert result.matched_expected is True
+        operation_ids = [
+            str(event["payload"].get("operationId", ""))
+            for event in result.events
+            if isinstance(event["payload"], dict)
+        ]
+        assert not any(
+            marker in operation_id for marker in forbidden for operation_id in operation_ids
+        )
+
+    interrupted = decode_v1_document(
+        (scenario_root / "samsung-unlock-wipe-interruption.json").read_text()
+    )
+    interrupted_result = replay_scenario(procedure, interrupted)
+    assert interrupted_result.terminal_state_id == "unlock-outcome-unknown"
+
+    for scenario_id in (
+        "samsung-simulation-only-unqualified-write-failure",
+        "samsung-simulation-only-unqualified-write-interruption",
+    ):
+        scenario = decode_v1_document((scenario_root / f"{scenario_id}.json").read_text())
+        result = replay_scenario(procedure, scenario)
+        assert result.matched_expected is True
+        assert result.terminal_state_id == "flash-outcome-unknown"

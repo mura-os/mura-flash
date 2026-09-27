@@ -768,8 +768,8 @@
   {
     "authenticationStatus": "test-only",
     "blockers": [
-      "No successful launch unlock capture is bound to a full build, SKU, and bootloader revision.",
-      "No complete PIT/GPT, AVB, stock artifact, protected-state backup, or restore plan exists."
+      "No successful launch unlock capture is bound to a full build, CSC/SKU, RP SWREV, and independent post-reboot Download lock-state observation.",
+      "No authenticated AYIA digest, exact package/member filenames, Download entry/transport capture, complete PIT/GPT/AVB analysis, protected-state backup, or restore plan exists."
     ],
     "builds": [
       {
@@ -836,7 +836,7 @@
     ],
     "unknowns": [
       "Whether SM-I610 exposes fastboot or fastbootd rather than only Samsung Download.",
-      "Exact downgrade floors, update relock behavior, Knox effects, partition layout, and AYIA package availability."
+      "Exact Download entry and host transport, downgrade floors, update relock behavior, Knox effects, partition layout, and AYIA package availability."
     ],
     "vendor": "Samsung",
     "writesEnabled": false

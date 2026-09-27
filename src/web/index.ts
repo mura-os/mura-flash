@@ -4,6 +4,7 @@ export { createBrowserSession } from "./session";
 export {
   getProcedure,
   loadProcedureCatalog,
+  loadReplayScenarioCatalog,
   loadTargetCatalog,
 } from "./v1-catalog";
 export { planProcedure, validateProcedure } from "./procedure";

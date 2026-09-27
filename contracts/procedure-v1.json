@@ -2003,6 +2003,11 @@
           "required": true
         },
         {
+          "name": "expectedDigest",
+          "type": "digest",
+          "required": true
+        },
+        {
           "name": "model",
           "type": "string",
           "required": true
@@ -2069,19 +2074,27 @@
       "requiredAdapterCapability": "samsung.package-inspect",
       "algorithmParameters": [
         {
+          "name": "digest-algorithm",
+          "value": "sha256"
+        },
+        {
+          "name": "expected-digest-required-before-inspection",
+          "value": true
+        },
+        {
           "name": "archive-policy",
-          "value": "exact-declared-members-only"
+          "value": "exact-declared-filenames-only"
         },
         {
-          "name": "member-order",
-          "value": "bl-ap-cp-csc"
-        },
-        {
-          "name": "home-csc-accepted",
-          "value": false
+          "name": "exact-filenames-required-before-verified-output",
+          "value": true
         },
         {
           "name": "path-traversal",
+          "value": "reject"
+        },
+        {
+          "name": "symlinks",
           "value": "reject"
         },
         {
@@ -2115,11 +2128,6 @@
           "required": true
         },
         {
-          "name": "csc",
-          "type": "string",
-          "required": true
-        },
-        {
           "name": "expectedSourceSwrev",
           "type": "string",
           "required": true
@@ -2128,11 +2136,6 @@
       "outputs": [
         {
           "name": "productName",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "csc",
           "type": "string",
           "required": true
         },
@@ -2167,6 +2170,11 @@
           "required": true
         },
         {
+          "name": "warrantyVoid",
+          "type": "string",
+          "required": true
+        },
+        {
           "name": "secureDownload",
           "type": "string",
           "required": true
@@ -2190,12 +2198,17 @@
             "FRP LOCK",
             "KG STATUS",
             "RP SWREV",
+            "WARRANTY VOID",
             "SECURE DOWNLOAD"
           ]
         },
         {
           "name": "transcription",
           "value": "exact-no-normalization"
+        },
+        {
+          "name": "csc-source",
+          "value": "running-os-property-not-download-output"
         },
         {
           "name": "arbitrary-argv",
@@ -2233,11 +2246,6 @@
           "required": true
         },
         {
-          "name": "csc",
-          "type": "string",
-          "required": true
-        },
-        {
           "name": "expectedSourceSwrev",
           "type": "string",
           "required": true
@@ -2248,8 +2256,8 @@
           "required": true
         },
         {
-          "name": "exactPackageMembers",
-          "type": "string-list",
+          "name": "transportEvidence",
+          "type": "string",
           "required": true
         },
         {
@@ -2286,11 +2294,11 @@
       "algorithmParameters": [
         {
           "name": "package-policy",
-          "value": "full-signed-package-one-shot"
+          "value": "exact-verified-package-single-attempt"
         },
         {
-          "name": "member-order",
-          "value": "bl-ap-cp-csc"
+          "name": "transport",
+          "value": "evidence-bound-adapter-only"
         },
         {
           "name": "repartition",
@@ -2317,14 +2325,6 @@
           "path": "docs/research/72-xr-unlock-and-flash-targets.md",
           "lineStart": 134,
           "lineEnd": 197
-        },
-        {
-          "kind": "pinned-external",
-          "uri": "https://github.com/zenfyrdev/bootloader-unlock-wall-of-shame/blob/92d55840269532ec0576c30a60db297a703f2daa/brands/samsung/README.md",
-          "commit": "92d55840269532ec0576c30a60db297a703f2daa",
-          "path": "brands/samsung/README.md",
-          "lineStart": 10,
-          "lineEnd": 39
         }
       ]
     }

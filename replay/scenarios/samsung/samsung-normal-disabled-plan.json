@@ -1,0 +1,33 @@
+{
+  "schema": "org.mura.flash.replay-scenario/v1",
+  "id": "samsung-normal-disabled-plan",
+  "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+  "flowId": "ayke-to-ayia-rollback",
+  "simulateDisabled": false,
+  "clock": {
+    "startTimestamp": "2026-09-27T12:00:00.000Z",
+    "tickMs": 10
+  },
+  "operationDurations": [],
+  "adapterCapabilities": [],
+  "inputs": [
+    {"name": "device", "type": "device-ref", "value": "simulated-sm-i610"},
+    {"name": "expected-csc", "type": "string", "value": "SIM"},
+    {"name": "expected-source-build", "type": "string", "value": "I610UEU1AYKE"},
+    {"name": "expected-current-binary", "type": "string", "value": "Samsung Official"},
+    {"name": "expected-system-status", "type": "string", "value": "Official"},
+    {"name": "expected-oem-lock", "type": "string", "value": "ON"},
+    {"name": "expected-post-unlock-oem-lock", "type": "string", "value": "OFF"},
+    {"name": "expected-frp-lock", "type": "string", "value": "OFF"},
+    {"name": "expected-kg-status", "type": "string", "value": "NORMAL"},
+    {"name": "expected-warranty-void", "type": "string", "value": "SIMULATED-PRE-CAPTURE"},
+    {"name": "expected-post-unlock-warranty-void", "type": "string", "value": "SIMULATED-POST-CAPTURE"},
+    {"name": "expected-secure-download", "type": "string", "value": "ENABLED"}
+  ],
+  "responses": [],
+  "expected": {
+    "terminalStateId": "ready",
+    "eventKinds": ["session-start", "session-end"],
+    "errorCode": null
+  }
+}

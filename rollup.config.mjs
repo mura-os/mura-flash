@@ -125,6 +125,7 @@ export default {
     {
       ...sharedOutput,
       file: "dist/mura-flash.min.mjs",
+      sourcemap: false,
       plugins: [
         terser({
           format: {

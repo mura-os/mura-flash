@@ -1,8 +1,8 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-download-write-failure",
+  "id": "samsung-post-reboot-lock-state-mismatch",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
-  "flowId": "ayke-to-ayia-rollback",
+  "flowId": "ayia-oem-unlock",
   "simulateDisabled": true,
   "clock": {
     "startTimestamp": "2026-09-27T12:00:00.000Z",
@@ -22,20 +22,40 @@
       "durationMs": 120
     },
     {
-      "operationId": "enter-download-mode",
+      "operationId": "enable-developer-options",
       "durationMs": 130
     },
     {
-      "operationId": "observe-download-u1",
+      "operationId": "enable-oem-unlocking",
       "durationMs": 140
     },
     {
-      "operationId": "inspect-ayia-package",
+      "operationId": "enter-oem-unlock-confirmation",
       "durationMs": 150
     },
     {
-      "operationId": "flash-ayia-full-package",
+      "operationId": "accept-oem-unlock-and-wipe",
       "durationMs": 160
+    },
+    {
+      "operationId": "reconnect-after-unlock",
+      "durationMs": 170
+    },
+    {
+      "operationId": "verify-ayia-after-unlock",
+      "durationMs": 180
+    },
+    {
+      "operationId": "enter-post-unlock-download-mode",
+      "durationMs": 190
+    },
+    {
+      "operationId": "observe-post-unlock-download-u1",
+      "durationMs": 200
+    },
+    {
+      "operationId": "record-unlock-unverified",
+      "durationMs": 210
     }
   ],
   "adapterCapabilities": [],
@@ -53,7 +73,7 @@
     {
       "name": "expected-source-build",
       "type": "string",
-      "value": "I610UEU1AYKE"
+      "value": "I610UEU1AYIA"
     },
     {
       "name": "expected-current-binary",
@@ -71,6 +91,11 @@
       "value": "ON"
     },
     {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
       "name": "expected-frp-lock",
       "type": "string",
       "value": "OFF"
@@ -81,17 +106,22 @@
       "value": "NORMAL"
     },
     {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-PRE-CAPTURE"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-POST-CAPTURE"
+    },
+    {
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
     },
     {
-      "name": "ayia-full-package",
-      "type": "artifact-ref",
-      "value": "simulated-user-supplied-ayia-package"
-    },
-    {
-      "name": "confirm-simulated-full-package-write",
+      "name": "confirm-simulated-oem-unlock-wipe",
       "type": "boolean",
       "value": true
     }
@@ -115,7 +145,7 @@
         {
           "name": "value",
           "type": "string",
-          "value": "I610UEU1AYKE"
+          "value": "I610UEU1AYIA"
         }
       ]
     },
@@ -132,7 +162,7 @@
     },
     {
       "kind": "success",
-      "operationId": "enter-download-mode",
+      "operationId": "enable-developer-options",
       "outputs": [
         {
           "name": "acknowledged",
@@ -143,17 +173,78 @@
     },
     {
       "kind": "success",
-      "operationId": "observe-download-u1",
+      "operationId": "enable-oem-unlocking",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "enter-oem-unlock-confirmation",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "accept-oem-unlock-and-wipe",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "reconnect-after-unlock",
+      "outputs": [
+        {
+          "name": "reconnectedDevice",
+          "type": "device-ref",
+          "value": "simulated-sm-i610-after-unlock"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "verify-ayia-after-unlock",
+      "outputs": [
+        {
+          "name": "value",
+          "type": "string",
+          "value": "I610UEU1AYIA"
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "enter-post-unlock-download-mode",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "kind": "success",
+      "operationId": "observe-post-unlock-download-u1",
       "outputs": [
         {
           "name": "productName",
           "type": "string",
           "value": "SM-I610"
-        },
-        {
-          "name": "csc",
-          "type": "string",
-          "value": "SIM"
         },
         {
           "name": "currentBinary",
@@ -186,6 +277,11 @@
           "value": "U1"
         },
         {
+          "name": "warrantyVoid",
+          "type": "string",
+          "value": "SIMULATED-POST-CAPTURE"
+        },
+        {
           "name": "secureDownload",
           "type": "string",
           "value": "ENABLED"
@@ -194,48 +290,18 @@
     },
     {
       "kind": "success",
-      "operationId": "inspect-ayia-package",
+      "operationId": "record-unlock-unverified",
       "outputs": [
         {
-          "name": "verifiedPackage",
-          "type": "verified-artifact-ref",
-          "value": "verified-ayia-package"
-        },
-        {
-          "name": "actualDigest",
-          "type": "digest",
-          "value": "e971d250393920bcc63b3093f59806f3c111bb30b41acc12caf8bac77e6e8584"
-        },
-        {
-          "name": "model",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "csc",
-          "type": "string",
-          "value": "SIM"
-        },
-        {
-          "name": "targetBuild",
-          "type": "string",
-          "value": "I610UEU1AYIA"
-        },
-        {
-          "name": "targetSwrev",
-          "type": "string",
-          "value": "U1"
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
         }
       ]
-    },
-    {
-      "kind": "failure",
-      "operationId": "flash-ayia-full-package",
-      "failureClass": "write-failed"
     }
   ],
   "expected": {
-    "terminalStateId": "package-inspected",
+    "terminalStateId": "unlock-unverified",
     "eventKinds": [
       "session-start",
       "confirmation",
@@ -248,15 +314,27 @@
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
       "state-transition",
       "operation-success",
       "operation-would-execute",
       "state-transition",
+      "operation-success",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
       "operation-success",
       "operation-would-execute",
       "operation-failure",
+      "recovery-start",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
       "session-end"
     ],
-    "errorCode": "write-failed"
+    "errorCode": "postcondition-failed"
   }
 }

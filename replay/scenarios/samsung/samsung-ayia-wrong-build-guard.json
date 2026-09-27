@@ -1,0 +1,66 @@
+{
+  "schema": "org.mura.flash.replay-scenario/v1",
+  "id": "samsung-ayia-wrong-build-guard",
+  "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+  "flowId": "ayia-oem-unlock",
+  "simulateDisabled": true,
+  "clock": {
+    "startTimestamp": "2026-09-27T12:00:00.000Z",
+    "tickMs": 10
+  },
+  "operationDurations": [
+    {"operationId": "probe-model", "durationMs": 100},
+    {"operationId": "probe-build", "durationMs": 110},
+    {"operationId": "record-safe-stop", "durationMs": 120}
+  ],
+  "adapterCapabilities": [],
+  "inputs": [
+    {"name": "device", "type": "device-ref", "value": "simulated-sm-i610"},
+    {"name": "expected-csc", "type": "string", "value": "SIM"},
+    {"name": "expected-source-build", "type": "string", "value": "I610UEU1AYIA"},
+    {"name": "expected-current-binary", "type": "string", "value": "Samsung Official"},
+    {"name": "expected-system-status", "type": "string", "value": "Official"},
+    {"name": "expected-oem-lock", "type": "string", "value": "ON"},
+    {"name": "expected-post-unlock-oem-lock", "type": "string", "value": "OFF"},
+    {"name": "expected-frp-lock", "type": "string", "value": "OFF"},
+    {"name": "expected-kg-status", "type": "string", "value": "NORMAL"},
+    {"name": "expected-warranty-void", "type": "string", "value": "SIMULATED-PRE-CAPTURE"},
+    {"name": "expected-post-unlock-warranty-void", "type": "string", "value": "SIMULATED-POST-CAPTURE"},
+    {"name": "expected-secure-download", "type": "string", "value": "ENABLED"},
+    {"name": "confirm-simulated-oem-unlock-wipe", "type": "boolean", "value": true}
+  ],
+  "responses": [
+    {
+      "kind": "success",
+      "operationId": "probe-model",
+      "outputs": [{"name": "value", "type": "string", "value": "SM-I610"}]
+    },
+    {
+      "kind": "success",
+      "operationId": "probe-build",
+      "outputs": [{"name": "value", "type": "string", "value": "I610UEU1AYKE"}]
+    },
+    {
+      "kind": "success",
+      "operationId": "record-safe-stop",
+      "outputs": [{"name": "acknowledged", "type": "boolean", "value": true}]
+    }
+  ],
+  "expected": {
+    "terminalStateId": "safe-stop",
+    "eventKinds": [
+      "session-start",
+      "confirmation",
+      "operation-would-execute",
+      "operation-success",
+      "operation-would-execute",
+      "operation-failure",
+      "recovery-start",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
+      "session-end"
+    ],
+    "errorCode": "postcondition-failed"
+  }
+}

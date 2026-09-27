@@ -59,6 +59,11 @@
       "value": "ON"
     },
     {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
       "name": "expected-frp-lock",
       "type": "string",
       "value": "OFF"
@@ -69,14 +74,19 @@
       "value": "NORMAL"
     },
     {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-PRE-CAPTURE"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-POST-CAPTURE"
+    },
+    {
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
-    },
-    {
-      "name": "ayia-full-package",
-      "type": "artifact-ref",
-      "value": "simulated-user-supplied-ayia-package"
     }
   ],
   "responses": [

@@ -1,8 +1,8 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-kg-frp-block",
+  "id": "samsung-unlock-declined",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
-  "flowId": "ayke-to-ayia-rollback",
+  "flowId": "ayia-oem-unlock",
   "simulateDisabled": true,
   "clock": {
     "startTimestamp": "2026-09-27T12:00:00.000Z",
@@ -22,16 +22,20 @@
       "durationMs": 120
     },
     {
-      "operationId": "enter-download-mode",
+      "operationId": "enable-developer-options",
       "durationMs": 130
     },
     {
-      "operationId": "observe-download-u1",
+      "operationId": "enable-oem-unlocking",
       "durationMs": 140
     },
     {
-      "operationId": "record-download-blocked",
+      "operationId": "enter-oem-unlock-confirmation",
       "durationMs": 150
+    },
+    {
+      "operationId": "record-unlock-declined",
+      "durationMs": 160
     }
   ],
   "adapterCapabilities": [],
@@ -49,7 +53,7 @@
     {
       "name": "expected-source-build",
       "type": "string",
-      "value": "I610UEU1AYKE"
+      "value": "I610UEU1AYIA"
     },
     {
       "name": "expected-current-binary",
@@ -67,6 +71,11 @@
       "value": "ON"
     },
     {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "OFF"
+    },
+    {
       "name": "expected-frp-lock",
       "type": "string",
       "value": "OFF"
@@ -77,17 +86,22 @@
       "value": "NORMAL"
     },
     {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-PRE-CAPTURE"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "SIMULATED-POST-CAPTURE"
+    },
+    {
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
     },
     {
-      "name": "ayia-full-package",
-      "type": "artifact-ref",
-      "value": "simulated-user-supplied-ayia-package"
-    },
-    {
-      "name": "confirm-simulated-full-package-write",
+      "name": "confirm-simulated-oem-unlock-wipe",
       "type": "boolean",
       "value": true
     }
@@ -111,7 +125,7 @@
         {
           "name": "value",
           "type": "string",
-          "value": "I610UEU1AYKE"
+          "value": "I610UEU1AYIA"
         }
       ]
     },
@@ -128,7 +142,7 @@
     },
     {
       "kind": "success",
-      "operationId": "enter-download-mode",
+      "operationId": "enable-developer-options",
       "outputs": [
         {
           "name": "acknowledged",
@@ -139,58 +153,23 @@
     },
     {
       "kind": "success",
-      "operationId": "observe-download-u1",
+      "operationId": "enable-oem-unlocking",
       "outputs": [
         {
-          "name": "productName",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "csc",
-          "type": "string",
-          "value": "SIM"
-        },
-        {
-          "name": "currentBinary",
-          "type": "string",
-          "value": "Samsung Official"
-        },
-        {
-          "name": "systemStatus",
-          "type": "string",
-          "value": "Official"
-        },
-        {
-          "name": "oemLock",
-          "type": "string",
-          "value": "ON"
-        },
-        {
-          "name": "frpLock",
-          "type": "string",
-          "value": "ON"
-        },
-        {
-          "name": "kgStatus",
-          "type": "string",
-          "value": "PRENORMAL"
-        },
-        {
-          "name": "rpSwrev",
-          "type": "string",
-          "value": "U1"
-        },
-        {
-          "name": "secureDownload",
-          "type": "string",
-          "value": "ENABLED"
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
         }
       ]
     },
     {
+      "kind": "failure",
+      "operationId": "enter-oem-unlock-confirmation",
+      "failureClass": "manual-action-declined"
+    },
+    {
       "kind": "success",
-      "operationId": "record-download-blocked",
+      "operationId": "record-unlock-declined",
       "outputs": [
         {
           "name": "acknowledged",
@@ -201,10 +180,12 @@
     }
   ],
   "expected": {
-    "terminalStateId": "download-blocked",
+    "terminalStateId": "unlock-declined",
     "eventKinds": [
       "session-start",
       "confirmation",
+      "operation-would-execute",
+      "operation-success",
       "operation-would-execute",
       "operation-success",
       "operation-would-execute",
@@ -221,6 +202,6 @@
       "operation-success",
       "session-end"
     ],
-    "errorCode": "postcondition-failed"
+    "errorCode": "manual-action-declined"
   }
 }

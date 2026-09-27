@@ -3,7 +3,7 @@
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
   "targetId": "samsung-galaxy-xr-sm-i610",
   "sourceBehavior": {
-    "launchUnlock": "community-reported",
+    "launchUnlock": "community-reported-not-build-bound",
     "aykeUnlockRemoval": "community-reported",
     "aykeToAyiaRollback": "not-publicly-demonstrated",
     "u2ToU1Rollback": "not-publicly-demonstrated",
@@ -19,19 +19,16 @@
     "observe-launch-oem-unlock-setting",
     "accept-device-side-unlock-warning",
     "accept-data-wipe",
+    "reboot",
+    "independently-observe-download-lock-state",
     "observe-post-reboot-unlocked-warning"
   ],
-  "muraSimulationOrder": {
+  "runtimeFlows": {
     "ayke-to-ayia-rollback": [
       "probe-model",
       "probe-build",
       "probe-csc",
-      "enter-download-mode-unresolved",
-      "transcribe-complete-download-screen",
-      "inspect-user-supplied-ayia-full-package",
-      "simulate-full-bl-ap-cp-csc-package-write",
-      "reconnect",
-      "verify-ayia-model-build-csc"
+      "refuse-ayke-rollback-unverified"
     ],
     "ayia-oem-unlock": [
       "probe-model",
@@ -41,25 +38,79 @@
       "enable-oem-unlocking",
       "enter-device-side-unlock-confirmation",
       "accept-wipe",
-      "reconnect",
-      "verify-ayia",
+      "reconnect-after-clean-reboot",
+      "verify-ayia-build",
+      "enter-download-mode-with-independently-captured-instructions",
+      "capture-complete-download-screen-including-warranty-void",
+      "verify-post-reboot-oem-lock-state",
       "observe-unlocked-warning"
+    ],
+    "u2-rollback-protected": "zero-write",
+    "unknown-build-safe-stop": "zero-write"
+  },
+  "disabledAykeRollbackUnlockPlan": {
+    "status": "disabled-procedure-flow-simulation-only-unqualified",
+    "orderedSteps": [
+      "identify-exact-sm-i610-build-csc-and-swrev",
+      "resolve-exact-download-entry-and-host-transport",
+      "capture-complete-pre-write-download-screen-including-warranty-void",
+      "obtain-authenticated-ayia-package",
+      "verify-expected-sha256",
+      "verify-exact-package-member-filenames",
+      "inspect-pit-images-and-avb-offline",
+      "capture-two-matching-reads-of-all-protected-unit-state",
+      "perform-one-no-retry-evidence-bound-package-write",
+      "reconnect-without-inferring-flash-success",
+      "verify-exact-ayia-model-build-and-csc",
+      "enable-developer-options",
+      "enable-oem-unlocking-if-present",
+      "enter-device-side-unlock-confirmation",
+      "accept-unlock-and-wipe",
+      "reconnect-after-clean-reboot",
+      "verify-ayia-build",
+      "enter-download-mode-again",
+      "independently-observe-post-reboot-download-lock-state",
+      "observe-post-reboot-unlocked-warning"
+    ],
+    "firstUnresolvedGate": "ayke-to-ayia-rollback-not-demonstrated",
+    "runtimeTerminalBeforeWrite": "rollback-unverified",
+    "possiblePostWriteTerminal": "flash-outcome-unknown",
+    "possiblePostUnlockTerminals": [
+      "unlock-outcome-unknown",
+      "unlock-unverified"
+    ],
+    "automaticRetry": false,
+    "procedureFlowId": "simulation-only-unqualified-ayke-rollback-unlock-disabled-plan",
+    "edgeFlowId": "simulation-only-unqualified-package-write-edge-cases",
+    "fixtureEvidenceInputs": [
+      "fixture-expected-package-digest",
+      "fixture-exact-package-members",
+      "fixture-download-transport-evidence"
     ]
   },
-  "closedFlashShape": {
-    "model": "SM-I610",
-    "expectedSourceSwrev": "U1",
-    "expectedTargetSwrev": "U1",
-    "exactPackageMembers": [
-      "BL",
-      "AP",
-      "CP",
-      "CSC"
+  "packageInspectionContract": {
+    "verifiedOutputRequires": [
+      "expected-sha256",
+      "exact-package-member-filenames",
+      "exact-model",
+      "exact-csc",
+      "exact-target-build",
+      "exact-target-swrev"
     ],
-    "repartition": false,
-    "pitSubstitution": false,
-    "arbitraryArgv": false
+    "knownExpectedDigest": null,
+    "knownExactMemberFilenames": []
   },
+  "downloadCaptureFields": [
+    "PRODUCT NAME",
+    "CURRENT BINARY",
+    "SYSTEM STATUS",
+    "OEM LOCK",
+    "FRP LOCK",
+    "KG STATUS",
+    "RP SWREV",
+    "WARRANTY VOID",
+    "SECURE DOWNLOAD"
+  ],
   "artifact": {
     "source": "user-supplied",
     "build": "I610UEU1AYIA",
@@ -94,10 +145,6 @@
   ],
   "evidence": [
     {
-      "path": "evidence/samsung/official-build-ledger.json",
-      "sha256": "04c6726868940b0b1dd4a163c89b90d67c6ce3ab33069b8d37b941444528bd8b"
-    },
-    {
       "path": "evidence/samsung/ayia-community-report.json",
       "sha256": "9ca5afe1a2e6b28743380177ed1ba34fd28433963f5bf50af15fbd63dbff6526"
     },
@@ -106,8 +153,12 @@
       "sha256": "eea2398195287dfe1e29a17708d996f6f5de6dc0b165b3c5bd5d90722fac7af2"
     },
     {
+      "path": "evidence/samsung/official-build-ledger.json",
+      "sha256": "04c6726868940b0b1dd4a163c89b90d67c6ce3ab33069b8d37b941444528bd8b"
+    },
+    {
       "path": "evidence/samsung/wall-of-shame-claims.json",
-      "sha256": "8e0a6c3730b44bfe9f7a4eb2768339497c4c17b39cd20804027d0e0618515019"
+      "sha256": "62c0c42f6c334fbcb94c4568a91b2c443ea51ef41823de80091813ef77d5aead"
     }
   ],
   "citations": [

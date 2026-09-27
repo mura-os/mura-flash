@@ -1,4 +1,9 @@
-export type ScalarValue = string | number | boolean | null;
+export type ScalarValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly string[];
 
 export interface TypedValue {
   readonly name: string;
@@ -218,7 +223,7 @@ export interface ReplayScenario {
   readonly id: string;
   readonly procedureId: string;
   readonly flowId: string;
-  readonly simulateDisabled: true;
+  readonly simulateDisabled: boolean;
   readonly clock: {
     readonly startTimestamp: string;
     readonly tickMs: number;
@@ -251,6 +256,8 @@ export interface ReplayScenario {
     readonly errorCode: string | null;
   };
 }
+
+export type ReplayScenarioCatalog = readonly ReplayScenario[];
 
 export interface PlannedStep {
   readonly index: number;

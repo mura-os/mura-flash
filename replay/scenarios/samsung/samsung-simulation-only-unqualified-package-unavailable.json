@@ -1,0 +1,140 @@
+{
+  "schema": "org.mura.flash.replay-scenario/v1",
+  "id": "samsung-simulation-only-unqualified-package-unavailable",
+  "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
+  "flowId": "simulation-only-unqualified-package-write-edge-cases",
+  "simulateDisabled": true,
+  "clock": {
+    "startTimestamp": "2026-09-27T12:00:00.000Z",
+    "tickMs": 10
+  },
+  "operationDurations": [
+    {
+      "operationId": "simulation-only-unqualified-inspect-package",
+      "durationMs": 100
+    },
+    {
+      "operationId": "record-simulation-only-unqualified-package-unavailable",
+      "durationMs": 110
+    }
+  ],
+  "adapterCapabilities": [],
+  "inputs": [
+    {
+      "name": "device",
+      "type": "device-ref",
+      "value": "contract-fixture-sm-i610"
+    },
+    {
+      "name": "expected-csc",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-CSC"
+    },
+    {
+      "name": "expected-source-build",
+      "type": "string",
+      "value": "I610UEU1AYKE"
+    },
+    {
+      "name": "expected-current-binary",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-CURRENT-BINARY"
+    },
+    {
+      "name": "expected-system-status",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-SYSTEM-STATUS"
+    },
+    {
+      "name": "expected-oem-lock",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-OEM-LOCK"
+    },
+    {
+      "name": "expected-post-unlock-oem-lock",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-POST-OEM-LOCK"
+    },
+    {
+      "name": "expected-frp-lock",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-FRP-LOCK"
+    },
+    {
+      "name": "expected-kg-status",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-KG-STATUS"
+    },
+    {
+      "name": "expected-warranty-void",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-WARRANTY-VOID"
+    },
+    {
+      "name": "expected-post-unlock-warranty-void",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-POST-WARRANTY-VOID"
+    },
+    {
+      "name": "expected-secure-download",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-SECURE-DOWNLOAD"
+    },
+    {
+      "name": "fixture-expected-package-digest",
+      "type": "digest",
+      "value": "f000000000000000000000000000000000000000000000000000000000000001"
+    },
+    {
+      "name": "fixture-exact-package-members",
+      "type": "string-list",
+      "value": [
+        "CONTRACT-FIXTURE-MEMBER-A",
+        "CONTRACT-FIXTURE-MEMBER-B"
+      ]
+    },
+    {
+      "name": "fixture-download-transport-evidence",
+      "type": "string",
+      "value": "CONTRACT-FIXTURE-NO-HARDWARE-TRANSPORT"
+    },
+    {
+      "name": "confirm-simulation-only-unqualified-package-write",
+      "type": "boolean",
+      "value": true
+    }
+  ],
+  "responses": [
+    {
+      "kind": "failure",
+      "operationId": "simulation-only-unqualified-inspect-package",
+      "failureClass": "artifact-verification-failed"
+    },
+    {
+      "kind": "success",
+      "operationId": "record-simulation-only-unqualified-package-unavailable",
+      "outputs": [
+        {
+          "name": "acknowledged",
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "terminalStateId": "simulation-only-unqualified-package-unavailable",
+    "eventKinds": [
+      "session-start",
+      "confirmation",
+      "operation-would-execute",
+      "operation-failure",
+      "recovery-start",
+      "operation-would-execute",
+      "state-transition",
+      "operation-success",
+      "session-end"
+    ],
+    "errorCode": "artifact-verification-failed"
+  }
+}

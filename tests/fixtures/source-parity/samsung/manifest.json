@@ -3,7 +3,7 @@
   "source": {
     "kind": "vendor-ledger-plus-community-reports",
     "retrieved": "2026-09-27",
-    "provenanceLimit": "The sources establish build identities and reported launch unlock behavior, not an authenticated AYIA package or a qualified Galaxy XR rollback transport."
+    "provenanceLimit": "The sources establish build identities and launch unlock reporting, not an authenticated AYIA package, qualified rollback transport, exact package members, or independent post-reboot Download lock-state capture."
   },
   "procedureFixtures": [
     {

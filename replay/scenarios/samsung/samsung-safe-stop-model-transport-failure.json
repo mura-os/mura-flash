@@ -1,8 +1,8 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-oem-unlock-absent",
+  "id": "samsung-safe-stop-model-transport-failure",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
-  "flowId": "ayia-oem-unlock",
+  "flowId": "unknown-build-safe-stop",
   "simulateDisabled": true,
   "clock": {
     "startTimestamp": "2026-09-27T12:00:00.000Z",
@@ -14,24 +14,8 @@
       "durationMs": 100
     },
     {
-      "operationId": "probe-build",
+      "operationId": "record-safe-stop",
       "durationMs": 110
-    },
-    {
-      "operationId": "probe-csc",
-      "durationMs": 120
-    },
-    {
-      "operationId": "enable-developer-options",
-      "durationMs": 130
-    },
-    {
-      "operationId": "enable-oem-unlocking",
-      "durationMs": 140
-    },
-    {
-      "operationId": "record-oem-unlock-absent",
-      "durationMs": 150
     }
   ],
   "adapterCapabilities": [],
@@ -49,7 +33,7 @@
     {
       "name": "expected-source-build",
       "type": "string",
-      "value": "I610UEU1AYIA"
+      "value": "I610UEU1AYZZ"
     },
     {
       "name": "expected-current-binary",
@@ -95,66 +79,17 @@
       "name": "expected-secure-download",
       "type": "string",
       "value": "ENABLED"
-    },
-    {
-      "name": "confirm-simulated-oem-unlock-wipe",
-      "type": "boolean",
-      "value": true
     }
   ],
   "responses": [
     {
-      "kind": "success",
-      "operationId": "probe-model",
-      "outputs": [
-        {
-          "name": "value",
-          "type": "string",
-          "value": "SM-I610"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "probe-build",
-      "outputs": [
-        {
-          "name": "value",
-          "type": "string",
-          "value": "I610UEU1AYIA"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "probe-csc",
-      "outputs": [
-        {
-          "name": "value",
-          "type": "string",
-          "value": "SIM"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "enable-developer-options",
-      "outputs": [
-        {
-          "name": "acknowledged",
-          "type": "boolean",
-          "value": true
-        }
-      ]
-    },
-    {
       "kind": "failure",
-      "operationId": "enable-oem-unlocking",
-      "failureClass": "manual-action-declined"
+      "operationId": "probe-model",
+      "failureClass": "transport-failed"
     },
     {
       "kind": "success",
-      "operationId": "record-oem-unlock-absent",
+      "operationId": "record-safe-stop",
       "outputs": [
         {
           "name": "acknowledged",
@@ -165,18 +100,9 @@
     }
   ],
   "expected": {
-    "terminalStateId": "oem-unlock-absent",
+    "terminalStateId": "safe-stop",
     "eventKinds": [
       "session-start",
-      "confirmation",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
       "operation-would-execute",
       "operation-failure",
       "recovery-start",
@@ -185,6 +111,6 @@
       "operation-success",
       "session-end"
     ],
-    "errorCode": "manual-action-declined"
+    "errorCode": "transport-failed"
   }
 }

@@ -12,11 +12,11 @@
   "sourceBehavior": {
     "unlockState": "reported",
     "installState": "procedure-available",
-    "summary": "A disabled simulation procedure preserves the reported launch unlock, the plausible but unproven AYKE U1 to AYIA U1 rollback shape, and the U2 refusal. No live Samsung write is qualified."
+    "summary": "The disabled simulation preserves launch unlock reporting, a zero-write AYKE rollback-unverified stop, independent post-reboot Download lock-state verification for direct AYIA unlock, and zero-write U2/unknown refusals. No live Samsung write is qualified."
   },
   "muraPolicy": {
     "writesAllowed": false,
-    "reason": "The AYIA package digest, exact CSC/package binding, Download entry and transport, complete protected-state backups, AYKE rollback transcript, and stock restore are unresolved. The procedure is test-only and all operations remain disabled."
+    "reason": "AYIA package digest, exact package/member filenames, Download entry and host transport, complete protected-state backups, AYKE rollback proof, and stock restore remain unresolved evidence gates."
   },
   "procedureAvailability": {
     "kind": "available",
@@ -28,26 +28,26 @@
     {
       "kind": "repository",
       "path": "evidence/samsung/official-build-ledger.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 12,
+      "lineEnd": 42
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/ayia-community-report.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 14,
+      "lineEnd": 24
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/launch-unlock-media.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 13,
+      "lineEnd": 40
     },
     {
       "kind": "repository",
       "path": "evidence/samsung/wall-of-shame-claims.json",
-      "lineStart": 1,
-      "lineEnd": 10
+      "lineStart": 16,
+      "lineEnd": 35
     },
     {
       "kind": "pinned-external",

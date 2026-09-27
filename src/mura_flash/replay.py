@@ -29,7 +29,7 @@ class TypedValue:
     """One value carrying the registry type used for exact matching."""
 
     type: str
-    value: str | int | bool | None
+    value: str | int | bool | list[str] | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -236,6 +236,7 @@ class _ReplayEngine:
         }
         self.simulate_disabled = cast("bool", scenario["simulateDisabled"])
         self.state_effects: list[JsonObject] = []
+        self.completed_operations: set[str] = set()
         self.secrets: set[str] = set()
         self._active_recoveries: set[str] = set()
         self._register_sensitive_inputs()
@@ -249,7 +250,7 @@ class _ReplayEngine:
                 raise RecipeInvalidError(f"duplicate typed value name: {name!r}")
             result[name] = TypedValue(
                 cast("str", item["type"]),
-                cast("str | int | bool | None", item["value"]),
+                cast("str | int | bool | list[str] | None", item["value"]),
             )
         return result
 
@@ -283,7 +284,7 @@ class _ReplayEngine:
         if kind == "constant":
             return TypedValue(
                 cast("str", reference["valueType"]),
-                cast("str | int | bool", reference["value"]),
+                cast("str | int | bool | list[str]", reference["value"]),
             )
         if kind == "operation-output":
             key = (
@@ -330,6 +331,20 @@ class _ReplayEngine:
         equal = left.value == right.value
         return not equal if kind == "not-equals" else equal
 
+    @staticmethod
+    def _predicate_operation_ids(predicate: JsonObject) -> tuple[str, ...]:
+        if predicate["kind"] == "state-assertion":
+            return ()
+        if predicate["kind"] == "output-present":
+            value = cast("JsonObject", predicate["value"])
+            return (cast("str", value["operationId"]),)
+        result: list[str] = []
+        for key in ("left", "right"):
+            reference = cast("JsonObject", predicate[key])
+            if reference["kind"] == "operation-output":
+                result.append(cast("str", reference["operationId"]))
+        return tuple(result)
+
     def _require_predicates(
         self,
         predicates: list[JsonObject],
@@ -339,6 +354,11 @@ class _ReplayEngine:
         defer_unresolved: bool = False,
     ) -> None:
         for predicate in predicates:
+            if defer_unresolved and any(
+                operation_id not in self.completed_operations
+                for operation_id in self._predicate_operation_ids(predicate)
+            ):
+                continue
             try:
                 passed = self._predicate(predicate)
             except KeyError:
@@ -441,7 +461,7 @@ class _ReplayEngine:
                 raise _ReplayAbort("replay-mismatch", operation_id)
             typed = TypedValue(
                 cast("str", value["type"]),
-                cast("str | int | bool | None", value["value"]),
+                cast("str | int | bool | list[str] | None", value["value"]),
             )
             if self._has_sensitive_inputs(variant) and isinstance(typed.value, str):
                 self.secrets.add(typed.value)
@@ -617,6 +637,7 @@ class _ReplayEngine:
                 "durationMs": duration,
             }
         )
+        self.completed_operations.add(operation_id)
 
     def _run_recovery(self, recovery_id: str, trigger: str) -> None:
         if recovery_id in self._active_recoveries:
@@ -636,7 +657,11 @@ class _ReplayEngine:
         try:
             steps = cast("list[JsonObject]", recovery["steps"])
             for reference in steps:
-                self._execute_operation(cast("str", reference["operationId"]))
+                operation_id = cast("str", reference["operationId"])
+                operation = self.operations[operation_id]
+                if operation["enabled"] is not True and not self.simulate_disabled:
+                    continue
+                self._execute_operation(operation_id)
             terminal = cast("str", cast("JsonObject", recovery["terminalState"])["stateId"])
             if terminal != self.current_state:
                 previous = self.current_state
@@ -673,7 +698,9 @@ class _ReplayEngine:
             )
             if plan.missing_capabilities:
                 raise _ReplayAbort("capability-missing")
-            self._confirm()
+            will_execute = any(step.would_execute for step in plan.steps)
+            if will_execute:
+                self._confirm()
             for reference in cast("list[JsonObject]", self.flow["steps"]):
                 operation_id = cast("str", reference["operationId"])
                 operation = self.operations[operation_id]
@@ -685,10 +712,11 @@ class _ReplayEngine:
                     "guard-failed",
                     defer_unresolved=True,
                 )
-            self._require_predicates(
-                cast("list[JsonObject]", self.flow["guards"]),
-                "guard-failed",
-            )
+            if will_execute:
+                self._require_predicates(
+                    cast("list[JsonObject]", self.flow["guards"]),
+                    "guard-failed",
+                )
             if not self.backend.exhausted:
                 raise _ReplayAbort("replay-mismatch")
         except _ReplayAbort as error:

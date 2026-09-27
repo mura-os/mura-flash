@@ -25,15 +25,12 @@
     {
       "status": "generic-samsung-warning",
       "claim": "Samsung One UI 8 flashing may relock an already-unlocked device."
-    },
-    {
-      "status": "generic-samsung-warning",
-      "claim": "A complete Samsung package uses BL, AP, CP, and CSC together rather than selective members."
     }
   ],
   "limits": [
     "No public SM-I610 AYKE-to-AYIA flash transcript is included.",
     "No public SM-I610 SW REV CHECK FAIL capture is included.",
+    "The cited survey does not establish exact SM-I610 package members, filenames, order, Download transport, or flashing semantics.",
     "Generic Samsung phone warnings are not treated as Galaxy XR policy authority or proof of SM-I610 behavior."
   ]
 }

@@ -15,10 +15,10 @@ nix run github:mura-os/mura-flash -- targets
 nix run github:mura-os/mura-flash -- procedures
 nix run github:mura-os/mura-flash -- plan \
   samsung-galaxy-xr-ayke-to-ayia-rollback-unlock \
-  --flow ayke-rollback-and-unlock
+  --flow simulation-only-unqualified-ayke-rollback-unlock-disabled-plan
 nix run github:mura-os/mura-flash -- replay \
   samsung-galaxy-xr-ayke-to-ayia-rollback-unlock \
-  --scenario replay/scenarios/samsung/samsung-ayke-u1-rollback-and-unlock-success.json
+  --scenario replay/scenarios/samsung/samsung-ayke-rollback-unverified.json
 ```
 
 The first public revision remains available by commit:
@@ -63,8 +63,9 @@ procedure is test-only, unqualified, and write-disabled. Destructive flows can
 only be simulated; live policy refusal occurs before an adapter is created.
 Device inspection is restricted to compiled-in read-only probes.
 
-The Galaxy XR procedure documents the community-reported `AYKE` (`U1`) to
-`AYIA` (`U1`) rollback and launch unlock, including package, CSC, SWREV,
-KG/FRP, interruption, and post-flash failure paths. It does not ship Samsung
-firmware, invent an Odin command, or claim a live rollback implementation.
+The Galaxy XR procedure preserves the unproven `AYKE` (`U1`) to `AYIA` (`U1`)
+rollback shape as disabled plan data, but execution stops at an evidence gate
+before any write. Launch unlock eligibility is community-reported and requires
+independent post-reboot lock-state observation in simulation. No Samsung
+firmware, Odin command, package layout, or successful rollback is invented.
 `U2` and later builds refuse the `U1` rollback without executing writes.

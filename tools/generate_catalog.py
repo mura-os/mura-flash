@@ -63,9 +63,7 @@ EXPECTED_PROCEDURES = {
         "quest-2-hollywood-50670960048600150-inactive-slot-unlock",
         "quest-2-hollywood-v29-direct-unlock",
     ],
-    "samsung-galaxy-xr-sm-i610": [
-        "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock"
-    ],
+    "samsung-galaxy-xr-sm-i610": ["samsung-galaxy-xr-ayke-to-ayia-rollback-unlock"],
 }
 EXPECTED_SAMSUNG_EVIDENCE = {
     "ayia-community-report.json",
@@ -74,18 +72,26 @@ EXPECTED_SAMSUNG_EVIDENCE = {
     "wall-of-shame-claims.json",
 }
 EXPECTED_SAMSUNG_SCENARIOS = {
-    "samsung-ayia-artifact-bad",
-    "samsung-ayia-artifact-unavailable",
     "samsung-ayia-direct-unlock-success",
-    "samsung-ayke-u1-rollback-and-unlock-success",
-    "samsung-csc-mismatch",
-    "samsung-download-write-failure",
-    "samsung-download-write-interruption",
-    "samsung-kg-frp-block",
+    "samsung-ayia-wrong-build-guard",
+    "samsung-ayke-rollback-unverified",
+    "samsung-download-entry-unresolved",
+    "samsung-download-observation-blocked",
     "samsung-oem-unlock-absent",
+    "samsung-normal-disabled-plan",
+    "samsung-post-reboot-lock-state-mismatch",
+    "samsung-safe-stop-model-transport-failure",
+    "samsung-simulation-only-unqualified-package-hash-failure",
+    "samsung-simulation-only-unqualified-package-member-failure",
+    "samsung-simulation-only-unqualified-package-unavailable",
+    "samsung-simulation-only-unqualified-write-failure",
+    "samsung-simulation-only-unqualified-write-interruption",
     "samsung-u2-rollback-refusal",
+    "samsung-unlock-declined",
+    "samsung-unlock-reconnect-failure",
+    "samsung-unlock-wipe-interruption",
+    "samsung-unlocked-warning-not-observed",
     "samsung-unknown-build-refusal",
-    "samsung-wrong-post-flash-build",
 }
 EXPECTED_BUILD_EVIDENCE = {
     "quest-pro-cambria": ["51483620027600340"],
@@ -1250,8 +1256,10 @@ def _scenario_typed_value_matches(value_type: str, value: Any) -> bool:
     if value_type == "boolean":
         return isinstance(value, bool)
     if value_type in {"duration-ms", "integer"}:
-        return isinstance(value, int) and not isinstance(value, bool) and (
-            value_type != "duration-ms" or value >= 0
+        return (
+            isinstance(value, int)
+            and not isinstance(value, bool)
+            and (value_type != "duration-ms" or value >= 0)
         )
     if value_type == "string-list":
         return isinstance(value, list) and all(isinstance(item, str) for item in value)
@@ -1295,42 +1303,21 @@ def validate_samsung_procedure_policy(
     required_backups = {
         item["partition"]["partitionId"]
         for item in procedure["backups"]
-        if item["requiredBeforeWrites"]
-        and item["unitBound"]
-        and item["minimumMatchingReads"] >= 2
+        if item["requiredBeforeWrites"] and item["unitBound"] and item["minimumMatchingReads"] >= 2
     }
     if required_backups != expected_partitions:
         fail("samsung-policy", "every protected Samsung state class requires two-read backup")
 
     operation_by_id = {item["id"]: item for item in procedure["operations"]}
-    flash = operation_by_id.get("flash-ayia-full-package")
-    if flash is None or flash["variant"] != "samsung.download-flash-package":
-        fail("samsung-policy", "missing closed Samsung full-package flash operation")
-    arguments = {item["inputName"]: item["value"] for item in flash["arguments"]}
-    exact_constants = {
-        "model": ("string", "SM-I610"),
-        "expectedSourceSwrev": ("string", "U1"),
-        "expectedTargetSwrev": ("string", "U1"),
-        "exactPackageMembers": ("string-list", ["BL", "AP", "CP", "CSC"]),
-        "repartition": ("boolean", False),
-        "pitSubstitution": ("boolean", False),
+    write_operations = {
+        operation["id"]
+        for operation in procedure["operations"]
+        if registry[operation["variant"]]["safetyClass"] == "device-write"
     }
-    for name, (value_type, value) in exact_constants.items():
-        reference = arguments.get(name)
-        if (
-            not isinstance(reference, dict)
-            or reference.get("kind") != "constant"
-            or reference.get("valueType") != value_type
-            or reference.get("value") != value
-        ):
-            fail("samsung-policy", f"flash argument {name!r} is not fail-closed")
-    if flash["idempotence"] != "non-idempotent" or any(
-        edge.get("terminalFailure") is not True
-        for edge in [*flash["failureEdges"], *flash["engineFailureEdges"]]
-    ):
+    if write_operations != {"simulation-only-unqualified-write-package"}:
         fail(
             "samsung-policy",
-            "a started Samsung write must be terminal, non-idempotent, and have no recovery edge",
+            "Samsung procedure may contain only the named disabled simulation write",
         )
 
     for variant_id in (
@@ -1341,37 +1328,194 @@ def validate_samsung_procedure_policy(
         definition = registry.get(variant_id)
         if definition is None:
             fail("samsung-policy", f"missing closed registry operation {variant_id}")
-        parameters = {
-            item["name"]: item["value"] for item in definition["algorithmParameters"]
-        }
+        parameters = {item["name"]: item["value"] for item in definition["algorithmParameters"]}
         if parameters.get("arbitrary-argv") is not False:
             fail("samsung-policy", f"{variant_id} must prohibit arbitrary argv")
+    inspection = registry["samsung.package-inspect"]
+    inspection_inputs = {item["name"] for item in inspection["inputs"]}
+    inspection_parameters = {
+        item["name"]: item["value"] for item in inspection["algorithmParameters"]
+    }
+    if (
+        "expectedDigest" not in inspection_inputs
+        or "exactPackageMembers" not in inspection_inputs
+        or inspection_parameters.get("expected-digest-required-before-inspection") is not True
+        or inspection_parameters.get("exact-filenames-required-before-verified-output") is not True
+        or "member-order" in inspection_parameters
+    ):
+        fail(
+            "samsung-policy",
+            "Samsung package verification requires digest and exact filenames "
+            "without invented order",
+        )
+    observation = registry["samsung.download-observe"]
+    observation_outputs = {item["name"] for item in observation["outputs"]}
+    observation_parameters = {
+        item["name"]: item["value"] for item in observation["algorithmParameters"]
+    }
+    if (
+        "csc" in observation_outputs
+        or "warrantyVoid" not in observation_outputs
+        or "WARRANTY VOID" not in observation_parameters.get("capture", [])
+    ):
+        fail(
+            "samsung-policy",
+            "Samsung Download capture must omit invented CSC and include WARRANTY VOID",
+        )
     flash_parameters = {
         item["name"]: item["value"]
         for item in registry["samsung.download-flash-package"]["algorithmParameters"]
     }
+    flash_inputs = {
+        item["name"]: item for item in registry["samsung.download-flash-package"]["inputs"]
+    }
     if (
-        flash_parameters.get("repartition") is not False
+        "member-order" in flash_parameters
+        or flash_inputs.get("transportEvidence", {}).get("type") != "string"
+        or flash_parameters.get("repartition") is not False
         or flash_parameters.get("pit-substitution") is not False
         or flash_parameters.get("automatic-retry") is not False
     ):
         fail("samsung-policy", "Samsung flash semantics must prohibit PIT/repartition/retry")
 
+    state_ids = {item["id"] for item in procedure["states"]}
+    required_states = {
+        "rollback-unverified",
+        "flash-outcome-unknown",
+        "simulation-only-unqualified-package-hash-failure",
+        "simulation-only-unqualified-package-member-failure",
+        "simulation-only-unqualified-package-unavailable",
+        "unlock-outcome-unknown",
+        "unlock-unverified",
+    }
+    if not required_states <= state_ids:
+        fail("samsung-policy", "Samsung uncertainty terminal states are incomplete")
+
     flows = {item["id"]: item for item in procedure["flows"]}
     expected_flows = {
         "ayke-to-ayia-rollback",
         "ayia-oem-unlock",
-        "ayke-rollback-and-unlock",
+        "simulation-only-unqualified-ayke-rollback-unlock-disabled-plan",
+        "simulation-only-unqualified-package-write-edge-cases",
         "u2-rollback-protected",
         "unknown-build-safe-stop",
     }
     if set(flows) != expected_flows:
         fail("samsung-policy", "Samsung build-shaped flow closure changed")
-    for flow_id in ("u2-rollback-protected", "unknown-build-safe-stop"):
+    ayke_steps = [item["operationId"] for item in flows["ayke-to-ayia-rollback"]["steps"]]
+    if ayke_steps != [
+        "probe-model",
+        "probe-build",
+        "probe-csc",
+        "refuse-ayke-rollback-unverified",
+    ]:
+        fail("samsung-policy", "AYKE runtime path must stop rollback-unverified before writes")
+    full_plan_steps = [
+        item["operationId"]
+        for item in flows["simulation-only-unqualified-ayke-rollback-unlock-disabled-plan"]["steps"]
+    ]
+    required_plan_order = [
+        "probe-model",
+        "probe-build",
+        "probe-csc",
+        "simulation-only-unqualified-enter-download-mode",
+        "simulation-only-unqualified-observe-download-u1",
+        "simulation-only-unqualified-inspect-package",
+        "simulation-only-unqualified-confirm-offline-inspection",
+        "simulation-only-unqualified-confirm-protected-backups",
+        "simulation-only-unqualified-write-package",
+        "simulation-only-unqualified-reconnect-after-write",
+        "simulation-only-unqualified-verify-ayia-model",
+        "simulation-only-unqualified-verify-ayia-build",
+        "simulation-only-unqualified-verify-ayia-csc",
+        "enable-developer-options",
+        "enable-oem-unlocking",
+        "enter-oem-unlock-confirmation",
+        "accept-oem-unlock-and-wipe",
+        "reconnect-after-unlock",
+        "verify-ayia-after-unlock",
+        "enter-post-unlock-download-mode",
+        "observe-post-unlock-download-u1",
+        "observe-unlocked-warning",
+    ]
+    if full_plan_steps != required_plan_order:
+        fail("samsung-policy", "disabled AYKE rollback-plus-unlock plan order changed")
+    edge_steps = [
+        item["operationId"]
+        for item in flows["simulation-only-unqualified-package-write-edge-cases"]["steps"]
+    ]
+    if edge_steps != [
+        "simulation-only-unqualified-inspect-package",
+        "simulation-only-unqualified-confirm-offline-inspection",
+        "simulation-only-unqualified-confirm-protected-backups",
+        "simulation-only-unqualified-write-package",
+    ]:
+        fail("samsung-policy", "simulation-only package/write edge flow changed")
+    evidence_inputs = {item["id"]: item for item in procedure["runtimeInputs"]}
+    if {
+        item_id: (
+            evidence_inputs.get(item_id, {}).get("type"),
+            evidence_inputs.get(item_id, {}).get("required"),
+        )
+        for item_id in (
+            "fixture-expected-package-digest",
+            "fixture-exact-package-members",
+            "fixture-download-transport-evidence",
+        )
+    } != {
+        "fixture-expected-package-digest": ("digest", False),
+        "fixture-exact-package-members": ("string-list", False),
+        "fixture-download-transport-evidence": ("string", False),
+    }:
+        fail("samsung-policy", "Samsung fixture evidence inputs changed")
+    write_operation = operation_by_id["simulation-only-unqualified-write-package"]
+    if (
+        write_operation["idempotence"] != "non-idempotent"
+        or {edge["recoveryId"] for edge in write_operation["failureEdges"]}
+        != {"simulation-only-unqualified-flash-outcome-unknown"}
+        or {edge["recoveryId"] for edge in write_operation["engineFailureEdges"]}
+        != {"simulation-only-unqualified-flash-outcome-unknown"}
+    ):
+        fail("samsung-policy", "write uncertainty must terminate unknown with no retry")
+    ayia_steps = [item["operationId"] for item in flows["ayia-oem-unlock"]["steps"]]
+    if (
+        "observe-post-unlock-download-u1" not in ayia_steps
+        or ayia_steps[-1] != "observe-unlocked-warning"
+        or ayia_steps.index("observe-post-unlock-download-u1")
+        > ayia_steps.index("observe-unlocked-warning")
+    ):
+        fail(
+            "samsung-policy",
+            "AYIA unlock success requires independent post-reboot Download observation",
+        )
+    for flow_id in (
+        "ayke-to-ayia-rollback",
+        "u2-rollback-protected",
+        "unknown-build-safe-stop",
+    ):
         for reference in flows[flow_id]["steps"]:
             operation = operation_by_id[reference["operationId"]]
             if registry[operation["variant"]]["safetyClass"] in DESTRUCTIVE_SAFETY_CLASSES:
                 fail("samsung-policy", f"{flow_id} must contain no state-changing operation")
+
+    parity = load_json(
+        ROOT / "tests/fixtures/source-parity/samsung/"
+        "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock.json"
+    )
+    plan = parity.get("disabledAykeRollbackUnlockPlan", {})
+    if (
+        plan.get("status") != "disabled-procedure-flow-simulation-only-unqualified"
+        or plan.get("procedureFlowId")
+        != "simulation-only-unqualified-ayke-rollback-unlock-disabled-plan"
+        or plan.get("edgeFlowId") != "simulation-only-unqualified-package-write-edge-cases"
+        or plan.get("runtimeTerminalBeforeWrite") != "rollback-unverified"
+        or plan.get("firstUnresolvedGate") != "ayke-to-ayia-rollback-not-demonstrated"
+        or plan.get("automaticRetry") is not False
+        or "perform-one-no-retry-evidence-bound-package-write" not in plan.get("orderedSteps", [])
+        or parity.get("packageInspectionContract", {}).get("knownExpectedDigest") is not None
+        or parity.get("packageInspectionContract", {}).get("knownExactMemberFilenames") != []
+    ):
+        fail("samsung-policy", "disabled AYKE plan or evidence gates are incomplete")
 
 
 def validate_samsung_scenarios(
@@ -1386,6 +1530,8 @@ def validate_samsung_scenarios(
     runtime_inputs = {item["id"]: item for item in procedure["runtimeInputs"]}
     value_types = set(load_json(PROCEDURE_REGISTRY_PATH)["valueTypes"])
     scenario_ids: set[str] = set()
+    covered_flows: set[str] = set()
+    covered_terminals: set[str] = set()
 
     for path in sorted(SAMSUNG_SCENARIO_ROOT.glob("*.json")):
         scenario = load_json(path)
@@ -1395,12 +1541,13 @@ def validate_samsung_scenarios(
         if path.stem != scenario_id or scenario_id in scenario_ids:
             fail("samsung-scenario", f"{path}: duplicate or mismatched scenario id")
         scenario_ids.add(scenario_id)
+        covered_flows.add(scenario["flowId"])
+        expected_simulation = scenario_id != "samsung-normal-disabled-plan"
         if (
             scenario["procedureId"] != procedure["id"]
             or scenario["flowId"] not in flow_ids
-            or scenario["simulateDisabled"] is not True
-            or scenario["clock"]
-            != {"startTimestamp": "2026-09-27T12:00:00.000Z", "tickMs": 10}
+            or scenario["simulateDisabled"] is not expected_simulation
+            or scenario["clock"] != {"startTimestamp": "2026-09-27T12:00:00.000Z", "tickMs": 10}
             or scenario["adapterCapabilities"] != []
         ):
             fail("samsung-scenario", f"{path}: nondeterministic or mismatched replay envelope")
@@ -1454,6 +1601,7 @@ def validate_samsung_scenarios(
         if set(durations) != response_operations:
             fail("samsung-scenario", f"{path}: durations must cover exact response operations")
         expected = scenario["expected"]
+        covered_terminals.add(expected["terminalStateId"])
         if (
             expected["terminalStateId"] not in state_ids
             or not expected["eventKinds"]
@@ -1472,6 +1620,34 @@ def validate_samsung_scenarios(
             "Samsung scenario closure mismatch; "
             f"missing={sorted(EXPECTED_SAMSUNG_SCENARIOS - scenario_ids)}, "
             f"extra={sorted(scenario_ids - EXPECTED_SAMSUNG_SCENARIOS)}",
+        )
+    if covered_flows != flow_ids:
+        fail(
+            "samsung-scenario",
+            f"Samsung scenario flow coverage mismatch; covered={sorted(covered_flows)}",
+        )
+    required_terminals = {
+        "download-blocked",
+        "download-entry-unresolved",
+        "oem-unlock-absent",
+        "rollback-protected",
+        "rollback-unverified",
+        "safe-stop",
+        "flash-outcome-unknown",
+        "simulation-only-unqualified-package-hash-failure",
+        "simulation-only-unqualified-package-member-failure",
+        "simulation-only-unqualified-package-unavailable",
+        "unknown-build-safe-stop",
+        "unlock-declined",
+        "unlock-outcome-unknown",
+        "unlock-unverified",
+        "unlocked-observed",
+    }
+    if not required_terminals <= covered_terminals:
+        fail(
+            "samsung-scenario",
+            "Samsung terminal coverage incomplete; "
+            f"missing={sorted(required_terminals - covered_terminals)}",
         )
 
 

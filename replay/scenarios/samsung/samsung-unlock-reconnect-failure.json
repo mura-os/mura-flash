@@ -1,6 +1,6 @@
 {
   "schema": "org.mura.flash.replay-scenario/v1",
-  "id": "samsung-ayia-direct-unlock-success",
+  "id": "samsung-unlock-reconnect-failure",
   "procedureId": "samsung-galaxy-xr-ayke-to-ayia-rollback-unlock",
   "flowId": "ayia-oem-unlock",
   "simulateDisabled": true,
@@ -42,20 +42,8 @@
       "durationMs": 170
     },
     {
-      "operationId": "verify-ayia-after-unlock",
+      "operationId": "record-unlock-outcome-unknown",
       "durationMs": 180
-    },
-    {
-      "operationId": "enter-post-unlock-download-mode",
-      "durationMs": 190
-    },
-    {
-      "operationId": "observe-post-unlock-download-u1",
-      "durationMs": 200
-    },
-    {
-      "operationId": "observe-unlocked-warning",
-      "durationMs": 210
     }
   ],
   "adapterCapabilities": [],
@@ -205,92 +193,13 @@
       ]
     },
     {
-      "kind": "success",
+      "kind": "failure",
       "operationId": "reconnect-after-unlock",
-      "outputs": [
-        {
-          "name": "reconnectedDevice",
-          "type": "device-ref",
-          "value": "simulated-sm-i610-after-unlock"
-        }
-      ]
+      "failureClass": "operation-timeout"
     },
     {
       "kind": "success",
-      "operationId": "verify-ayia-after-unlock",
-      "outputs": [
-        {
-          "name": "value",
-          "type": "string",
-          "value": "I610UEU1AYIA"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "enter-post-unlock-download-mode",
-      "outputs": [
-        {
-          "name": "acknowledged",
-          "type": "boolean",
-          "value": true
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "observe-post-unlock-download-u1",
-      "outputs": [
-        {
-          "name": "productName",
-          "type": "string",
-          "value": "SM-I610"
-        },
-        {
-          "name": "currentBinary",
-          "type": "string",
-          "value": "Samsung Official"
-        },
-        {
-          "name": "systemStatus",
-          "type": "string",
-          "value": "Official"
-        },
-        {
-          "name": "oemLock",
-          "type": "string",
-          "value": "OFF"
-        },
-        {
-          "name": "frpLock",
-          "type": "string",
-          "value": "OFF"
-        },
-        {
-          "name": "kgStatus",
-          "type": "string",
-          "value": "NORMAL"
-        },
-        {
-          "name": "rpSwrev",
-          "type": "string",
-          "value": "U1"
-        },
-        {
-          "name": "warrantyVoid",
-          "type": "string",
-          "value": "SIMULATED-POST-CAPTURE"
-        },
-        {
-          "name": "secureDownload",
-          "type": "string",
-          "value": "ENABLED"
-        }
-      ]
-    },
-    {
-      "kind": "success",
-      "operationId": "observe-unlocked-warning",
+      "operationId": "record-unlock-outcome-unknown",
       "outputs": [
         {
           "name": "acknowledged",
@@ -301,7 +210,7 @@
     }
   ],
   "expected": {
-    "terminalStateId": "unlocked-observed",
+    "terminalStateId": "unlock-outcome-unknown",
     "eventKinds": [
       "session-start",
       "confirmation",
@@ -321,20 +230,13 @@
       "state-transition",
       "operation-success",
       "operation-would-execute",
-      "state-transition",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "operation-success",
-      "operation-would-execute",
-      "state-transition",
-      "operation-success",
+      "operation-failure",
+      "recovery-start",
       "operation-would-execute",
       "state-transition",
       "operation-success",
       "session-end"
     ],
-    "errorCode": null
+    "errorCode": "operation-timeout"
   }
 }

@@ -1,6 +1,7 @@
 import indexSchema from "../../catalog/index-v1.schema.json";
 import targetSchema from "../../catalog/target-record-v1.schema.json";
 import procedureSchema from "../../recipes/install-procedure-v1.schema.json";
+import replayScenarioSchema from "../../replay/scenario-v1.schema.json";
 import builtInProcedureTexts from "virtual:mura-v1-procedures";
 import rawV1Data from "virtual:mura-v1-raw-data";
 
@@ -13,6 +14,8 @@ import type {
   CatalogIndexV1,
   InstallProcedure,
   ProcedureCatalog,
+  ReplayScenario,
+  ReplayScenarioCatalog,
   TargetCatalogV1,
   TargetRecord,
 } from "./v1-types";
@@ -49,6 +52,7 @@ function uniqueCatalog<T extends { readonly id: string }>(
 
 let defaultTargetCatalog: TargetCatalogV1 | undefined;
 let defaultProcedureCatalog: ProcedureCatalog | undefined;
+let defaultReplayScenarioCatalog: ReplayScenarioCatalog | undefined;
 
 const rawByPath = new Map(rawV1Data.map((entry) => [entry.path, entry.text]));
 const builtInIndex = deepFreeze(
@@ -239,4 +243,47 @@ export function getProcedure(
     throw fail("closure-unresolved", `unknown procedure ${JSON.stringify(id)}`);
   }
   return procedure;
+}
+
+export function loadReplayScenarioCatalog(
+  sources?: string | unknown | readonly (string | unknown)[],
+): ReplayScenarioCatalog {
+  if (sources === undefined && defaultReplayScenarioCatalog !== undefined) {
+    return defaultReplayScenarioCatalog;
+  }
+  const documents = normalizeSources(
+    sources ??
+      rawV1Data
+        .filter((entry) => entry.path.startsWith("replay/scenarios/"))
+        .map((entry) => entry.text),
+  ).map((source) =>
+    deepFreeze(
+      parseAndValidate<ReplayScenario>(
+        source,
+        replayScenarioSchema,
+        "invalid-document",
+      ),
+    ),
+  );
+  const catalog = uniqueCatalog(documents, "replay scenario");
+  const procedures = loadProcedureCatalog();
+  for (const scenario of catalog) {
+    const procedure = procedures.find((candidate) => candidate.id === scenario.procedureId);
+    if (procedure === undefined) {
+      throw fail(
+        "closure-unresolved",
+        `scenario ${scenario.id} references unknown procedure ${scenario.procedureId}`,
+      );
+    }
+    if (!procedure.flows.some((flow) => flow.id === scenario.flowId)) {
+      throw fail(
+        "closure-unresolved",
+        `scenario ${scenario.id} references unknown flow ${scenario.flowId}`,
+      );
+    }
+  }
+  if (sources === undefined) {
+    defaultReplayScenarioCatalog = catalog;
+  }
+  return catalog;
 }
