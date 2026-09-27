@@ -16,7 +16,6 @@ jobs:
         with:
           submodules: recursive
       - uses: DeterminateSystems/nix-installer-action@v19
-      - uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Verify submodules
         run: |
           test -z "$(git submodule status --recursive | grep '^[-+U]')"
