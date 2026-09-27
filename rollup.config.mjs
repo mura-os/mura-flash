@@ -40,6 +40,15 @@ const sharedOutput = {
   format: "es",
   sourcemap: true,
   inlineDynamicImports: true,
+  sourcemapPathTransform(relativeSourcePath) {
+    for (const rootName of ["node_modules/", "vendor/", "src/"]) {
+      const index = relativeSourcePath.lastIndexOf(rootName);
+      if (index !== -1) {
+        return relativeSourcePath.slice(index);
+      }
+    }
+    return relativeSourcePath;
+  },
 };
 
 export default {

@@ -69,6 +69,10 @@
         nodejs = pkgs.nodejs_24;
         buildNpmPackage = pkgs.buildNpmPackage.override { inherit nodejs; };
         npmDeps = pkgs.importNpmLock { npmRoot = self; };
+        nodeModules = pkgs.importNpmLock.buildNodeModules {
+          npmRoot = self;
+          inherit nodejs;
+        };
         npmCommon = {
           pname = "mura-flash-web";
           version = "0.0.0";
@@ -190,13 +194,10 @@
         formatter = pkgs.nixfmt;
 
         devShells.default = pkgs.mkShell {
-          inherit npmDeps;
-          npmRoot = ".";
           packages = [
             devPython
             pkgs.uv
             nodejs
-            pkgs.importNpmLock.hooks.linkNodeModulesHook
             pkgs.android-tools
           ];
           env = {
@@ -206,7 +207,9 @@
           };
           shellHook = ''
             unset PYTHONPATH
-            linkNodeModulesHook
+            if [ ! -e node_modules ]; then
+              ln -s ${nodeModules}/node_modules node_modules
+            fi
           '';
         };
       }
