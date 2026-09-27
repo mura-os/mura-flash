@@ -1,0 +1,5 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "lynx-r1",
+  "displayName": "Malformed fixture",
+  "vendor": "Fixture"

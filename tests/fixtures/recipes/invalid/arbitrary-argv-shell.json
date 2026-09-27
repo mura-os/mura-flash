@@ -1,0 +1,22 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "lynx-r1",
+  "displayName": "Arbitrary command fixture",
+  "vendor": "Fixture",
+  "models": [],
+  "codenames": [],
+  "builds": [],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python"],
+  "transports": ["manual"],
+  "probes": [],
+  "redactFacts": [],
+  "blockers": [],
+  "unknowns": [],
+  "sources": ["https://example.invalid/arbitrary-command"],
+  "argv": ["fastboot", "flash", "boot", "image.bin"],
+  "shell": "fastboot flash boot image.bin"
+}

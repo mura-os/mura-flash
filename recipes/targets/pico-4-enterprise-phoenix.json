@@ -1,0 +1,48 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "pico-4-enterprise-phoenix",
+  "displayName": "PICO 4 Enterprise",
+  "vendor": "PICO",
+  "models": ["PICO 4 Enterprise"],
+  "codenames": ["phoenix"],
+  "builds": [
+    {
+      "id": "5.13.8-and-below",
+      "status": "unsupported",
+      "note": "The tool's Enterprise programmer selection conflicts with vendor memory specifications and pinned recovery documentation."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unsupported",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.hardware-revision",
+    "fastboot.product",
+    "fastboot.unlocked",
+    "fastboot.variant"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "EDL operations are unsupported because programmer selection conflicts with the documented LPDDR5 hardware.",
+    "No accepted-loader evidence, Enterprise transcript, or qualified recovery path exists."
+  ],
+  "unknowns": [
+    "Exact SKU/build coverage and accepted programmer.",
+    "Enterprise-specific storage geometry, partition map, protected state, and unlock persistence."
+  ],
+  "sources": [
+    "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+    "https://github.com/thoricelli/PICO-documentation/tree/99face1b92ccf8350e30268089e2da5b2682010e",
+    "https://www.picoxr.com/sg/products/pico4e/specs"
+  ]
+}

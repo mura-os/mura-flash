@@ -1,0 +1,886 @@
+[
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No vendor unlock procedure or exact factory package has been found.",
+      "No complete partition, AVB, rollback, calibration, or stock-restore evidence exists."
+    ],
+    "builds": [
+      {
+        "id": "1.0.999.738",
+        "note": "Unlock is a single-author community report tied only to this displayed software release; the full fingerprint and hardware identity were not captured.",
+        "status": "inspect-only"
+      },
+      {
+        "id": "2.0.999.960",
+        "note": "The vendor documents this release, but relock and downgrade-corruption behavior remain single-author reports and no safe write path exists.",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [
+      "kyoto"
+    ],
+    "displayName": "HTC VIVE XR Elite",
+    "evidenceLevel": "community-reported",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "htc-vive-xr-elite-kyoto",
+    "models": [
+      "VIVE XR Elite"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "fastboot.bootloader-version",
+      "fastboot.hardware-revision",
+      "fastboot.product",
+      "fastboot.unlocked"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+      "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-10999738/",
+      "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-20999960/"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact fingerprint, SKU, bootloader revision, USB identities, and persistent unlock behavior.",
+      "Whether any build beyond the one reported is unlock-eligible."
+    ],
+    "vendor": "HTC",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "The current official 1.4.1 firmware download is unavailable.",
+      "Protected-state backup coverage and a hardware-qualified Mura write boundary do not exist."
+    ],
+    "builds": [
+      {
+        "id": "1.4.1",
+        "note": "The official portal records this build, but its tested download redirect returned 404 and the stock artifact could not be inspected.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [],
+    "displayName": "Lynx R1",
+    "evidenceLevel": "vendor-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "lynx-r1",
+    "models": [
+      "R1"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.device",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.bootloader-version",
+      "fastboot.current-slot",
+      "fastboot.product",
+      "fastboot.slot-count",
+      "fastboot.unlocked"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://portal.lynx-r.com/documentation/view/getting-started?version=30",
+      "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+      "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/",
+      "https://raw.githubusercontent.com/ellyq/lynx-mainline/main/dumps/partitions.log"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact stock boot header, protected partitions, USB identities, and persistent open-state transcript.",
+      "Complete stock partition and AVB inventory."
+    ],
+    "vendor": "Lynx",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "The official unlock package lacks a reproduced durable URL and digest in a Mura artifact manifest.",
+      "No complete partition, protected-state, or tested stock-restoration record exists."
+    ],
+    "builds": [],
+    "codenames": [
+      "pacific"
+    ],
+    "displayName": "Oculus Go",
+    "evidenceLevel": "vendor-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "oculus-go-pacific",
+    "models": [
+      "Oculus Go"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.device",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.verified-boot-state",
+      "fastboot.bootloader-version",
+      "fastboot.product",
+      "fastboot.secure",
+      "fastboot.unlocked"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://developers.meta.com/horizon/downloads/package/oculus-go-sw-unlock/",
+      "https://developers.meta.com/horizon/blog/unlocking-oculus-go/"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact retail revision behavior, USB descriptors, partition map, and protected state.",
+      "Stock restoration behavior after the permanent software unlock."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "EDL operations are unsupported because programmer selection conflicts with the documented LPDDR5 hardware.",
+      "No accepted-loader evidence, Enterprise transcript, or qualified recovery path exists."
+    ],
+    "builds": [
+      {
+        "id": "5.13.8-and-below",
+        "note": "The tool's Enterprise programmer selection conflicts with vendor memory specifications and pinned recovery documentation.",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [
+      "phoenix"
+    ],
+    "displayName": "PICO 4 Enterprise",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unsupported",
+    "id": "pico-4-enterprise-phoenix",
+    "models": [
+      "PICO 4 Enterprise"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.hardware-revision",
+      "fastboot.product",
+      "fastboot.unlocked",
+      "fastboot.variant"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+      "https://github.com/thoricelli/PICO-documentation/tree/99face1b92ccf8350e30268089e2da5b2682010e",
+      "https://www.picoxr.com/sg/products/pico4e/specs"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact SKU/build coverage and accepted programmer.",
+      "Enterprise-specific storage geometry, partition map, protected state, and unlock persistence."
+    ],
+    "vendor": "PICO",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No Mura hardware qualification, authenticated engineering payload closure, or protected-state-safe recovery exists.",
+      "The public 5.13.8 boundary has not been independently reproduced per model and build."
+    ],
+    "builds": [
+      {
+        "id": "5.13.8-and-below",
+        "note": "Pinned tooling claims this ceiling, but no public per-device transcript independently proves every exact build.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [
+      "phoenix"
+    ],
+    "displayName": "PICO 4",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "pico-4-phoenix",
+    "models": [
+      "PICO 4"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.hardware-revision",
+      "fastboot.product",
+      "fastboot.secure",
+      "fastboot.unlocked",
+      "fastboot.variant"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+      "https://pico4.wiki/guides/root/01-root/"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact programmer acceptance, UFS geometry, GPT, AVB indexes, and protected calibration partitions.",
+      "Unlock persistence and stock ABL/devinfo restoration on a bound retail specimen."
+    ],
+    "vendor": "PICO",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "The source proves a model-to-loader mapping, not independent physical-memory or loader-interchangeability evidence.",
+      "No Mura hardware qualification, payload provenance closure, or protected-state-safe recovery exists."
+    ],
+    "builds": [
+      {
+        "id": "5.13.8-and-below",
+        "note": "Pinned tooling claims this ceiling and maps Pro to its Lite programmer, but no complete public per-build transcript exists.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [
+      "phoenix"
+    ],
+    "displayName": "PICO 4 Pro",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "pico-4-pro-phoenix",
+    "models": [
+      "PICO 4 Pro"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.hardware-revision",
+      "fastboot.product",
+      "fastboot.secure",
+      "fastboot.unlocked",
+      "fastboot.variant"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+      "https://pico4.wiki/guides/root/01-root/"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact programmer acceptance, UFS geometry, GPT, AVB indexes, and protected calibration partitions.",
+      "Unlock persistence and stock ABL/devinfo restoration on a bound retail specimen."
+    ],
+    "vendor": "PICO",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "Neo 3 has no independently reproduced target/build/programmer and partition closure.",
+      "PICO 4 partition and recovery assumptions cannot be transferred to Neo 3."
+    ],
+    "builds": [
+      {
+        "id": "5.11.2-and-below",
+        "note": "This ceiling is maintainer-reported; the original discoverer tested only PICO 4 and did not reproduce Neo 3.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [],
+    "displayName": "PICO Neo 3",
+    "evidenceLevel": "community-reported",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "pico-neo-3",
+    "models": [
+      "PICO Neo 3"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.hardware-revision",
+      "fastboot.product",
+      "fastboot.unlocked",
+      "fastboot.variant"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Exact supported SKUs, regional builds, programmer, descriptors, and storage geometry.",
+      "Partition map, protected calibration, A/B behavior, unlock persistence, and stock restore."
+    ],
+    "vendor": "PICO",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "Only one apparently unfused unit is publicly shown unlocked; no retail eligibility matrix exists.",
+      "There is no complete stock firmware, protected-state map, or safe recovery path."
+    ],
+    "builds": [],
+    "codenames": [
+      "anorak"
+    ],
+    "displayName": "Play For Dream MR",
+    "evidenceLevel": "community-reported",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "play-for-dream-mr-mrd3a0",
+    "models": [
+      "MRD3A0"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.bootloader-version",
+      "fastboot.current-slot",
+      "fastboot.product",
+      "fastboot.secure",
+      "fastboot.unlocked",
+      "fastboot.variant"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/FreeXR/FreeXR/tree/1046c159c726bb2d0f8e5a3205ae82efa96c46df/targets/anorak",
+      "https://developer.yvrdream.com/yvrdoc/unity/UserManual/GetStartedXR/BuildXRScene.html",
+      "https://mastodon.social/api/v1/statuses/114027425822225840"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Retail fuse and authorization state, mode-specific USB identities, and OEM unlock method.",
+      "Complete GPT, AVB, rollback, protected calibration, stock recovery, and regional differences."
+    ],
+    "vendor": "Play For Dream",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "Final-stock packages are community mirrored rather than authenticated by Meta.",
+      "No Mura hardware record proves both-slot recovery, protected-state backup, or persistent unlock."
+    ],
+    "builds": [
+      {
+        "id": "49845030443200410",
+        "note": "The current community flow starts from this final Quest 1 build, but Mura has no hardware qualification or authenticated stock acquisition.",
+        "status": "inspect-only"
+      },
+      {
+        "id": "16476800119700000",
+        "note": "The source uses this v29 boot-chain build only on the inactive slot; this recipe authorizes no transition or write.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [
+      "monterey"
+    ],
+    "displayName": "Meta Quest 1",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "quest-1-monterey",
+    "models": [
+      "Quest 1"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.bootloader-version",
+      "fastboot.current-slot",
+      "fastboot.product",
+      "fastboot.slot-count",
+      "fastboot.unlocked"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/darknight1050/quest1-bootloader-unlocker-web/tree/7f34276ecef9021771e7bf4a2d53f10b26243334",
+      "https://www.meta.com/help/quest/software_update/"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Complete LUN/GPT map, protected state, USB Update Mode descriptors, and fuse rollback floors.",
+      "Official final-stock acquisition and recovery after loss of both bootable slots."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "Ordinary current retail firmware has no matching public entry path.",
+      "Quest 1 partition, payload, and rollback assumptions do not transfer to Quest 2."
+    ],
+    "builds": [
+      {
+        "id": "16476800118700000",
+        "note": "This exact v29 build has a source-documented direct exploit path, but this recipe authorizes inspection only.",
+        "status": "inspect-only"
+      },
+      {
+        "id": "50670960048600150",
+        "note": "The inactive-slot flow is source-bounded and deployed with pinned assets, but remains community deployment evidence rather than Mura hardware qualification.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [
+      "hollywood"
+    ],
+    "displayName": "Meta Quest 2",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "quest-2-hollywood",
+    "models": [
+      "Quest 2"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.slot-suffix",
+      "fastboot.bootloader-version",
+      "fastboot.current-slot",
+      "fastboot.product",
+      "fastboot.slot-count",
+      "fastboot.unlocked"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/darknight1050/quest-bootloader-unlocker/tree/e171bbee61e754863fd3a82fe9dc35cd18adf3ac",
+      "https://github.com/darknight1050/quest1-bootloader-unlocker-web/tree/7f34276ecef9021771e7bf4a2d53f10b26243334"
+    ],
+    "transports": [
+      "adb",
+      "fastboot",
+      "manual"
+    ],
+    "unknowns": [
+      "Storage/revision variants, exact Quest 2 partition set, root ceiling, protected state, and stock recovery.",
+      "Independent reproduction of the newer-build inactive-slot path."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No public persistent retail bootloader unlock exists.",
+      "No matching public Firehose recovery or accepted alternate trust root is known."
+    ],
+    "builds": [
+      {
+        "id": "52433670036000520",
+        "note": "Public source provides temporary post-boot root only; it does not change the persistent boot trust root.",
+        "status": "unsupported"
+      },
+      {
+        "id": "52433670048800520",
+        "note": "Pinned source identifies this as the first build patched against the temporary-root exploit.",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [
+      "eureka"
+    ],
+    "displayName": "Meta Quest 3",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unsupported",
+    "id": "quest-3-eureka",
+    "models": [
+      "Quest 3"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.security-patch",
+      "adb.verified-boot-state"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/Henry1887/fuguquest/tree/53cbd602d7a3978e4a5eac089096015ae756c24c",
+      "https://github.com/FreeXR/FreeXR/tree/1046c159c726bb2d0f8e5a3205ae82efa96c46df"
+    ],
+    "transports": [
+      "adb",
+      "manual"
+    ],
+    "unknowns": [
+      "Persistent owner-controlled unlock mechanism and independently recoverable write boundary.",
+      "Exact retail partition, rollback, and protected-state maps."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No public persistent retail bootloader unlock exists.",
+      "No matching public Firehose recovery or accepted alternate trust root is known."
+    ],
+    "builds": [
+      {
+        "id": "52433670036000520",
+        "note": "Public source provides temporary post-boot root only; it does not change the persistent boot trust root.",
+        "status": "unsupported"
+      },
+      {
+        "id": "52433670048800520",
+        "note": "Pinned source identifies this as the first build patched against the temporary-root exploit.",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [
+      "panther"
+    ],
+    "displayName": "Meta Quest 3S",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unsupported",
+    "id": "quest-3s-panther",
+    "models": [
+      "Quest 3S"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.security-patch",
+      "adb.verified-boot-state"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/Henry1887/fuguquest/tree/53cbd602d7a3978e4a5eac089096015ae756c24c",
+      "https://github.com/FreeXR/FreeXR/tree/1046c159c726bb2d0f8e5a3205ae82efa96c46df"
+    ],
+    "transports": [
+      "adb",
+      "manual"
+    ],
+    "unknowns": [
+      "Persistent owner-controlled unlock mechanism and independently recoverable write boundary.",
+      "Exact retail partition, rollback, and protected-state maps."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No public persistent retail bootloader unlock exists.",
+      "Temporary root is RAM-only and disappears fully on reboot."
+    ],
+    "builds": [
+      {
+        "id": "52433670036000520",
+        "note": "Public source provides temporary post-boot root only; it does not change the persistent boot trust root.",
+        "status": "unsupported"
+      },
+      {
+        "id": "52433670048800520",
+        "note": "Pinned source identifies this as the first build patched against the temporary-root exploit.",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [
+      "cambria"
+    ],
+    "displayName": "Meta Quest Pro",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unsupported",
+    "id": "quest-pro-cambria",
+    "models": [
+      "Quest Pro"
+    ],
+    "probes": [
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.security-patch",
+      "adb.verified-boot-state"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://github.com/Henry1887/fuguquest/tree/53cbd602d7a3978e4a5eac089096015ae756c24c"
+    ],
+    "transports": [
+      "adb",
+      "manual"
+    ],
+    "unknowns": [
+      "Persistent owner-controlled unlock mechanism and independently recoverable write boundary.",
+      "Exact retail partition, rollback, and protected-state maps."
+    ],
+    "vendor": "Meta",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "No successful launch unlock capture is bound to a full build, SKU, and bootloader revision.",
+      "No complete PIT/GPT, AVB, stock artifact, protected-state backup, or restore plan exists."
+    ],
+    "builds": [
+      {
+        "id": "I610UEU1AYIA",
+        "note": "AYIA is separately reported as the launch build, but no preserved capture binds a successful unlock event to this full build identity.",
+        "status": "unknown"
+      },
+      {
+        "id": "I610UEU1AYKE",
+        "note": "Unlock removal is community-reported; a safe return to AYIA is not established.",
+        "status": "unsupported"
+      },
+      {
+        "id": "I610UEU2AZCI",
+        "note": "This is the first ledgered U2 build; no complete public custom-image path exists.",
+        "status": "unsupported"
+      },
+      {
+        "id": "I610UEU2AZD8",
+        "status": "unsupported"
+      },
+      {
+        "id": "I610UEU2AZF3",
+        "status": "unsupported"
+      }
+    ],
+    "codenames": [],
+    "displayName": "Samsung Galaxy XR",
+    "evidenceLevel": "community-reported",
+    "frontends": [
+      "python",
+      "webusb"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "samsung-galaxy-xr-sm-i610",
+    "models": [
+      "SM-I610"
+    ],
+    "probes": [
+      "adb.boot-devices",
+      "adb.build-fingerprint",
+      "adb.build-id",
+      "adb.build-incremental",
+      "adb.device",
+      "adb.flash-locked",
+      "adb.hardware-sku",
+      "adb.manufacturer",
+      "adb.model",
+      "adb.security-patch",
+      "adb.slot-suffix",
+      "adb.vbmeta-device-state",
+      "adb.verified-boot-state"
+    ],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://doc.samsungmobile.com/SM-I610/036371251209/eng.html",
+      "https://www.androidauthority.com/samsung-galaxy-xr-bootloader-unlocking-3609841/",
+      "https://www.sammobile.com/news/galaxy-xr-bootloader-unlock-is-possible-at-least-for-now/"
+    ],
+    "transports": [
+      "adb",
+      "manual"
+    ],
+    "unknowns": [
+      "Whether SM-I610 exposes fastboot or fastbootd rather than only Samsung Download.",
+      "Exact downgrade floors, update relock behavior, Knox effects, partition layout, and AYIA package availability."
+    ],
+    "vendor": "Samsung",
+    "writesEnabled": false
+  },
+  {
+    "authenticationStatus": "test-only",
+    "blockers": [
+      "Administrator access in the stock OS is not proof of cryptographic bootloader unlock.",
+      "No alternate-OS procedure, independently bootable rescue path, or complete lower-boot-chain policy is known."
+    ],
+    "builds": [
+      {
+        "id": "20260921.6090922-0.5.0",
+        "note": "This is the pinned donor specimen inspected by Mura, not a channel-independent latest release or hardware qualification.",
+        "status": "inspect-only"
+      }
+    ],
+    "codenames": [
+      "deckard"
+    ],
+    "displayName": "Valve Steam Frame",
+    "evidenceLevel": "source-documented",
+    "frontends": [
+      "python"
+    ],
+    "hardwareStatus": "unqualified",
+    "id": "valve-steam-frame-deckard",
+    "models": [
+      "Steam Frame"
+    ],
+    "probes": [],
+    "redactFacts": [],
+    "schema": "org.mura.flash.inspection-recipe/v1",
+    "sources": [
+      "https://partner.steamgames.com/doc/steamhardware/steamframe/debugging"
+    ],
+    "transports": [
+      "manual"
+    ],
+    "unknowns": [
+      "Secure-boot fuse and U-Boot policy, external boot, EDL programmer, physical-LUN map, and rescue image.",
+      "Boot-firmware update transaction, persistent UEFI variables, and factory or calibration partitions."
+    ],
+    "vendor": "Valve",
+    "writesEnabled": false
+  }
+]

@@ -1,0 +1,68 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "samsung-galaxy-xr-sm-i610",
+  "displayName": "Samsung Galaxy XR",
+  "vendor": "Samsung",
+  "models": ["SM-I610"],
+  "codenames": [],
+  "builds": [
+    {
+      "id": "I610UEU1AYIA",
+      "status": "unknown",
+      "note": "AYIA is separately reported as the launch build, but no preserved capture binds a successful unlock event to this full build identity."
+    },
+    {
+      "id": "I610UEU1AYKE",
+      "status": "unsupported",
+      "note": "Unlock removal is community-reported; a safe return to AYIA is not established."
+    },
+    {
+      "id": "I610UEU2AZCI",
+      "status": "unsupported",
+      "note": "This is the first ledgered U2 build; no complete public custom-image path exists."
+    },
+    {
+      "id": "I610UEU2AZD8",
+      "status": "unsupported"
+    },
+    {
+      "id": "I610UEU2AZF3",
+      "status": "unsupported"
+    }
+  ],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "manual"],
+  "probes": [
+    "adb.boot-devices",
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.flash-locked",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.security-patch",
+    "adb.slot-suffix",
+    "adb.vbmeta-device-state",
+    "adb.verified-boot-state"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "No successful launch unlock capture is bound to a full build, SKU, and bootloader revision.",
+    "No complete PIT/GPT, AVB, stock artifact, protected-state backup, or restore plan exists."
+  ],
+  "unknowns": [
+    "Whether SM-I610 exposes fastboot or fastbootd rather than only Samsung Download.",
+    "Exact downgrade floors, update relock behavior, Knox effects, partition layout, and AYIA package availability."
+  ],
+  "sources": [
+    "https://doc.samsungmobile.com/SM-I610/036371251209/eng.html",
+    "https://www.androidauthority.com/samsung-galaxy-xr-bootloader-unlocking-3609841/",
+    "https://www.sammobile.com/news/galaxy-xr-bootloader-unlock-is-possible-at-least-for-now/"
+  ]
+}

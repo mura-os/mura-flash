@@ -1,0 +1,20 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "lynx-r1",
+  "displayName": "Writes enabled fixture",
+  "vendor": "Fixture",
+  "models": [],
+  "codenames": [],
+  "builds": [],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": true,
+  "frontends": ["python"],
+  "transports": ["manual"],
+  "probes": [],
+  "redactFacts": [],
+  "blockers": [],
+  "unknowns": [],
+  "sources": ["https://example.invalid/writes-true"]
+}

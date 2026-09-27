@@ -1,0 +1,34 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "valve-steam-frame-deckard",
+  "displayName": "Valve Steam Frame",
+  "vendor": "Valve",
+  "models": ["Steam Frame"],
+  "codenames": ["deckard"],
+  "builds": [
+    {
+      "id": "20260921.6090922-0.5.0",
+      "status": "inspect-only",
+      "note": "This is the pinned donor specimen inspected by Mura, not a channel-independent latest release or hardware qualification."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python"],
+  "transports": ["manual"],
+  "probes": [],
+  "redactFacts": [],
+  "blockers": [
+    "Administrator access in the stock OS is not proof of cryptographic bootloader unlock.",
+    "No alternate-OS procedure, independently bootable rescue path, or complete lower-boot-chain policy is known."
+  ],
+  "unknowns": [
+    "Secure-boot fuse and U-Boot policy, external boot, EDL programmer, physical-LUN map, and rescue image.",
+    "Boot-firmware update transaction, persistent UEFI variables, and factory or calibration partitions."
+  ],
+  "sources": [
+    "https://partner.steamgames.com/doc/steamhardware/steamframe/debugging"
+  ]
+}

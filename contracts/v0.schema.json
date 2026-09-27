@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mura.dev/schemas/flash-contract-v0.schema.json",
+  "title": "Mura Flash v0 contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "targetIds",
+    "probeIds",
+    "deniedOperationClasses",
+    "limits",
+    "errorCodes",
+    "cli",
+    "esmExports"
+  ],
+  "properties": {
+    "schema": {
+      "const": "org.mura.flash.contract/v0"
+    },
+    "targetIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "probeIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "transport", "fact"],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "transport": {
+            "enum": ["adb", "fastboot"]
+          },
+          "fact": {
+            "$ref": "#/$defs/id"
+          },
+          "sensitive": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "deniedOperationClasses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "device-transition",
+          "device-code-execution",
+          "device-write",
+          "arbitrary-command"
+        ]
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["probeTimeoutSeconds", "reconnectTimeoutSeconds", "maxOutputBytes", "maxDevices"],
+      "properties": {
+        "probeTimeoutSeconds": {
+          "const": 10
+        },
+        "reconnectTimeoutSeconds": {
+          "const": 10
+        },
+        "maxOutputBytes": {
+          "const": 1048576
+        },
+        "maxDevices": {
+          "const": 1
+        }
+      }
+    },
+    "errorCodes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 5
+      }
+    },
+    "cli": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands", "jsonFlag"],
+      "properties": {
+        "commands": {
+          "const": ["targets", "show", "validate", "inspect"]
+        },
+        "jsonFlag": {
+          "const": "--json"
+        }
+      }
+    },
+    "esmExports": {
+      "const": [
+        "loadCatalog",
+        "getTarget",
+        "validateRecipe",
+        "createBrowserSession",
+        "redactTranscript"
+      ]
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{0,79}$"
+    }
+  }
+}

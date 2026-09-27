@@ -1,0 +1,49 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "lynx-r1",
+  "displayName": "Lynx R1",
+  "vendor": "Lynx",
+  "models": ["R1"],
+  "codenames": [],
+  "builds": [
+    {
+      "id": "1.4.1",
+      "status": "inspect-only",
+      "note": "The official portal records this build, but its tested download redirect returned 404 and the stock artifact could not be inspected."
+    }
+  ],
+  "evidenceLevel": "vendor-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.device",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.bootloader-version",
+    "fastboot.current-slot",
+    "fastboot.product",
+    "fastboot.slot-count",
+    "fastboot.unlocked"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "The current official 1.4.1 firmware download is unavailable.",
+    "Protected-state backup coverage and a hardware-qualified Mura write boundary do not exist."
+  ],
+  "unknowns": [
+    "Exact stock boot header, protected partitions, USB identities, and persistent open-state transcript.",
+    "Complete stock partition and AVB inventory."
+  ],
+  "sources": [
+    "https://portal.lynx-r.com/documentation/view/getting-started?version=30",
+    "https://portal.lynx-r.com/documentation/view/updating-your-device?version=15",
+    "https://portal.lynx-r.com/downloads/firmware/lynx-r-1/",
+    "https://raw.githubusercontent.com/ellyq/lynx-mainline/main/dumps/partitions.log"
+  ]
+}

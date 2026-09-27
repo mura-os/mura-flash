@@ -1,0 +1,48 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "pico-4-phoenix",
+  "displayName": "PICO 4",
+  "vendor": "PICO",
+  "models": ["PICO 4"],
+  "codenames": ["phoenix"],
+  "builds": [
+    {
+      "id": "5.13.8-and-below",
+      "status": "inspect-only",
+      "note": "Pinned tooling claims this ceiling, but no public per-device transcript independently proves every exact build."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.hardware-revision",
+    "fastboot.product",
+    "fastboot.secure",
+    "fastboot.unlocked",
+    "fastboot.variant"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "No Mura hardware qualification, authenticated engineering payload closure, or protected-state-safe recovery exists.",
+    "The public 5.13.8 boundary has not been independently reproduced per model and build."
+  ],
+  "unknowns": [
+    "Exact programmer acceptance, UFS geometry, GPT, AVB indexes, and protected calibration partitions.",
+    "Unlock persistence and stock ABL/devinfo restoration on a bound retail specimen."
+  ],
+  "sources": [
+    "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+    "https://pico4.wiki/guides/root/01-root/"
+  ]
+}

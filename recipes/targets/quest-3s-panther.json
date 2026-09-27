@@ -1,0 +1,50 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "quest-3s-panther",
+  "displayName": "Meta Quest 3S",
+  "vendor": "Meta",
+  "models": ["Quest 3S"],
+  "codenames": ["panther"],
+  "builds": [
+    {
+      "id": "52433670036000520",
+      "status": "unsupported",
+      "note": "Public source provides temporary post-boot root only; it does not change the persistent boot trust root."
+    },
+    {
+      "id": "52433670048800520",
+      "status": "unsupported",
+      "note": "Pinned source identifies this as the first build patched against the temporary-root exploit."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unsupported",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.security-patch",
+    "adb.verified-boot-state"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "No public persistent retail bootloader unlock exists.",
+    "No matching public Firehose recovery or accepted alternate trust root is known."
+  ],
+  "unknowns": [
+    "Persistent owner-controlled unlock mechanism and independently recoverable write boundary.",
+    "Exact retail partition, rollback, and protected-state maps."
+  ],
+  "sources": [
+    "https://github.com/Henry1887/fuguquest/tree/53cbd602d7a3978e4a5eac089096015ae756c24c",
+    "https://github.com/FreeXR/FreeXR/tree/1046c159c726bb2d0f8e5a3205ae82efa96c46df"
+  ]
+}

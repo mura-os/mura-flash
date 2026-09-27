@@ -1,0 +1,20 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "not-a-contract-target",
+  "displayName": "Unknown target fixture",
+  "vendor": "Fixture",
+  "models": [],
+  "codenames": [],
+  "builds": [],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python"],
+  "transports": ["manual"],
+  "probes": [],
+  "redactFacts": [],
+  "blockers": [],
+  "unknowns": [],
+  "sources": ["https://example.invalid/bad-target"]
+}

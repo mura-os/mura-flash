@@ -1,0 +1,44 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "play-for-dream-mr-mrd3a0",
+  "displayName": "Play For Dream MR",
+  "vendor": "Play For Dream",
+  "models": ["MRD3A0"],
+  "codenames": ["anorak"],
+  "builds": [],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.bootloader-version",
+    "fastboot.current-slot",
+    "fastboot.product",
+    "fastboot.secure",
+    "fastboot.unlocked",
+    "fastboot.variant"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "Only one apparently unfused unit is publicly shown unlocked; no retail eligibility matrix exists.",
+    "There is no complete stock firmware, protected-state map, or safe recovery path."
+  ],
+  "unknowns": [
+    "Retail fuse and authorization state, mode-specific USB identities, and OEM unlock method.",
+    "Complete GPT, AVB, rollback, protected calibration, stock recovery, and regional differences."
+  ],
+  "sources": [
+    "https://github.com/FreeXR/FreeXR/tree/1046c159c726bb2d0f8e5a3205ae82efa96c46df/targets/anorak",
+    "https://developer.yvrdream.com/yvrdoc/unity/UserManual/GetStartedXR/BuildXRScene.html",
+    "https://mastodon.social/api/v1/statuses/114027425822225840"
+  ]
+}

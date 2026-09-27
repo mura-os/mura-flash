@@ -1,0 +1,53 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "quest-1-monterey",
+  "displayName": "Meta Quest 1",
+  "vendor": "Meta",
+  "models": ["Quest 1"],
+  "codenames": ["monterey"],
+  "builds": [
+    {
+      "id": "49845030443200410",
+      "status": "inspect-only",
+      "note": "The current community flow starts from this final Quest 1 build, but Mura has no hardware qualification or authenticated stock acquisition."
+    },
+    {
+      "id": "16476800119700000",
+      "status": "inspect-only",
+      "note": "The source uses this v29 boot-chain build only on the inactive slot; this recipe authorizes no transition or write."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.bootloader-version",
+    "fastboot.current-slot",
+    "fastboot.product",
+    "fastboot.slot-count",
+    "fastboot.unlocked"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "Final-stock packages are community mirrored rather than authenticated by Meta.",
+    "No Mura hardware record proves both-slot recovery, protected-state backup, or persistent unlock."
+  ],
+  "unknowns": [
+    "Complete LUN/GPT map, protected state, USB Update Mode descriptors, and fuse rollback floors.",
+    "Official final-stock acquisition and recovery after loss of both bootable slots."
+  ],
+  "sources": [
+    "https://github.com/darknight1050/quest1-bootloader-unlocker-web/tree/7f34276ecef9021771e7bf4a2d53f10b26243334",
+    "https://www.meta.com/help/quest/software_update/"
+  ]
+}

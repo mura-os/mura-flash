@@ -1,0 +1,40 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "oculus-go-pacific",
+  "displayName": "Oculus Go",
+  "vendor": "Meta",
+  "models": ["Oculus Go"],
+  "codenames": ["pacific"],
+  "builds": [],
+  "evidenceLevel": "vendor-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.device",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.verified-boot-state",
+    "fastboot.bootloader-version",
+    "fastboot.product",
+    "fastboot.secure",
+    "fastboot.unlocked"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "The official unlock package lacks a reproduced durable URL and digest in a Mura artifact manifest.",
+    "No complete partition, protected-state, or tested stock-restoration record exists."
+  ],
+  "unknowns": [
+    "Exact retail revision behavior, USB descriptors, partition map, and protected state.",
+    "Stock restoration behavior after the permanent software unlock."
+  ],
+  "sources": [
+    "https://developers.meta.com/horizon/downloads/package/oculus-go-sw-unlock/",
+    "https://developers.meta.com/horizon/blog/unlocking-oculus-go/"
+  ]
+}

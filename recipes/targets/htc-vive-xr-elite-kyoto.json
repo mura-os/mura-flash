@@ -1,0 +1,52 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "htc-vive-xr-elite-kyoto",
+  "displayName": "HTC VIVE XR Elite",
+  "vendor": "HTC",
+  "models": ["VIVE XR Elite"],
+  "codenames": ["kyoto"],
+  "builds": [
+    {
+      "id": "1.0.999.738",
+      "status": "inspect-only",
+      "note": "Unlock is a single-author community report tied only to this displayed software release; the full fingerprint and hardware identity were not captured."
+    },
+    {
+      "id": "2.0.999.960",
+      "status": "unsupported",
+      "note": "The vendor documents this release, but relock and downgrade-corruption behavior remain single-author reports and no safe write path exists."
+    }
+  ],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "fastboot.bootloader-version",
+    "fastboot.hardware-revision",
+    "fastboot.product",
+    "fastboot.unlocked"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "No vendor unlock procedure or exact factory package has been found.",
+    "No complete partition, AVB, rollback, calibration, or stock-restore evidence exists."
+  ],
+  "unknowns": [
+    "Exact fingerprint, SKU, bootloader revision, USB identities, and persistent unlock behavior.",
+    "Whether any build beyond the one reported is unlock-eligible."
+  ],
+  "sources": [
+    "https://xdaforums.com/t/htc-vive-xr-elite-bootloader-unlock-guide.4777618/",
+    "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-10999738/",
+    "https://www.vive.com/release-notes/vive-xr-elite/vive-xr-elite-software-20999960/"
+  ]
+}

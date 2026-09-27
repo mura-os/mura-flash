@@ -1,0 +1,53 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "quest-2-hollywood",
+  "displayName": "Meta Quest 2",
+  "vendor": "Meta",
+  "models": ["Quest 2"],
+  "codenames": ["hollywood"],
+  "builds": [
+    {
+      "id": "16476800118700000",
+      "status": "inspect-only",
+      "note": "This exact v29 build has a source-documented direct exploit path, but this recipe authorizes inspection only."
+    },
+    {
+      "id": "50670960048600150",
+      "status": "inspect-only",
+      "note": "The inactive-slot flow is source-bounded and deployed with pinned assets, but remains community deployment evidence rather than Mura hardware qualification."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-id",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.bootloader-version",
+    "fastboot.current-slot",
+    "fastboot.product",
+    "fastboot.slot-count",
+    "fastboot.unlocked"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "Ordinary current retail firmware has no matching public entry path.",
+    "Quest 1 partition, payload, and rollback assumptions do not transfer to Quest 2."
+  ],
+  "unknowns": [
+    "Storage/revision variants, exact Quest 2 partition set, root ceiling, protected state, and stock recovery.",
+    "Independent reproduction of the newer-build inactive-slot path."
+  ],
+  "sources": [
+    "https://github.com/darknight1050/quest-bootloader-unlocker/tree/e171bbee61e754863fd3a82fe9dc35cd18adf3ac",
+    "https://github.com/darknight1050/quest1-bootloader-unlocker-web/tree/7f34276ecef9021771e7bf4a2d53f10b26243334"
+  ]
+}

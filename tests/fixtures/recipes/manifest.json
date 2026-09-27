@@ -1,0 +1,14 @@
+{
+  "schema": "org.mura.flash.recipe-fixtures/v1",
+  "fixtures": {
+    "valid/minimal.json": null,
+    "invalid/arbitrary-argv-shell.json": "recipe-invalid",
+    "invalid/bad-target-id.json": "recipe-invalid",
+    "invalid/duplicate-key.json": "recipe-invalid",
+    "invalid/malformed.json": "recipe-invalid",
+    "invalid/transition-write-fields.json": "recipe-invalid",
+    "invalid/unknown-field.json": "recipe-invalid",
+    "invalid/unknown-probe.json": "recipe-invalid",
+    "invalid/writes-true.json": "recipe-invalid"
+  }
+}

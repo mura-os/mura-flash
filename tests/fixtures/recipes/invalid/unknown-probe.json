@@ -1,0 +1,20 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "lynx-r1",
+  "displayName": "Unknown probe fixture",
+  "vendor": "Fixture",
+  "models": [],
+  "codenames": [],
+  "builds": [],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python"],
+  "transports": ["adb"],
+  "probes": ["adb.run-anything"],
+  "redactFacts": [],
+  "blockers": [],
+  "unknowns": [],
+  "sources": ["https://example.invalid/unknown-probe"]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "pico-4-pro-phoenix",
+  "displayName": "PICO 4 Pro",
+  "vendor": "PICO",
+  "models": ["PICO 4 Pro"],
+  "codenames": ["phoenix"],
+  "builds": [
+    {
+      "id": "5.13.8-and-below",
+      "status": "inspect-only",
+      "note": "Pinned tooling claims this ceiling and maps Pro to its Lite programmer, but no complete public per-build transcript exists."
+    }
+  ],
+  "evidenceLevel": "source-documented",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.hardware-revision",
+    "fastboot.product",
+    "fastboot.secure",
+    "fastboot.unlocked",
+    "fastboot.variant"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "The source proves a model-to-loader mapping, not independent physical-memory or loader-interchangeability evidence.",
+    "No Mura hardware qualification, payload provenance closure, or protected-state-safe recovery exists."
+  ],
+  "unknowns": [
+    "Exact programmer acceptance, UFS geometry, GPT, AVB indexes, and protected calibration partitions.",
+    "Unlock persistence and stock ABL/devinfo restoration on a bound retail specimen."
+  ],
+  "sources": [
+    "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968",
+    "https://pico4.wiki/guides/root/01-root/"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "org.mura.flash.inspection-recipe/v1",
+  "id": "pico-neo-3",
+  "displayName": "PICO Neo 3",
+  "vendor": "PICO",
+  "models": ["PICO Neo 3"],
+  "codenames": [],
+  "builds": [
+    {
+      "id": "5.11.2-and-below",
+      "status": "inspect-only",
+      "note": "This ceiling is maintainer-reported; the original discoverer tested only PICO 4 and did not reproduce Neo 3."
+    }
+  ],
+  "evidenceLevel": "community-reported",
+  "hardwareStatus": "unqualified",
+  "authenticationStatus": "test-only",
+  "writesEnabled": false,
+  "frontends": ["python", "webusb"],
+  "transports": ["adb", "fastboot", "manual"],
+  "probes": [
+    "adb.build-fingerprint",
+    "adb.build-incremental",
+    "adb.device",
+    "adb.hardware-sku",
+    "adb.manufacturer",
+    "adb.model",
+    "adb.slot-suffix",
+    "fastboot.hardware-revision",
+    "fastboot.product",
+    "fastboot.unlocked",
+    "fastboot.variant"
+  ],
+  "redactFacts": [],
+  "blockers": [
+    "Neo 3 has no independently reproduced target/build/programmer and partition closure.",
+    "PICO 4 partition and recovery assumptions cannot be transferred to Neo 3."
+  ],
+  "unknowns": [
+    "Exact supported SKUs, regional builds, programmer, descriptors, and storage geometry.",
+    "Partition map, protected calibration, A/B behavior, unlock persistence, and stock restore."
+  ],
+  "sources": [
+    "https://github.com/chaixshot/more-picohaxx-tool/tree/29591aec1b2babab3c3c26239e85576da556e968"
+  ]
+}

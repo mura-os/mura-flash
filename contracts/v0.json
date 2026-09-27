@@ -1,0 +1,190 @@
+{
+  "schema": "org.mura.flash.contract/v0",
+  "targetIds": [
+    "htc-vive-xr-elite-kyoto",
+    "lynx-r1",
+    "oculus-go-pacific",
+    "pico-4-enterprise-phoenix",
+    "pico-4-phoenix",
+    "pico-4-pro-phoenix",
+    "pico-neo-3",
+    "play-for-dream-mr-mrd3a0",
+    "quest-1-monterey",
+    "quest-2-hollywood",
+    "quest-3-eureka",
+    "quest-3s-panther",
+    "quest-pro-cambria",
+    "samsung-galaxy-xr-sm-i610",
+    "valve-steam-frame-deckard"
+  ],
+  "probeIds": [
+    {
+      "id": "adb.boot-devices",
+      "transport": "adb",
+      "fact": "boot-devices"
+    },
+    {
+      "id": "adb.build-fingerprint",
+      "transport": "adb",
+      "fact": "build-fingerprint"
+    },
+    {
+      "id": "adb.build-id",
+      "transport": "adb",
+      "fact": "build-id"
+    },
+    {
+      "id": "adb.build-incremental",
+      "transport": "adb",
+      "fact": "build-incremental"
+    },
+    {
+      "id": "adb.device",
+      "transport": "adb",
+      "fact": "device"
+    },
+    {
+      "id": "adb.flash-locked",
+      "transport": "adb",
+      "fact": "flash-locked"
+    },
+    {
+      "id": "adb.hardware-sku",
+      "transport": "adb",
+      "fact": "hardware-sku"
+    },
+    {
+      "id": "adb.manufacturer",
+      "transport": "adb",
+      "fact": "manufacturer"
+    },
+    {
+      "id": "adb.model",
+      "transport": "adb",
+      "fact": "model"
+    },
+    {
+      "id": "adb.security-patch",
+      "transport": "adb",
+      "fact": "security-patch"
+    },
+    {
+      "id": "adb.slot-suffix",
+      "transport": "adb",
+      "fact": "slot-suffix"
+    },
+    {
+      "id": "adb.vbmeta-device-state",
+      "transport": "adb",
+      "fact": "vbmeta-device-state"
+    },
+    {
+      "id": "adb.vbmeta-digest",
+      "transport": "adb",
+      "fact": "vbmeta-digest",
+      "sensitive": true
+    },
+    {
+      "id": "adb.verified-boot-state",
+      "transport": "adb",
+      "fact": "verified-boot-state"
+    },
+    {
+      "id": "fastboot.battery-soc-ok",
+      "transport": "fastboot",
+      "fact": "battery-soc-ok"
+    },
+    {
+      "id": "fastboot.bootloader-version",
+      "transport": "fastboot",
+      "fact": "bootloader-version"
+    },
+    {
+      "id": "fastboot.current-slot",
+      "transport": "fastboot",
+      "fact": "current-slot"
+    },
+    {
+      "id": "fastboot.hardware-revision",
+      "transport": "fastboot",
+      "fact": "hardware-revision"
+    },
+    {
+      "id": "fastboot.is-userspace",
+      "transport": "fastboot",
+      "fact": "is-userspace"
+    },
+    {
+      "id": "fastboot.max-download-size",
+      "transport": "fastboot",
+      "fact": "max-download-size"
+    },
+    {
+      "id": "fastboot.product",
+      "transport": "fastboot",
+      "fact": "product"
+    },
+    {
+      "id": "fastboot.secure",
+      "transport": "fastboot",
+      "fact": "secure"
+    },
+    {
+      "id": "fastboot.slot-count",
+      "transport": "fastboot",
+      "fact": "slot-count"
+    },
+    {
+      "id": "fastboot.snapshot-status",
+      "transport": "fastboot",
+      "fact": "snapshot-status"
+    },
+    {
+      "id": "fastboot.super-partition-name",
+      "transport": "fastboot",
+      "fact": "super-partition-name"
+    },
+    {
+      "id": "fastboot.unlocked",
+      "transport": "fastboot",
+      "fact": "unlocked"
+    },
+    {
+      "id": "fastboot.variant",
+      "transport": "fastboot",
+      "fact": "variant"
+    }
+  ],
+  "deniedOperationClasses": [
+    "arbitrary-command",
+    "device-code-execution",
+    "device-transition",
+    "device-write"
+  ],
+  "limits": {
+    "probeTimeoutSeconds": 10,
+    "reconnectTimeoutSeconds": 10,
+    "maxOutputBytes": 1048576,
+    "maxDevices": 1
+  },
+  "errorCodes": {
+    "usage": 2,
+    "recipe-invalid": 2,
+    "device-missing": 3,
+    "device-ambiguous": 3,
+    "probe-failed": 4,
+    "probe-timeout": 4,
+    "safety-refusal": 5
+  },
+  "cli": {
+    "commands": ["targets", "show", "validate", "inspect"],
+    "jsonFlag": "--json"
+  },
+  "esmExports": [
+    "loadCatalog",
+    "getTarget",
+    "validateRecipe",
+    "createBrowserSession",
+    "redactTranscript"
+  ]
+}
