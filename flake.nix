@@ -190,10 +190,13 @@
         formatter = pkgs.nixfmt;
 
         devShells.default = pkgs.mkShell {
+          inherit npmDeps;
+          npmRoot = ".";
           packages = [
             devPython
             pkgs.uv
             nodejs
+            pkgs.importNpmLock.hooks.linkNodeModulesHook
             pkgs.android-tools
           ];
           env = {
@@ -203,6 +206,7 @@
           };
           shellHook = ''
             unset PYTHONPATH
+            linkNodeModulesHook
           '';
         };
       }
