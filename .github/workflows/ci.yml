@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: DeterminateSystems/nix-installer-action@v19
+      - uses: DeterminateSystems/magic-nix-cache-action@v13
+      - name: Verify submodules
+        run: |
+          test -z "$(git submodule status --recursive | grep '^[-+U]')"
+          test "$(git -C vendor/fastboot.js rev-parse HEAD)" = \
+            ffe7e270061b95fe0f0f3abd1aa7d3c28999d1d9
+      - name: Check
+        run: nix flake check -L
+      - name: Build CLI and web library
+        run: nix build -L .#default .#web
+      - name: Smoke test CLI
+        run: nix run .# -- --help
+      - name: Verify committed web build
+        run: |
+          cp -a dist "$RUNNER_TEMP/dist.before"
+          nix develop -c npm run build
+          diff -ru "$RUNNER_TEMP/dist.before" dist
